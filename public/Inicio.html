@@ -8,30 +8,20 @@
     rel="stylesheet" 
     integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" 
     crossorigin="anonymous">
-    <style>
-        .bg-maron {
-            background-color: #800000; /* Marrón rojizo */
-        }
-        .bg-pastel {
-            background-color: #f8f9fa; 
-        }
-        .text-pastel {
-            color: #f8f9fa; /* Blanco pastel */
-        }
-    </style>
-    <title>Document</title>
+    <link rel="stylesheet" href="common.css">
+    <title>Inicio de sesión</title>
 </head>
-
-<body class="bg-pastel">
-    <header class="py-4 bg-maron">
+<body>
+    <header class="py-4 bg-maron d-none d-sm-block">
         <h1 class="display-5 text-center text-pastel font-weight-bold">Portal de Gestión de Eventos Universitarios</h1>
     </header>
-    
-        <h2 class="text-center font-weight-bold mt-4">Bienvenido</h2>
-        <div class="container mt-4">
+        <div class="container mt-3">
+            
             <div class="row justify-content-center">
-                <div class="col-12 col-md-8 col-lg-6">
+                <div class="col col-md-8 col-gl-7 col-xg-6 bg-white p-5 rounded shadow">
+                    <h2 class="text-center font-weight-bold">Bienvenido</h2>
                     <form>
+                        <!-- Estructura de nuestro LOGIN -->
                         <div class="mb-4">
                             <label for="usuario" class="form-label">Usuario</label>
                             <input type="email" class="form-control" name="usuario" required>
@@ -49,12 +39,13 @@
                             <span>No tienes cuenta? <a href="/registro">Regístrate</a></span><br>
                             <span>Has olvidado tu contrasena? <a href="/recuperarcontraseña"> Recuperar contraseña</a></span>
                         </div>
+
                     </form>
                 </div>
             </div>
         </div>
                 
     
-    <footer class="py-5 bg-maron mt-auto" style="position: fixed; bottom: 0; width: 100%;"></footer>
+    <div class="py-4 bg-maron mt-2 w-100 fixed-bottom d-none d-sm-block"></div>
 </body>
 </html>
