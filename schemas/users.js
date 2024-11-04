@@ -9,12 +9,12 @@ const userSchema = z.object({
     facultad: z.string({ required_error: 'Facultad es requerida' }),
     password: z.string().min(8, 'Contraseña debe tener al menos 8 caracteres')
 }).superRefine((data, ctx) => {
-    const emailRegex = new RegExp(`.*@${data.facultad}\.com$`);
-    if (!emailRegex.test(data.email)) {
+    const emailRegex = new RegExp(`.*@${data.facultad.toLowerCase()}\.com$`);
+    if (!emailRegex.test(data.email.toLowerCase())) {
         ctx.addIssue({
             path: ['email'],
-            message: 'Email no tiene el formato correcto para la facultad',
-            code: 'custom'
+            message: 'email no tiene el formato correcto para la facultad',
+            id: data
         });
     }
 });

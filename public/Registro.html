@@ -19,18 +19,18 @@
         <div class="row justify-content-center">
             <div class="col col-md-8 col-gl-7 col-xg-6 bg-white p-4 rounded shadow">
                 <h2 class="text-center font-weight-bold">Registrarse</h2>
-                <form>
+                <form  method="POST" action="/usuario">
                     <!-- Estructura de nuestro REGISTRO -->
                      <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre Completo</label>
                         <input type="text" class="form-control" name="nombre" required>
                      </div>
                      <div class="mb-3">
-                        <label for="correo" class="form-label">Correo Electrónico Universitario</label>
-                        <input type="email" class="form-control" name="correo" required>
+                        <label for="email" class="form-label">Correo Electrónico Universitario</label>
+                        <input type="email" class="form-control" name="email" required>
                      </div>
                      <div class="mb-3">
-                        <label for="telefono" class="form-label">Telédono de contacto</label>
+                        <label for="telefono" class="form-label">Teléfono de contacto</label>
                         <input type="text" class="form-control" name="telefono" required>
                      </div>
                      <div class="mb-3"> 
@@ -44,7 +44,13 @@
                      <div class="mb-3"> 
                     <!--Por ahora es así pero hay que cambiarlo a un get que te saque un desplegable con las facus posibles-->
                         <label for="facultad" class="form-label">Facultad</label>
-                        <input type="text" class="form-control" name="facultad" required>
+                        <select id="facultad" name="facultad" class="form-select" required>
+                            <option value="">Seleccione una facultad</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" name="password" minlength="8" required>
                     </div>
              
                     <div class="d-grid">
@@ -60,5 +66,24 @@
     </div>
 
     <div class="py-4 bg-maron mt-2 w-100  d-none d-sm-block"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded',  async function(params) {
+          try{ 
+            const respuesta= await fetch('/facultades')
+            const data = await respuesta.json();
+            const facultadSelect = document.getElementById('facultad');
+            data.forEach(facultad => {
+                const option = document.createElement('option');
+                option.value = facultad.nombre;
+                option.textContent = facultad.nombre;
+                facultadSelect.appendChild(option);    
+            });
+
+        }catch(error){
+          console.log(error);
+        }
+    });
+
+    </script>
 </body>
 </html>

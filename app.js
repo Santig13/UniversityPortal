@@ -62,8 +62,23 @@ app.get('/usuario',validateLogIn,(req,res,next)=>{
         });
     });
     
-});
-//Registro de usuario
+}); 
+//Obtener todas las facultades
+app.get('/facultades',(req,res,next)=>{
+    const sql='SELECT * FROM facultades';
+
+    pool.getConnection((err,connection)=>{
+        if(err) 
+            next(err);
+        connection.query(sql,(err,rows)=>{
+            connection.release();
+            if(err)  
+                next(err);
+            res.status(200).send(rows);
+        });
+    });
+}); 
+//Registro de usuario 
 app.post('/usuario', validateUser,(req,res,next)=>{
     const {nombre, email, telefono,facultad,rol, password}=req.body;
 

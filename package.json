@@ -4,7 +4,7 @@
   "description": "",
   "main": "Inicio.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
@@ -14,5 +14,8 @@
     "express": "^4.21.1",
     "mysql": "^2.18.1",
     "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
   }
 }
