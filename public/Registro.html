@@ -34,6 +34,14 @@
                         <input type="text" class="form-control" name="telefono" required>
                      </div>
                      <div class="mb-3"> 
+                            <label for="rol" class="form-label">Rol </label>
+                        <select class="form-select" name="rol" required>
+                            <option value="">Seleccione su rol</option>
+                            <option value="participante">Participante</option>
+                            <option value="organizador">Organizador</option>
+                        </select>
+                        </div>
+                     <div class="mb-3"> 
                     <!--Por ahora es así pero hay que cambiarlo a un get que te saque un desplegable con las facus posibles-->
                         <label for="facultad" class="form-label">Facultad</label>
                         <input type="text" class="form-control" name="facultad" required>

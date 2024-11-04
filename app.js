@@ -1,12 +1,12 @@
 const mysql=require('mysql');
 const express=require('express');
 const path=require('path');
-const { z } = require('zod');
+const {validateLogIn, validateUser}= require('./schemas/users.js');
 
 
 //Configuración del servidor
 const app= express();
-const port=3000;
+const PORT=3000;
 
 //Configuración de la base de datos
 const pool=mysql.createPool({
@@ -29,31 +29,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Esquema de validación
-const userSchema = z.object({
-    nombre: z.string({ required_error: 'Nombre es requerido' }).nonempty('Contraseña es requerida'),
-    email: z.string({ required_error: 'Email es requerido' }).email('Email no tiene el formato correcto').refine((email, ctx) => {
-        const facultad = ctx.parent.facultad;//Uso el objeto ctx(contexto en zod) para acceder a la facultad
-        const emailRegex = new RegExp(`.*@${facultad}\.com$`);
-        return emailRegex.test(email);
-    }, {
-        message: 'Email no tiene el formato correcto para la facultad'
-    }),
-    telefono: z.string({ required_error: 'Teléfono es requerido' })
-        .min(10, 'Teléfono debe tener al menos 9 caracteres'),
-    facultad: z.string({ required_error: 'Facultad es requerido' }).nonempty('Contraseña es requerida'),
-    password: z.string()
-        .nonempty('Contraseña es requerida')
-        .min(8, 'Contraseña debe tener al menos 8 caracteres')
-});
-
-const validate = (schema) => (req, res, next) => {
-    const { error } = schema.validate(req.body);
-    if (error) {
-      return res.status(400).send(error.details[0].message);
-    }
-    next();
-  };
 
 //Middleware para  el manejo de errores
 app.use((err,req,res,next)=>{
@@ -69,11 +44,8 @@ app.get('/',(req,res)=>{
 app.get('/registro',(req,res)=>{
     res.sendFile(path.join(__dirname,'public','Registro.html'));
 });
-app.get('/login',(req,res)=>{
+app.get('/usuario',validateLogIn,(req,res,next)=>{
     const {email, password}=req.body;
-    
-    if(!email || !password)
-        res.status(400).send('Faltan datos');
 
     pool.getConnection((err,connection)=>{
         if(err) 
@@ -92,31 +64,50 @@ app.get('/login',(req,res)=>{
     
 });
 //Registro de usuario
-app.post('/registro', validate(userSchema),(req,res)=>{
-    /*Aqui se valida con el middleware
-    const {nombre, email, telefono,facultad, password}=req.body;
-    
-    if(!nombre || !email || !password || !telefono || !facultad)
-        res.status(400).send('Faltan datos');
+app.post('/usuario', validateUser,(req,res,next)=>{
+    const {nombre, email, telefono,facultad,rol, password}=req.body;
 
-    const emailRegex = new RegExp(`.*@${facultad}\.com$`);
-    if (!emailRegex.test(email)) {
-        return res.status(400).send('Email no tiene el formato correcto');
-    }*/
+    const consultaINSERTuser = 'INSERT INTO usuarios(nombre,email,telefono,facultad_id,rol,accesibilidad_id,password) VALUES(?,?,?,?,?,?,?)';
+    const consultaSELECTfacultad = 'SELECT id FROM facultades WHERE nombre=?';
+    const consultaINSERTfacultad = 'INSERT INTO facultades(nombre) VALUES(?)';
 
-    pool.getConnection((err,connection)=>{
-        if(err) 
-            next(err);
-        connection.query('INSERT INTO usuarios(nombre,email,password) VALUES(?,?,?)',[nombre,email,password],(err,rows)=>{
+    function insertarUsuario(connection, facultad_id) {
+        connection.query(consultaINSERTuser, [nombre, email, telefono, facultad_id,rol,1, password], (err, rows) => {
             connection.release();
-            if(err)  
-                next(err);
-            res.render('Inicio',{data:req.body});
+            if (err) return next(err);
+            res.status(200).send({ rows: rows });
         });
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) return next(err);
+
+        connection.query(consultaSELECTfacultad, [facultad], (err, rows) => {
+            if (err) {
+                connection.release();
+                return next(err);
+            }
+
+            let facultad_id;
+            if (rows.length > 0) {
+                facultad_id = rows[0].id;
+                insertarUsuario(connection, facultad_id);
+            } else {
+                connection.query(consultaINSERTfacultad, [facultad], (err, result) => {
+                    if (err) {
+                        connection.release();
+                        return next(err);
+                    }
+                    facultad_id = result.insertId;
+                    insertarUsuario(connection, facultad_id);
+                });
+            }
+        });
+
+        
     });
-    
 });
 
-app.listen(port,()=>{
-    console.log('Servidor escuchando en http://localhost:${port}');
+app.listen(PORT,()=>{
+    console.log(`server listening on port http://localhost:${PORT}`);
 });
