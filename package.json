@@ -1,5 +1,5 @@
 {
-  "name": "ProyectoAW",
+  "name": "proyectoaw",
   "version": "1.0.0",
   "description": "",
   "main": "Inicio.js",
@@ -16,6 +16,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "bcrypt": "^5.1.1",
     "nodemon": "^3.1.7"
   }
 }

@@ -1,6 +1,7 @@
 const mysql=require('mysql');
 const express=require('express');
 const path=require('path');
+const bcrypt = require('bcrypt');
 const {validateLogIn, validateUser}= require('./schemas/users.js');
 
 
@@ -44,13 +45,13 @@ app.get('/',(req,res)=>{
 app.get('/registro',(req,res)=>{
     res.sendFile(path.join(__dirname,'public','Registro.html'));
 });
-app.get('/usuario',validateLogIn,(req,res,next)=>{
+app.get('/usuario',validateLogIn, async (req,res,next)=>{
     const {email, password}=req.body;
-
+    const hashedPassword = await bcrypt.hash(password, 10); // hash password 10 salt rounds
     pool.getConnection((err,connection)=>{
         if(err) 
             next(err);
-        connection.query('SELECT * FROM usuarios WHERE email=? AND password=?',[email,password],(err,rows)=>{
+        connection.query('SELECT * FROM usuarios WHERE email=? AND password=?',[email,hashedPassword],(err,rows)=>{
             connection.release();
             if(err)  
                 next(err);
@@ -77,17 +78,18 @@ app.get('/facultades',(req,res,next)=>{
             res.status(200).send(rows);
         });
     });
-}); 
+});  
 //Registro de usuario 
-app.post('/usuario', validateUser,(req,res,next)=>{
-    const {nombre, email, telefono,facultad,rol, password}=req.body;
+app.post('/usuario', validateUser, async (req,res,next)=>{
+    const {nombre, email, telefonoCompleto,facultad,rol, password}=req.body;
+    const hashedPassword = await bcrypt.hash(password, 10); // hash password 10 salt rounds
 
     const consultaINSERTuser = 'INSERT INTO usuarios(nombre,email,telefono,facultad_id,rol,accesibilidad_id,password) VALUES(?,?,?,?,?,?,?)';
     const consultaSELECTfacultad = 'SELECT id FROM facultades WHERE nombre=?';
     const consultaINSERTfacultad = 'INSERT INTO facultades(nombre) VALUES(?)';
 
     function insertarUsuario(connection, facultad_id) {
-        connection.query(consultaINSERTuser, [nombre, email, telefono, facultad_id,rol,1, password], (err, rows) => {
+        connection.query(consultaINSERTuser, [nombre, email, telefonoCompleto, facultad_id,rol,1, hashedPassword], (err, rows) => {
             connection.release();
             if (err) return next(err);
             res.status(200).send({ rows: rows });

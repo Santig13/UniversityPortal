@@ -3,7 +3,7 @@ const z = require('zod');
 const userSchema = z.object({
     nombre: z.string({ required_error: 'Nombre es requerido' }),
     email: z.string({ required_error: 'Email es requerido' }).email('Email no tiene el formato correcto'),
-    telefono: z.string({ required_error: 'Teléfono es requerido' })
+    telefonoCompleto: z.string({ required_error: 'Teléfono es requerido' })
         .min(10, 'Teléfono debe tener al menos 10 caracteres'),
     rol: z.enum(['participante', 'organizador'], { required_error: 'Rol es requerido' }),
     facultad: z.string({ required_error: 'Facultad es requerida' }),
