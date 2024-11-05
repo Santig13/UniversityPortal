@@ -45,25 +45,37 @@ app.get('/',(req,res)=>{
 app.get('/registro',(req,res)=>{
     res.sendFile(path.join(__dirname,'public','Registro.html'));
 });
-app.get('/usuario',validateLogIn, async (req,res,next)=>{
-    const {email, password}=req.body;
-    const hashedPassword = await bcrypt.hash(password, 10); // hash password 10 salt rounds
-    pool.getConnection((err,connection)=>{
-        if(err) 
-            next(err);
-        connection.query('SELECT * FROM usuarios WHERE email=? AND password=?',[email,hashedPassword],(err,rows)=>{
+
+app.post('/login', validateLogIn, async (req, res, next) => {
+    const { email, password } = req.body;
+    
+    pool.getConnection((err, connection) => {
+        if (err) return next(err);
+        
+        connection.query('SELECT * FROM usuarios WHERE email = ?', [email], async (err, rows) => {
             connection.release();
-            if(err)  
-                next(err);
-            if(rows.length>0){
-                res.render('Inicio',{data:rows[0]});
-            }else{
+            if (err) return next(err);
+
+            if (rows.length > 0) {
+                const user = rows[0];
+                
+                const isMatch = await bcrypt.compare(password, user.password);
+                const { password: _, ...userWithoutPassword } = user;
+
+                if (isMatch) {
+                    //res.render('Inicio', { data: userWithoutPassword });
+                    res.json(userWithoutPassword);
+                } else {
+                    res.status(400).send('Email o contraseña incorrectos');
+                }
+            } else {
                 res.status(400).send('Email o contraseña incorrectos');
             }
         });
     });
-    
-}); 
+});
+
+
 //Obtener todas las facultades
 app.get('/facultades',(req,res,next)=>{
     const sql='SELECT * FROM facultades';
