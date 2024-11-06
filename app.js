@@ -78,7 +78,7 @@ app.post('/login', validateLogIn, async (req, res, next) => {
                 if (isMatch) {
                    
                     req.session.user = userWithoutPassword;
-                    res.render('dashboard', { user: userWithoutPassword });
+                    res.redirect('/dashboard');
                 } else {
                     res.status(400).send('Email o contraseña incorrectos');
                 }
