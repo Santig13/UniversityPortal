@@ -3,7 +3,24 @@ const express=require('express');
 const path=require('path');
 const bcrypt = require('bcrypt');
 const {validateLogIn, validateUser}= require('./schemas/users.js');
+// const { url } = require('inspector');
+// const { error } = require('console');
+const session = require('express-session');
+const mysqlSession = require('express-mysql-session');
+const mysqlStore = mysqlSession(session);
+const sessionStore = new mysqlStore({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "AW_24"
+});
 
+const middlewareSession = session({ 
+    saveUninitialized: false,
+    resave: true,
+    secret: 'secret',
+    store: sessionStore
+});
 
 //Configuración del servidor
 const app= express();
@@ -26,16 +43,11 @@ app.use(express.urlencoded({ extended: true }));
 // Middleware para que cargue todos los archivos estáticos y poder usar js y css en el html
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(middlewareSession);
+
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
-
-//Middleware para  el manejo de errores
-app.use((err,req,res,next)=>{
-    console.error(err.stack);
-    res.status(500).send('Algo salió mal');//Temporal, hay que tratar los errores de forma adecuada
-});
 
 //Navegacion a la pagina de inicio
 app.get('/',(req,res)=>{
@@ -46,6 +58,7 @@ app.get('/registro',(req,res)=>{
     res.sendFile(path.join(__dirname,'public','Registro.html'));
 });
 
+//Navegacion a la pagina de login
 app.post('/login', validateLogIn, async (req, res, next) => {
     const { email, password } = req.body;
     
@@ -63,8 +76,9 @@ app.post('/login', validateLogIn, async (req, res, next) => {
                 const { password: _, ...userWithoutPassword } = user;
 
                 if (isMatch) {
-                    //res.render('Inicio', { data: userWithoutPassword });
-                    res.json(userWithoutPassword);
+                   
+                    req.session.user = userWithoutPassword;
+                    res.render('dashboard', { user: userWithoutPassword });
                 } else {
                     res.status(400).send('Email o contraseña incorrectos');
                 }
@@ -72,6 +86,14 @@ app.post('/login', validateLogIn, async (req, res, next) => {
                 res.status(400).send('Email o contraseña incorrectos');
             }
         });
+    });
+});
+
+// Cerrar sesión
+app.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) return res.status(500).send('Error al cerrar sesión');
+        res.redirect('/'); 
     });
 });
 
@@ -91,6 +113,8 @@ app.get('/facultades',(req,res,next)=>{
         });
     });
 });  
+
+
 //Registro de usuario 
 app.post('/usuario', validateUser, async (req,res,next)=>{
     const {nombre, email, telefonoCompleto,facultad,rol, password}=req.body;
@@ -137,6 +161,38 @@ app.post('/usuario', validateUser, async (req,res,next)=>{
     });
 });
 
-app.listen(PORT,()=>{
-    console.log(`server listening on port http://localhost:${PORT}`);
+// Middleware de autenticación
+function requireAuth(req, res, next) {
+    if (req.session.user) {
+        return next();
+    } else {
+        res.status(401).send('Debes iniciar sesión para acceder a esta página.');
+    }
+}
+
+// Navegación a la página de dashboard
+app.get('/dashboard', requireAuth, (req, res) => {
+    res.render('dashboard', { user: req.session.user });
+});
+
+//Middleware para  el manejo de errores
+app.use((err,req,res,next)=>{
+    res.status(500);
+    res.render('error500', {
+        mensaje: err.message,
+        pila: err.stack
+    });
+});
+
+//Navegacion a la pagina de error 404
+app.use((req,res)=>{
+    res.status(404);
+    res.render("error404", {url:req.url});
+})
+
+app.listen(PORT,(err)=>{
+    if(err)
+        console.error(`Error al iniciar el servidor: ${err}`);
+    else
+        console.log(`server listening on port http://localhost:${PORT}`);
 });
