@@ -166,6 +166,47 @@ a:hover {
 }
 
     
+.card {
+    background-color: #1A2226; /* Fondo oscuro */
+    border: 1px solid #0DB8DE; /* Borde azul */
+    border-radius: 15px; /* Más redondeado */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card-title {
+    color: #ECF0F5; /* Texto claro */
+}
+
+.card-text {
+    color: #B0B0B0; /* Texto gris claro */
+}
+
+.card-footer {
+    background-color: #1A2226; /* Fondo oscuro */
+    border-top: 1px solid #0DB8DE; /* Borde azul */
+    border-radius: 20px; /* Más redondeado */
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
 
 
-
+.modal-content {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+}
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+}
+.modal-body, .modal-header {
+    color: #212529;
+}
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+}

@@ -84,9 +84,32 @@ function requireAuth(req, res, next) {
     }
 }
 
-// Navegación a la página de dashboard
-app.get('/dashboard', requireAuth, (req, res) => {
-    res.render('dashboard', { user: req.session.user });
+
+// Middleware para obtener eventos
+function getEventos(req, res, next) {
+    const sql = 'SELECT * FROM eventos';
+
+    pool.getConnection((err, connection) => {
+        if (err) return next(err);
+
+        connection.query(sql, (err, rows) => {
+            connection.release();
+            if (err) return next(err);
+
+            req.eventos = rows;
+            next();
+        });
+    });
+}
+
+// Obtener eventos y enviarlos al dashboard
+app.post('/eventos', requireAuth, getEventos, (req, res) => {
+    res.status(200).json(req.eventos);
+});
+
+// Navegación a la página de dashboard con eventos
+app.get('/dashboard', requireAuth, getEventos, (req, res) => {
+    res.render('dashboard', { user: req.session.user, eventos: req.eventos });
 });
 
 //Middleware para  el manejo de errores
