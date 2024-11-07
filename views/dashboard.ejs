@@ -1,4 +1,4 @@
-<%- include("partials/header.ejs") %>
+<%- include("partials/header.ejs", { user: user }) %>
     
     <h1> Bienvenido <%= user.email %> !</h1>
     <p> Este es tu dashboard</p>

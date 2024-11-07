@@ -1,7 +1,6 @@
 const mysql=require('mysql');
 const express=require('express');
 const path=require('path');
-const {validateLogIn, validateUser}= require('./schemas/users.js');
 const session = require('express-session');
 const mysqlSession = require('express-mysql-session');
 const createAuthRouter = require('./routes/auth.js');
@@ -44,7 +43,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(middlewareSession);
 
 // Utiliza el router de autenticación
-app.use('/auth', createAuthRouter(pool, middlewareSession, validateLogIn, validateUser));
+app.use('/auth', createAuthRouter(pool, middlewareSession));
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');

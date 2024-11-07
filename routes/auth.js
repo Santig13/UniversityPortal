@@ -1,7 +1,8 @@
 const { Router } = require('express');
 const bcrypt = require('bcrypt');
+const { validateLogIn, validateUser } = require('../schemas/users');
 
-function createAuthRouter(pool, sessionMiddleware, validateLogIn, validateUser) {
+function createAuthRouter(pool, sessionMiddleware) {
     const router = Router();
 
     router.use(sessionMiddleware); // Usar el middleware de sesión
