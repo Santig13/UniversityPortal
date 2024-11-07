@@ -40,6 +40,7 @@ header, .footer-nuestro {
     padding-left: 0;
     color: #ECF0F5;
     margin-bottom: 20px;
+
 }
 
 .form-control:focus {
@@ -54,9 +55,25 @@ header, .footer-nuestro {
     letter-spacing: 1px;
 }
 
+/* Estilo para el <select> */
+.form-select {
+    background-color: #1A2226;
+    border: none;
+    border-bottom: 2px solid #0DB8DE;
+    color: #ECF0F5;
+    padding: 0.5em;
+}
+
+.form-select:focus {
+    box-shadow: none;
+    border-color: #0DB8DE;
+    background-color: #1A2226;
+    color: #ECF0F5;
+}
+
+
+
 .btn-outline-primary {
-    width: 200px;
-    height: 50px;
     border-radius: 15px;
     cursor: pointer;
     border-color: #0DB8DE !important;
@@ -80,5 +97,6 @@ a {
 a:hover {
     color: #2d77c2;
 }
+
 
 

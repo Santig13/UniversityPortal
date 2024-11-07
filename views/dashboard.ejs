@@ -1,11 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-</head>
-<body>
+<%- include("partials/header.ejs") %>
+    
     <h1> Bienvenido <%= user.email %> !</h1>
     <p> Este es tu dashboard</p>
     <form action="/logout" method="POST">
@@ -13,6 +7,6 @@
     </form>
     <p> Estos son tus datos</p>
     <pre><%= JSON.stringify(user, null, 2) %></pre>
-    
-</body>
-</html>
+
+
+<%- include("partials/footer.ejs") %>
