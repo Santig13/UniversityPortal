@@ -1,10 +1,10 @@
 const mysql=require('mysql');
 const express=require('express');
 const path=require('path');
-const bcrypt = require('bcrypt');
 const {validateLogIn, validateUser}= require('./schemas/users.js');
 const session = require('express-session');
 const mysqlSession = require('express-mysql-session');
+const createAuthRouter = require('./routes/auth.js');
 const mysqlStore = mysqlSession(session);
 const sessionStore = new mysqlStore({
     host: "localhost",
@@ -43,6 +43,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(middlewareSession);
 
+// Utiliza el router de autenticación
+app.use('/auth', createAuthRouter(pool, middlewareSession, validateLogIn, validateUser));
+
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -56,47 +59,7 @@ app.get('/registro',(req,res)=>{
     res.sendFile(path.join(__dirname,'public','Registro.html'));
 });
 
-//Navegacion a la pagina de login
-app.post('/login', validateLogIn, async (req, res, next) => {
-    const { email, password } = req.body;
-    
-    pool.getConnection((err, connection) => {
-        if (err) return next(err);
-        
-        connection.query('SELECT * FROM usuarios WHERE email = ?', [email], async (err, rows) => {
-            connection.release();
-            if (err) return next(err);
-
-            if (rows.length > 0) {
-                const user = rows[0];
-                
-                const isMatch = await bcrypt.compare(password, user.password);
-                const { password: _, ...userWithoutPassword } = user;
-
-                if (isMatch) {
-                   
-                    req.session.user = userWithoutPassword;
-                    res.redirect('/dashboard');
-                } else {
-                    res.status(400).send('Email o contraseña incorrectos');
-                }
-            } else {
-                res.status(400).send('Email o contraseña incorrectos');
-            }
-        });
-    });
-});
-
-// Cerrar sesión
-app.post('/logout', (req, res) => {
-    req.session.destroy(err => {
-        if (err) return res.status(500).send('Error al cerrar sesión');
-        res.redirect('/'); 
-    });
-});
-
-
-//Obtener todas las facultades
+//Obtener todas las facultades para la página de registro
 app.get('/facultades',(req,res,next)=>{
     const sql='SELECT * FROM facultades';
 
@@ -112,52 +75,6 @@ app.get('/facultades',(req,res,next)=>{
     });
 });  
 
-
-//Registro de usuario 
-app.post('/usuario', validateUser, async (req,res,next)=>{
-    const {nombre, email, telefonoCompleto,facultad,rol, password}=req.body;
-    const hashedPassword = await bcrypt.hash(password, 10); // hash password 10 salt rounds
-
-    const consultaINSERTuser = 'INSERT INTO usuarios(nombre,email,telefono,facultad_id,rol,accesibilidad_id,password) VALUES(?,?,?,?,?,?,?)';
-    const consultaSELECTfacultad = 'SELECT id FROM facultades WHERE nombre=?';
-    const consultaINSERTfacultad = 'INSERT INTO facultades(nombre) VALUES(?)';
-
-    function insertarUsuario(connection, facultad_id) {
-        connection.query(consultaINSERTuser, [nombre, email, telefonoCompleto, facultad_id,rol,1, hashedPassword], (err, rows) => {
-            connection.release();
-            if (err) return next(err);
-            res.status(200).send({ rows: rows });
-        });
-    }
-
-    pool.getConnection((err, connection) => {
-        if (err) return next(err);
-
-        connection.query(consultaSELECTfacultad, [facultad], (err, rows) => {
-            if (err) {
-                connection.release();
-                return next(err);
-            }
-
-            let facultad_id;
-            if (rows.length > 0) {
-                facultad_id = rows[0].id;
-                insertarUsuario(connection, facultad_id);
-            } else {
-                connection.query(consultaINSERTfacultad, [facultad], (err, result) => {
-                    if (err) {
-                        connection.release();
-                        return next(err);
-                    }
-                    facultad_id = result.insertId;
-                    insertarUsuario(connection, facultad_id);
-                });
-            }
-        });
-
-        
-    });
-});
 
 // Middleware de autenticación
 function requireAuth(req, res, next) {

@@ -98,5 +98,29 @@ a:hover {
     color: #2d77c2;
 }
 
+/* Estilos personalizados para el toast */
+.custom-toast {
+    background-color: #1A2226; /* Fondo oscuro como el de otros componentes */
+    color: #ECF0F5; /* Color del texto claro */
+    border-radius: 20px; /* Bordes completamente redondeados */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23); /* Sombra para dar profundidad */
+
+}
+
+.toast-header {
+    background-color: #0DB8DE; /* Encabezado con color azul */
+    color: #fff; /* Texto blanco en el encabezado */
+
+}
+
+.toast-body {
+    background-color: #1A2226; /* Fondo oscuro */
+    color: #ECF0F5; /* Texto claro */
+    font-size: 16px; /* Tamaño de fuente adecuado */
+    text-align: center; /* Texto centrado */
+    border-radius: 5px;
+}
+    
+
 
 
