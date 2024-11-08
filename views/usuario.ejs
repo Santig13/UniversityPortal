@@ -1,32 +1,29 @@
 <%- include("partials/header.ejs", { user: user }) %>
+
 <div class="container mt-2 mb-2">
     <div class="row">
         <!-- Columna de Filtros -->
         <div class="col-md-3">
-            <h2 class="mb-3">Filtrar Eventos</h2>
-            <form id="filterForm" class="p-4 rounded dark-box shadow-sm">
+            <h2 class="mb-3">Actualizar Perfil</h2>
+            <form id="updateProfileForm" class="p-4 rounded dark-box shadow-sm">
                 <div class="mb-3">
-                    <label for="fecha" class="form-label">Fecha</label>
-                    <input type="date" class="form-control" id="fecha" name="fecha">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese su nombre">
                 </div>
                 <div class="mb-3">
-                    <label for="tipo" class="form-label">Tipo de evento</label>
-                    <input type="text" class="form-control" id="tipo" name="tipo" placeholder="Ej: Conferencia, Taller">
+                    <label for="telefono" class="form-label">Teléfono</label>
+                    <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="Ingrese su nuevo teléfono">
                 </div>
                 <div class="mb-3">
-                    <label for="ubicacion" class="form-label">Ubicación</label>
-                    <input type="text" class="form-control" id="ubicacion" name="ubicacion" placeholder="Ej: Auditorio, Sala A">
-                </div>
-                <div class="mb-3">
-                    <label for="capacidad" class="form-label">Capacidad mínima</label>
-                    <input type="number" class="form-control" id="capacidad" name="capacidad" placeholder="Ej: 50">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Ingrese su nueva contraseña">
                 </div>
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-outline-primary">
-                        <i class="bi bi-search me-1"></i> Filtrar
+                        <i class="bi bi-save me-1">Guardar Cambios</i> 
                     </button>
                     <button type="reset" class="btn btn-outline-secondary">
-                        <i class="bi bi-x-circle me-1"></i> Limpiar
+                        <i class="bi bi-x-circle me-1">Cancelar</i> 
                     </button>
                 </div>
             </form>
@@ -35,7 +32,11 @@
         <!-- Columna de Lista de Eventos -->
         <div class="col-md-9">
             <div class="container mt-5" style="overflow-y: auto; max-height: 75vh;">
-            <h1 class="mb-4">Lista de Eventos</h1>
+            <% if (user.rol === 'organizador') { %>
+                <h1 class="mb-4">Lista de Eventos que has creado</h1>
+            <% } else if (user.rol === 'participante') { %>
+                <h1 class="mb-4">Eventos en los que estás inscrito </h1>
+            <% } %>
             <% eventos.forEach(evento => { %>
                 <div class="row mb-4">
                     <div class="col-12">
@@ -62,35 +63,5 @@
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const userRole = "<%= user.rol %>";
-        const buttons = document.querySelectorAll(".btn-event");
-
-        buttons.forEach(button => {
-            if (button.classList.contains(userRole)) {
-                button.style.display = "inline-block";
-            } else {
-                button.style.display = "none";
-            }
-        });
-    });
-
-    document.getElementById('filterForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const fecha = document.getElementById('fecha').value;
-        const tipo = document.getElementById('tipo').value;
-        const ubicacion = document.getElementById('ubicacion').value;
-        const capacidad = document.getElementById('capacidad').value;
-        const queryParams = new URLSearchParams({ fecha, tipo, ubicacion, capacidad }).toString();
-        window.location.href = `/dashboard?${queryParams}`;
-    });
-
-    document.getElementById('filterForm').addEventListener('reset', function(event) {
-        event.preventDefault();
-        window.location.href = `/dashboard`;
-    });
-</script>
 
 <%- include("partials/footer.ejs") %>
