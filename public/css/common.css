@@ -78,11 +78,17 @@ header, .footer-nuestro ,.navbar{
     cursor: pointer;
     border-color: #0DB8DE !important;
     color: #0DB8DE;
+    outline: none;
 }
 
 .btn-outline-primary:hover {
     background-image: linear-gradient(160deg, #071014 0%, #0db8de 100%) !important;
     color: #ffffff !important;
+}
+
+.btn-outline-primary:focus {
+    outline: none;
+    box-shadow: none; /* Esto también elimina cualquier sombra azul que pueda aparecer */
 }
 
 span {

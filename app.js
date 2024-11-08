@@ -5,8 +5,6 @@ const session = require('express-session');
 const mysqlSession = require('express-mysql-session');
 const createAuthRouter = require('./routes/auth.js');
 const mysqlStore = mysqlSession(session);
-const util = require('util');
-const { get } = require('http');
 
 const sessionStore = new mysqlStore({
     host: "localhost",
