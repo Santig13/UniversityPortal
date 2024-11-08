@@ -142,6 +142,9 @@ app.post('/eventos', requireAuth, getEventos, (req, res) => {
 app.get('/dashboard', requireAuth, getEventos, (req, res) => {
     res.render('dashboard', { user: req.session.user, eventos: req.eventos });
 });
+app.get('/dashboard/filter', requireAuth, getEventos, (req, res) => {
+    res.status(200).json(req.eventos);
+});
 function getEventosPersonales(req, res, next) {
     if (req.session.user.rol === 'participante') {
         getEventosParticipante(req, res, next);

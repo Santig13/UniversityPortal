@@ -34,38 +34,44 @@
 
         <!-- Columna de Lista de Eventos -->
         <div class="col-md-9">
-            <div class="container mt-5" style="overflow-y: auto; max-height: 75vh;">
+            <div class="container mt-5 " style="overflow-y: auto; max-height: 75vh;">
             <h1 class="mb-4">Lista de Eventos</h1>
-            <% eventos.forEach(evento => { %>
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title"><%= evento.titulo %></h5>
-                                <p class="card-text"><strong>Descripción:</strong> <%= evento.descripcion %></p>
-                                <p class="card-text"><strong>Fecha:</strong> <%= new Date(evento.fecha).toLocaleDateString() %></p>
-                                <p class="card-text"><strong>Hora:</strong> <%= evento.hora %></p>
-                                <p class="card-text"><strong>Ubicación:</strong> <%= evento.ubicacion %></p>
-                                <p class="card-text"><strong>Capacidad Máxima:</strong> <%= evento.capacidad_maxima %></p>
-                                <p class="card-text"><strong>Organizador ID:</strong> <%= evento.organizador_id %></p>
-                            </div>
-                            <div class="card-footer m-1">
-                                <small class="text-muted mx-2">ID del Evento: <%= evento.id %></small>
-                                <button class="btn btn-outline-primary btn-event participante">Apuntarse</button>
-                                <button class="btn btn-outline-primary btn-event organizador">Editar</button>
+            <div id="eventosContainer">
+                <% eventos.forEach(evento => { %>
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title"><%= evento.titulo %></h5>
+                                    <p class="card-text"><strong>Descripción:</strong> <%= evento.descripcion %></p>
+                                    <p class="card-text"><strong>Fecha:</strong> <%= new Date(evento.fecha).toLocaleDateString() %></p>
+                                    <p class="card-text"><strong>Hora:</strong> <%= evento.hora %></p>
+                                    <p class="card-text"><strong>Ubicación:</strong> <%= evento.ubicacion %></p>
+                                    <p class="card-text"><strong>Capacidad Máxima:</strong> <%= evento.capacidad_maxima %></p>
+                                    <p class="card-text"><strong>Organizador ID:</strong> <%= evento.organizador_id %></p>
+                                </div>
+                                <div class="card-footer m-1">
+                                        <small class="text-muted mx-2">ID del Evento: <%= evento.id %></small>
+                                    <% if (user.rol === 'organizador') { %>
+                                        <button class="btn btn-outline-primary btn-event organizador">Editar</button>
+                                    <% } else if (user.rol === 'participante') { %>
+                                        <button class="btn btn-outline-primary btn-event participante">Apuntarse</button>
+                                    <% } %>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            <% }) %>
+                <% }) %>
+            </div>
         </div>
         </div>
     </div>
 </div>
 
 <script>
+    const userRole = "<%= user.rol %>";  // Pasa el rol al cliente
+
     document.addEventListener("DOMContentLoaded", function() {
-        const userRole = "<%= user.rol %>";
         const buttons = document.querySelectorAll(".btn-event");
 
         buttons.forEach(button => {
@@ -77,20 +83,61 @@
         });
     });
 
-    document.getElementById('filterForm').addEventListener('submit', function(event) {
+    document.getElementById('filterForm').addEventListener('submit', async function(event) {
         event.preventDefault();
+        await filtrar();
+    });
+    async function filtrar() {
         const fecha = document.getElementById('fecha').value;
         const tipo = document.getElementById('tipo').value;
         const ubicacion = document.getElementById('ubicacion').value;
         const capacidad = document.getElementById('capacidad').value;
         const queryParams = new URLSearchParams({ fecha, tipo, ubicacion, capacidad }).toString();
-        window.location.href = `/dashboard?${queryParams}`;
+        const response = await fetch(`/dashboard/filter?${queryParams}`);
+        const eventos = await response.json();
+        console.log(eventos);
+        renderEventos(eventos);
+    }
+
+    function renderEventos(eventos) {
+        const eventosContainer = document.getElementById('eventosContainer');
+        eventosContainer.innerHTML = ''; // Limpia la lista actual de eventos
+        eventos.forEach(evento => {
+            const eventoHTML = `
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">${evento.titulo}</h5>
+                                <p class="card-text"><strong>Descripción:</strong> ${evento.descripcion}</p>
+                                <p class="card-text"><strong>Fecha:</strong> ${new Date(evento.fecha).toLocaleDateString()}</p>
+                                <p class="card-text"><strong>Hora:</strong> ${evento.hora}</p>
+                                <p class="card-text"><strong>Ubicación:</strong> ${evento.ubicacion}</p>
+                                <p class="card-text"><strong>Capacidad Máxima:</strong> ${evento.capacidad_maxima}</p>
+                                <p class="card-text"><strong>Organizador ID:</strong> ${evento.organizador_id}</p>
+                            </div>
+                            <div class="card-footer m-1">
+                                <small class="text-muted mx-2">ID del Evento: ${evento.id}</small>
+                                ${userRole === 'organizador' ? `<button class="btn btn-outline-primary btn-event organizador">Editar</button>` : ''}
+                                ${userRole === 'participante' ? `<button class="btn btn-outline-primary btn-event participante">Apuntarse</button>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            eventosContainer.insertAdjacentHTML('beforeend', eventoHTML);
+        });
+    }
+
+    document.getElementById('filterForm').addEventListener('reset', async function(event) {
+        event.preventDefault();
+        document.getElementById('fecha').value = '';
+        document.getElementById('tipo').value = '';
+        document.getElementById('ubicacion').value = '';
+        document.getElementById('capacidad').value = '';
+        await filtrar();
     });
 
-    document.getElementById('filterForm').addEventListener('reset', function(event) {
-        event.preventDefault();
-        window.location.href = `/dashboard`;
-    });
 </script>
 
 <%- include("partials/footer.ejs") %>
