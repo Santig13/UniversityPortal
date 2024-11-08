@@ -10,7 +10,7 @@ const userSchema = z.object({
     facultad: z.string().nonempty({ message: 'Facultad es requerida' }),
     password: z.string().min(8, { message: 'Contraseña debe tener al menos 8 caracteres' })
 }).superRefine((data, ctx) => {
-    const emailRegex = new RegExp(`.*@${data.facultad.toLowerCase()}\.com$`);
+    const emailRegex = new RegExp(`.*@${data.facultad.toLowerCase()}\.(com|es)$`);
     if (!emailRegex.test(data.email.toLowerCase())) {
         ctx.addIssue({
             path: ['email'],

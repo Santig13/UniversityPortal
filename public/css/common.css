@@ -72,7 +72,6 @@ header, .footer-nuestro ,.navbar{
 }
 
 
-
 .btn-outline-primary {
     border-radius: 15px;
     cursor: pointer;
@@ -116,6 +115,7 @@ a:hover {
 .toast-header {
     background-color: #0DB8DE; /* Encabezado con color azul */
     color: #fff; /* Texto blanco en el encabezado */
+    border-radius: 20px 20px 0 0;
 
 }
 
@@ -124,7 +124,7 @@ a:hover {
     color: #ECF0F5; /* Texto claro */
     font-size: 16px; /* Tamaño de fuente adecuado */
     text-align: center; /* Texto centrado */
-    border-radius: 5px;
+    border-radius: 0 0 20px 20px;
 }
 
 /* Estilos para nav-links */
@@ -203,16 +203,56 @@ a:hover {
 }
 
 
+/* Estilos personalizados para el modal */
 .modal-content {
-    background-color: #f8f9fa;
-    border-radius: 10px;
+    background-color: #1A2226; /* Fondo oscuro similar al tema */
+    color: #ECF0F5; /* Texto claro */
+    border-radius: 15px; /* Bordes redondeados */
+    border: 1px solid #0DB8DE; /* Borde azul */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra para darle profundidad */
 }
+
 .modal-header {
-    border-bottom: 1px solid #dee2e6;
+    background-color: #0DB8DE; /* Fondo azul para la cabecera */
+    color: #ffffff; /* Texto blanco */
+    border-bottom: 1px solid #0DB8DE; /* Borde inferior azul */
+    border-top-left-radius: 15px; /* Bordes redondeados coherentes con el modal */
+    border-top-right-radius: 15px;
 }
-.modal-body, .modal-header {
-    color: #212529;
+
+.modal-title {
+    font-weight: bold;
 }
+
+.modal-body {
+    background-color: #1A2226; /* Fondo oscuro */
+    color: #ECF0F5; /* Texto claro */
+    padding: 20px;
+}
+
 .modal-footer {
-    border-top: 1px solid #dee2e6;
+    background-color: #1A2226; /* Fondo oscuro */
+    border-top: 1px solid #0DB8DE; /* Borde superior azul */
+    border-bottom-left-radius: 15px; /* Bordes redondeados */
+    border-bottom-right-radius: 15px;
 }
+
+/* Estilo del botón de cerrar */
+.btn-close {
+    background-color: transparent;
+    color: #ECF0F5;
+    border: none;
+    transition: transform 0.2s ease;
+    outline: 0;
+}
+
+.btn-close:hover {
+    transform: scale(1.1);
+    color: #ffffff; /* Color más claro para hover */
+}
+
+.btn-close:focus {
+    outline: none;
+    box-shadow: none; /* Esto también elimina cualquier sombra azul que pueda aparecer */
+}
+

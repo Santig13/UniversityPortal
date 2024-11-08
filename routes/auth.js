@@ -2,6 +2,7 @@ const { Router } = require('express');
 const bcrypt = require('bcrypt');
 const { validateLogIn, validateUser } = require('../schemas/users');
 
+
 function createAuthRouter(pool, sessionMiddleware) {
     const router = Router();
 
@@ -56,7 +57,7 @@ function createAuthRouter(pool, sessionMiddleware) {
             connection.query(consultaINSERTuser, [nombre, email, telefonoCompleto, facultad_id,rol,1, hashedPassword], (err, rows) => {
                 connection.release();
                 if (err) return next(err);
-                res.redirect('/?success=true');
+                res.redirect('/?success=true&type=register');
             });
         }
 
@@ -86,6 +87,42 @@ function createAuthRouter(pool, sessionMiddleware) {
             });
 
             
+        });
+    });
+
+    // Ruta recuperar contraseña
+    router.post('/recover', (req, res) => {
+        const { email } = req.body;
+        pool.getConnection((err, connection) => {
+            if (err) return next(err);
+
+            connection.query('SELECT * FROM usuarios WHERE email = ?', [email], (err, rows) => {
+            connection.release();
+            if (err) return next(err);
+
+            if (rows.length > 0) {
+                const user = rows[0];
+                res.render('restorepassword', { email: email, user: user }); // le paso el user por si acaso meto header tambien
+            } else {
+                res.status(400).send('Email no encontrado');
+            }
+            });
+        });
+    });
+
+    // Ruta cambiar contraseña
+    router.patch('/updatepassword', async (req, res, next) => {
+        const { email, password } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+    
+        pool.getConnection((err, connection) => {
+            if (err) return next(err);
+            
+            connection.query('UPDATE usuarios SET password = ? WHERE email = ?', [hashedPassword, email], (err, rows) => {
+                connection.release();
+                if (err) return next(err);
+                res.status(200).send('Contraseña actualizada correctamente');
+            });
         });
     });
 

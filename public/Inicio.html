@@ -22,15 +22,37 @@
     </header>
 
     <!-- Toast -->
-    <div class="position-fixed bottom-0 end-0 p-3" aria-live="polite" aria-atomic="true">
-        <div class="toast custom-toast p-3" id="myToast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="position-fixed bottom-0 end-0 p-4" aria-live="polite" aria-atomic="true">
+        <div class="toast custom-toast mb-3" id="myToast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header mb-0">
                 <strong class="me-auto">Notificación</strong>
                 <small>just now</small>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">
-                Registro exitoso. Ya puede iniciar sesión.
+                <!-- Aquí va el contenido del mensaje del toast de manera dinamica -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal Recuperar Contraseña -->
+    <div class="modal fade" id="recoverPasswordModal" tabindex="-1" aria-labelledby="recoverPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="recoverPasswordModalLabel">Recuperar Contraseña</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body m-1">
+                    <form id="recoverPasswordModal" method="POST" action="/auth/recover">
+                        <div class="mb-3">
+                            <label for="recoverEmail" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control bg-white p-1" id="recoverEmail" name="email" required style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary">Enviar</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -41,15 +63,15 @@
             <div class="col-12 col-md-8 col-lg-6 dark-box p-4 rounded shadow">
                 <h2 class="text-center fw-bold form-title">Bienvenido</h2>
                 <form method="POST" action="/auth/login">
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label for="usuario" class="form-label">Usuario</label>
                         <input type="email" class="form-control" id="usuario" name="email" required>
                     </div>
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label for="contrasena" class="form-label">Contraseña</label>
                         <div class="input-group">
                             <input type="password" class="form-control" id="contrasena" name="password" required>
-                            <button class="btn btn-sm btn-outline-primary mt-3" type="button" id="togglePassword">
+                            <button class="btn btn-sm btn-outline-primary ms-2 mb-3" type="button" id="togglePassword">
                                 <i class="bi bi-eye"></i>
                             </button>
                         </div>
@@ -60,7 +82,7 @@
                     </div>
                     <div class="text-center">
                         <p class="mb-1"><span>¿No tienes cuenta? <a href="/registro">Regístrate</a></span></p>
-                        <p><span>¿Has olvidado tu contraseña? <a href="/recuperarcontrasena">Recuperar contraseña</a></span></p>
+                        <p><span>¿Has olvidado tu contraseña? <a href="#" data-bs-toggle="modal" data-bs-target="#recoverPasswordModal">Recuperar contraseña</a></span></p>
                     </div>
                 </form>
             </div>
