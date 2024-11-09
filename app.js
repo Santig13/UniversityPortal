@@ -188,6 +188,10 @@ function getEventosOrganizador(req, res, next) {
 app.get('/usuario:id', requireAuth, getEventosPersonales, (req, res) => {
     res.render('usuario', { user: req.session.user, eventos: req.eventos });
 });
+app.get('/calendar', requireAuth, getEventos, (req, res) => {
+    res.render('calendar', {user:req.session.user });
+});
+
 
 //Navegacion a la pagina de error 404
 app.use((req,res)=>{

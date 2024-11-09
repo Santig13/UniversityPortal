@@ -1,0 +1,74 @@
+<%- include("partials/header.ejs", { user: user }) %>
+    <div class="container my-5">
+        <h1 class="mb-4">Calendario de Eventos</h1>
+        <div id="calendar"></div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventModalLabel">Detalles del Evento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Título:</strong> <span id="modalTitle"></span></p>
+                    <p><strong>Descripción:</strong> <span id="modalDescription"></span></p>
+                    <p><strong>Ubicación:</strong> <span id="modalLocation"></span></p>
+                    <p><strong>Capacidad:</strong> <span id="modalCapacity"></span></p>
+                    <p><strong>Organizador ID:</strong> <span id="modalOrganizer"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<%- include("partials/footer.ejs") %>
+</body>
+</html>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/dashboard/filter')
+            .then(response => response.json())
+            .then(lista => {
+
+                const eventos = lista.map(row => ({
+                    id: row.id,
+                    title: row.titulo,
+                    description: row.descripcion,
+                    start: row.fecha, // Combina fecha y hora
+                    end: row.fecha ,// Si tienes una hora de finalización, puedes usarla aquí
+                    location: row.ubicacion,
+                    capacity: row.capacidad_maxima,
+                    organizer: row.organizador_id
+                }));
+                console.log(eventos);
+                const calendarEl = document.getElementById('calendar');
+                const calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',  // Vista mensual
+                    locale: 'es',  // Configuración de idioma español
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'  // Vistas disponibles
+                    },
+                    events: eventos,
+                    eventBackgroundColor: '#378006', // Color de los evento
+                    eventClick: function(info) {
+                    document.getElementById('modalTitle').textContent = info.event.title;
+                    document.getElementById('modalDescription').textContent = info.event.extendedProps.description;
+                    document.getElementById('modalLocation').textContent = info.event.extendedProps.location;
+                    document.getElementById('modalCapacity').textContent = info.event.extendedProps.capacity;
+                    document.getElementById('modalOrganizer').textContent = info.event.extendedProps.organizer;
+                    var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+                    eventModal.show();
+                    }   
+                });
+                calendar.render();
+            })
+            .catch(error => console.error('Error fetching events:', error));
+    });
+</script>
