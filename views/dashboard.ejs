@@ -55,8 +55,9 @@
                                     <% if (user.rol === 'organizador') { %>
                                         <button class="btn btn-outline-primary btn-event organizador">Editar</button>
                                     <% } else if (user.rol === 'participante') { %>
-                                        <button class="btn btn-outline-primary btn-event participante">Apuntarse</button>
+                                        <button onclick="inscribirUsuario('<%= evento.id %>')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>
                                     <% } %>
+                                        <div id="mensaje-<%= evento.id %>"></div>
                                 </div>
                             </div>
                         </div>
@@ -137,6 +138,36 @@
         document.getElementById('capacidad').value = '';
         await filtrar();
     });
+
+    function inscribirUsuario(eventId) {
+    fetch('/usuarios/inscribir', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            userId: '<%= user.id %>',
+            eventId: eventId,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
+        if (data.success) {
+            mensajeElemento.innerText = 'Inscrito en el evento';
+            mensajeElemento.classList.add('text-success');  
+            // Deshabilitar el botón después de la inscripción
+            const botonApuntarse = mensajeElemento.previousElementSibling;
+            botonApuntarse.disabled = true;
+            botonApuntarse.innerText = 'Inscrito';
+        } 
+    })
+    .catch(error => {
+        const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
+        mensajeElemento.innerText = 'Error al inscribirse en el evento';
+        mensajeElemento.classList.add('text-danger');
+    });
+}
 
 </script>
 
