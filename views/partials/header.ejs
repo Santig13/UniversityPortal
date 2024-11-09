@@ -25,13 +25,14 @@
         <div class="container-fluid">
             <a href="/">
                 <img src="/images/calendar.png" alt="Logo" width="auto" height="60px" class="d-inline-block align-text-top rounded">
-            </a></a>
+            </a>
             <span class="mx-3 display-6" id="texto-navbar">PGEU</span>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav mx-auto">
+                <!-- Centrado en pantallas grandes -->
+                <ul class="navbar-nav mx-lg-auto ">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/dashboard">Home</a>
                     </li>
@@ -49,9 +50,10 @@
                         </ul>
                     </li>
                 </ul>
+    
                 <!-- Botones de perfil y notificaciones -->
-                <div class="navbar-buttons ms-5">
-                    <button class="navbar-button" title="Notificaciones">
+                <div class="navbar-buttons ms-lg-5">
+                    <button class="navbar-button me-2" title="Notificaciones">
                         <img src="/images/bell.png" alt="Campana de notificaciones">
                     </button>
                     <div class="nav-item dropdown">
@@ -60,7 +62,6 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="/usuario:<%= user.id %>">Ver perfil</a></li>
-                            <!-- Trigger Modal -->
                             <li>
                                 <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">Cerrar Sesión</a>
                             </li>
@@ -70,6 +71,7 @@
             </div>
         </div>
     </nav>
+    
 
     <!-- Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
