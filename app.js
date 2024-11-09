@@ -4,6 +4,8 @@ const path=require('path');
 const session = require('express-session');
 const mysqlSession = require('express-mysql-session');
 const createAuthRouter = require('./routes/auth.js');
+const {createEventosRouter,getEventos,getEventosPersonales} = require('./routes/events.js');
+const { get } = require('http');
 const mysqlStore = mysqlSession(session);
 
 const sessionStore = new mysqlStore({
@@ -45,6 +47,7 @@ app.use(middlewareSession);
 
 // Utiliza el router de autenticación
 app.use('/auth', createAuthRouter(pool, middlewareSession));
+app.use('/eventos', createEventosRouter(pool, requireAuth, middlewareSession));
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
@@ -92,103 +95,27 @@ function requireAuth(req, res, next) {
     }
 }
 
-
-// Middleware para obtener eventos
-function getEventos(req, res, next) {
-    const { fecha, tipo, ubicacion, capacidad } = req.query;
-    let sql = 'SELECT * FROM eventos WHERE 1=1';
-    const params = [];
-
-    if (fecha) {
-        sql += ' AND DATE(fecha) = ?';
-        params.push(fecha);
-    }
-    if (tipo) {
-        sql += ' AND tipo LIKE ?';
-        params.push(`%${tipo}%`);
-    }
-    if (ubicacion) {
-        sql += ' AND ubicacion LIKE ?';
-        params.push(`%${ubicacion}%`);
-    }
-    if (capacidad) {
-        sql += ' AND capacidad_maxima >= ?';
-        params.push(capacidad);
-    }
-
-    pool.getConnection((err, connection) => {
-        if (err) {
-            return next(err);
-        }
-        connection.query(sql, params, (err, rows) => {
-            connection.release();
-            if (err) {
-                return next(err);
-            }
-            req.eventos = rows;
-            next();
+app.get('/dashboard', requireAuth, (req, res) => {
+    getEventos(req.query, pool)
+        .then((eventos) => {
+            res.render('dashboard', { user: req.session.user, eventos });
+        })
+        .catch((error) => {
+            res.status(500).send("Error retrieving events.");
         });
-    });
-}
-
-// Obtener eventos y enviarlos al dashboard
-app.post('/eventos', requireAuth, getEventos, (req, res) => {
-    res.status(200).json(req.eventos);
 });
 
-// Navegación a la página de dashboard con eventos
-app.get('/dashboard', requireAuth, getEventos, (req, res) => {
-    res.render('dashboard', { user: req.session.user, eventos: req.eventos });
-});
-app.get('/dashboard/filter', requireAuth, getEventos, (req, res) => {
-    res.status(200).json(req.eventos);
-});
-function getEventosPersonales(req, res, next) {
-    if (req.session.user.rol === 'participante') {
-        getEventosParticipante(req, res, next);
-    } else {
-        getEventosOrganizador(req, res, next);
-    }
-}
-
-function getEventosParticipante(req, res, next) {
-    const sql = 'SELECT * FROM eventos WHERE id IN (SELECT evento_id FROM inscripciones WHERE usuario_id=?)';
-    pool.getConnection((err, connection) => {
-        if (err) {
-            return next(err);
-        }
-        connection.query(sql, [req.session.user.id], (err, rows) => {
-            connection.release();
-            if (err) {
-                return next(err);
-            }
-            req.eventos = rows;
-            next();
+app.get('/usuario:id', requireAuth, (req, res) => {
+    getEventosPersonales(req.session.user, pool)
+        .then((eventos) => {
+            res.render('usuario', { user: req.session.user, eventos });
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send("Error retrieving personal events.");
         });
-    });
-}
-
-function getEventosOrganizador(req, res, next) {
-    const sql = 'SELECT * FROM eventos WHERE organizador_id=?';
-    pool.getConnection((err, connection) => {
-        if (err) {
-            return next(err);
-        }
-        connection.query(sql, [req.session.user.id], (err, rows) => {
-            connection.release();
-            if (err) {
-                return next(err);
-            }
-            req.eventos = rows;
-            next();
-        });
-    });
-}
-
-app.get('/usuario:id', requireAuth, getEventosPersonales, (req, res) => {
-    res.render('usuario', { user: req.session.user, eventos: req.eventos });
 });
-app.get('/calendar', requireAuth, getEventos, (req, res) => {
+app.get('/calendar', requireAuth, (req, res) => {
     res.render('calendar', {user:req.session.user });
 });
 

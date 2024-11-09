@@ -93,7 +93,7 @@
         const ubicacion = document.getElementById('ubicacion').value;
         const capacidad = document.getElementById('capacidad').value;
         const queryParams = new URLSearchParams({ fecha, tipo, ubicacion, capacidad }).toString();
-        const response = await fetch(`/dashboard/filter?${queryParams}`);
+        const response = await fetch(`/eventos/filter?${queryParams}`);
         const eventos = await response.json();
         console.log(eventos);
         renderEventos(eventos);
