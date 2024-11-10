@@ -66,7 +66,6 @@ function getEventos(query, pool) {
         sql += ' AND capacidad_maxima >= ?';
         params.push(capacidad);
     }
-
     return new Promise((resolve, reject) => {
         pool.getConnection((err, connection) => {
             if (err) {
@@ -90,7 +89,21 @@ function createEventosRouter(pool, requireAuth,middlewareSession) {
     router.use(middlewareSession);
     
     router.get('/filter', requireAuth, (req, res) => {
-         getEventos(req.query,pool).then((eventos) => {res.status(200).json(eventos)}).catch((error) => {res.status(500).send("Error retrieving events.")});    
+        getEventos(req.query, pool)
+            .then(eventos => {
+                return getEventosPersonales(req.session.user, pool)
+                    .then(eventosPersonales => {
+                        eventos = eventos.map(evento => {
+                            evento.inscrito = eventosPersonales.some(e => e.id === evento.id);
+                            return evento;
+                        });
+                        res.status(200).json(eventos);
+                    });
+            })
+            .catch(err => {
+                console.error(err);
+                res.status(500).send("Error retrieving events.");
+            });
     });
     
     return router;

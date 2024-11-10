@@ -55,9 +55,19 @@
                                     <% if (user.rol === 'organizador') { %>
                                         <button class="btn btn-outline-primary btn-event organizador">Editar</button>
                                     <% } else if (user.rol === 'participante') { %>
-                                        <button onclick="inscribirUsuario('<%= evento.id %>')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>
+                                        <% if (!evento.inscrito) { %>
+                                            <button onclick="inscribirUsuario('<%= evento.id %>')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>
+                                        <% } else { %>
+                                            <button class="btn btn-outline-primary btn-event participante" disabled>Inscrito</button>
+                                        <% } %>
+
                                     <% } %>
+
+                                    <% if (evento.inscrito) { %>
+                                        <div id="mensaje-<%= evento.id %>" class="text-success">Inscrito en el evento</div>
+                                    <% } else { %>
                                         <div id="mensaje-<%= evento.id %>"></div>
+                                    <% } %>
                                 </div>
                             </div>
                         </div>
@@ -99,7 +109,7 @@
         console.log(eventos);
         renderEventos(eventos);
     }
-
+        
     function renderEventos(eventos) {
         const eventosContainer = document.getElementById('eventosContainer');
         eventosContainer.innerHTML = ''; // Limpia la lista actual de eventos
@@ -120,7 +130,13 @@
                             <div class="card-footer m-1">
                                 <small class="text-muted mx-2">ID del Evento: ${evento.id}</small>
                                 ${userRole === 'organizador' ? `<button class="btn btn-outline-primary btn-event organizador">Editar</button>` : ''}
-                                ${userRole === 'participante' ? `<button class="btn btn-outline-primary btn-event participante">Apuntarse</button>` : ''}
+                                ${userRole === 'participante' ? 
+                                    (!evento.inscrito ? 
+                                        `<button onclick="inscribirUsuario('${evento.id}')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>` : 
+                                        `<button class="btn btn-outline-primary btn-event participante" disabled>Inscrito</button>`) : ''}
+                                ${evento.inscrito ? 
+                                    `<div id="mensaje-${evento.id}" class="text-success">Inscrito en el evento</div>` : 
+                                    `<div id="mensaje-${evento.id}"></div>`}
                             </div>
                         </div>
                     </div>

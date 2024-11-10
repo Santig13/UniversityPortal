@@ -99,7 +99,16 @@ function requireAuth(req, res, next) {
 app.get('/dashboard', requireAuth, (req, res) => {
     getEventos(req.query, pool)
         .then((eventos) => {
+            getEventosPersonales(req.session.user, pool).then((eventosPersonales) => {
+                eventos = eventos.map(evento => {
+                    evento.inscrito = eventosPersonales.some(e => e.id === evento.id);
+                    return evento;
+                });
             res.render('dashboard', { user: req.session.user, eventos });
+
+            }).catch((error) => {
+                res.status(500).send("Error retrieving personal events.");
+            });
         })
         .catch((error) => {
             res.status(500).send("Error retrieving events.");

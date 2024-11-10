@@ -58,13 +58,13 @@
                     events: eventos,
                     eventBackgroundColor: '#378006', // Color de los evento
                     eventClick: function(info) {
-                    document.getElementById('modalTitle').textContent = info.event.title;
-                    document.getElementById('modalDescription').textContent = info.event.extendedProps.description;
-                    document.getElementById('modalLocation').textContent = info.event.extendedProps.location;
-                    document.getElementById('modalCapacity').textContent = info.event.extendedProps.capacity;
-                    document.getElementById('modalOrganizer').textContent = info.event.extendedProps.organizer;
-                    var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
-                    eventModal.show();
+                        document.getElementById('modalTitle').textContent = info.event.title;
+                        document.getElementById('modalDescription').textContent = info.event.extendedProps.description;
+                        document.getElementById('modalLocation').textContent = info.event.extendedProps.location;
+                        document.getElementById('modalCapacity').textContent = info.event.extendedProps.capacity;
+                        document.getElementById('modalOrganizer').textContent = info.event.extendedProps.organizer;
+                        var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+                        eventModal.show();
                     }   
                 });
                 calendar.render();
