@@ -7,7 +7,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
     router.use(middlewareSession);
 
     // Inscribir usuario en un evento
-    router.post('/inscribir', (req, res) => {
+    router.post('/inscribir', (req, res, next) => {
         console.log("Datos de inscripción recibidos:", req.body); // Verifica los datos recibidos
         const { userId, eventId } = req.body;
         const fecha_inscripcion = new Date().toISOString().split('T')[0];
@@ -15,7 +15,9 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
     
         pool.query(query, [userId, eventId, "1", fecha_inscripcion], (error, results) => {
             if (error) {
-                return res.status(500).send('Error inscribiendo al usuario en el evento');
+                error.message = 'Error inscribiendo al usuario en el evento';
+                error.status = 500;
+                return next(err);
             }
             res.status(200).send({ success: true, message: 'Usuario inscrito en el evento' });
         });
@@ -23,12 +25,14 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
     
 
     // Listar eventos en los que el usuario está inscrito
-    router.get('/:userId/eventos', (req, res) => {
+    router.get('/:userId/eventos', (req, res, next) => {
         const { userId } = req.params;
         const query = 'SELECT * FROM EVENTOS WHERE id IN (SELECT evento_id FROM Inscripciones WHERE usuario_id = ?)';
         pool.query(query, [userId], (error, results) => {
             if (error) {
-                return res.status(500).send('Error recuperando eventos del usuario');
+                error.message = 'Error recuperando eventos del usuario';
+                error.status = 500;
+                return next(err);
             }
             res.status(200).json(results);
         });

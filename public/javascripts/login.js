@@ -1,5 +1,5 @@
 
-// Mostrar toast si el registro fue exitoso
+// Mostrar toast con mensaje de éxito o error
 setTimeout(function() {
     const urlParams = new URLSearchParams(window.location.search);
     console.log(urlParams);  
@@ -12,7 +12,22 @@ setTimeout(function() {
         }
         const toast = new bootstrap.Toast(document.getElementById('myToast'));
         toast.show(); 
+        setTimeout(() => toast.hide(), 5000); // Ocultar toast después de 5 segundos
     }
+    else if(urlParams.get('fail') === 'true'){
+        if (urlParams.get('type') === 'psw') {
+            toastBody.textContent = 'Contraseña incorrecta';
+        } else if (urlParams.get('type') === 'user') {
+            toastBody.textContent = 'El usuario introducido no existe';
+        }
+        else if(urlParams.get('type') === 'recover'){
+            toastBody.textContent = 'El correo introducido no existe';
+        }
+        const toast = new bootstrap.Toast(document.getElementById('myToast'));
+        toast.show(); 
+        setTimeout(() => toast.hide(), 5000); // Ocultar toast después de 5 segundos
+    }
+    
 }, 200);
 
 

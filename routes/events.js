@@ -1,6 +1,6 @@
 const { Router } = require('express');
 
-function getEventosPersonales(user,pool) {
+function getEventosPersonales(user, pool) {
     if (user.rol === 'participante') {
         return getEventosParticipante(user, pool);
     } else {
@@ -13,11 +13,13 @@ function getEventosParticipante(user, pool) {
     return new Promise((resolve, reject) => {
         pool.getConnection((err, connection) => {
             if (err) {
+                err.message = 'Error al obtener conexión de la base de datos para obtener eventos del participante.';
                 return reject(err);
             }
             connection.query(sql, [user.id], (err, rows) => {
                 connection.release();
                 if (err) {
+                    err.message = 'Error al consultar eventos del participante en la base de datos.';
                     return reject(err);
                 }
                 resolve(rows);
@@ -31,11 +33,13 @@ function getEventosOrganizador(user, pool) {
     return new Promise((resolve, reject) => {
         pool.getConnection((err, connection) => {
             if (err) {
+                err.message = 'Error al obtener conexión de la base de datos para obtener eventos del organizador.';
                 return reject(err);
             }
             connection.query(sql, [user.id], (err, rows) => {
                 connection.release();
                 if (err) {
+                    err.message = 'Error al consultar eventos del organizador en la base de datos.';
                     return reject(err);
                 }
                 resolve(rows);
@@ -43,7 +47,6 @@ function getEventosOrganizador(user, pool) {
         });
     });
 }
-
 
 function getEventos(query, pool) {
     const { fecha, tipo, ubicacion, capacidad } = query;
@@ -69,11 +72,13 @@ function getEventos(query, pool) {
     return new Promise((resolve, reject) => {
         pool.getConnection((err, connection) => {
             if (err) {
+                err.message = 'Error al obtener conexión de la base de datos para filtrar eventos.';
                 return reject(err);
             }
             connection.query(sql, params, (err, rows) => {
                 connection.release();
                 if (err) {
+                    err.message = 'Error al consultar eventos en la base de datos.';
                     return reject(err);
                 }
                 resolve(rows);
@@ -82,13 +87,13 @@ function getEventos(query, pool) {
     });
 }
 
-function createEventosRouter(pool, requireAuth,middlewareSession) {
+function createEventosRouter(pool, requireAuth, middlewareSession) {
     const router = Router();
     
     router.use(requireAuth);
     router.use(middlewareSession);
     
-    router.get('/filter', requireAuth, (req, res) => {
+    router.get('/filter', requireAuth, (req, res,next) => {
         getEventos(req.query, pool)
             .then(eventos => {
                 return getEventosPersonales(req.session.user, pool)
@@ -98,11 +103,17 @@ function createEventosRouter(pool, requireAuth,middlewareSession) {
                             return evento;
                         });
                         res.status(200).json(eventos);
+                    })
+                    .catch(err => {
+                        err.message = 'Error al obtener eventos personales para el usuario.';
+                        err.status = 500;
+                        next(err);
                     });
             })
             .catch(err => {
-                console.error(err);
-                res.status(500).send("Error retrieving events.");
+                err.message = 'Error al filtrar eventos.';
+                err.status = 500;
+                next(err);
             });
     });
     

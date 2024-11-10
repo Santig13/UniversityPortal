@@ -54,14 +54,6 @@ app.use('/usuarios', createUsuariosRouter(pool, requireAuth, middlewareSession))
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-//Middleware para  el manejo de errores
-app.use((err,req,res,next)=>{
-    res.status(500);
-    res.render('error500', {
-        mensaje: err.message,
-        pila: err.stack
-    });
-});
 
 
 
@@ -81,6 +73,8 @@ app.get('/facultades',  (req,res,next)=>{
         const sql='SELECT * FROM facultades';
         pool.query(sql, (err, results) => {
             if (err) {
+                err.mensaje = "Error al recuperar las facultades.";
+                err.status = 500;
                 return next(err);
             }
             res.status(200).json(results);
@@ -90,13 +84,16 @@ app.get('/facultades',  (req,res,next)=>{
 // Middleware de autenticación
 function requireAuth(req, res, next) {
     if (req.session.user) {
-        return next();
+        return next(); 
     } else {
-        res.status(401).send('Debes iniciar sesión para acceder a esta página.');
+        const err = new Error('Debes iniciar sesión para acceder a esta página.');
+        err.status = 401;
+        next(err); 
     }
 }
 
-app.get('/dashboard', requireAuth, (req, res) => {
+// Navegación a la página de dashboard
+app.get('/dashboard', requireAuth, (req, res, next) => {
     getEventos(req.query, pool)
         .then((eventos) => {
             getEventosPersonales(req.session.user, pool).then((eventosPersonales) => {
@@ -107,34 +104,62 @@ app.get('/dashboard', requireAuth, (req, res) => {
             res.render('dashboard', { user: req.session.user, eventos });
 
             }).catch((error) => {
-                res.status(500).send("Error retrieving personal events.");
+                error.message = "Error al recuperar los eventos personales.";
+                error.status = 500;
+                return next(error);
             });
         })
         .catch((error) => {
-            res.status(500).send("Error retrieving events.");
+            error.message = "Error al recuperar los eventos.";
+            error.status = 500;
+            return next(error);
         });
 });
 
-app.get('/usuario:id', requireAuth, (req, res) => {
+// Navegación a la página de usuario personal
+app.get('/usuario:id', requireAuth, (req, res, next) => {
     getEventosPersonales(req.session.user, pool)
         .then((eventos) => {
             res.render('usuario', { user: req.session.user, eventos });
         })
         .catch((error) => {
             console.error(error);
-            res.status(500).send("Error retrieving personal events.");
+            const err = new Error('Error al recuperar los eventos personales.');
+            err.status = 500;
+            next(err);
         });
 });
 app.get('/calendar', requireAuth, (req, res) => {
     res.render('calendar', {user:req.session.user });
 });
 
+// Middleware para manejar errores unificados
+app.use((err, req, res, next) => {
+    const statusCode = err.status || 500;
+    const defaultMessages = {
+        400: 'Hubo un problema con la solicitud enviada al servidor.',
+        401: 'Debes iniciar sesión para acceder a esta página.',
+        404: `La página que buscas (${req.url}) no existe.`,
+        500: 'Ocurrió un error en el servidor. Por favor, inténtalo más tarde.'
+    };
 
-//Navegacion a la pagina de error 404
-app.use((req,res)=>{
-    res.status(404);
-    res.render("error404", {url:req.url});
-})
+    const titles = {
+        400: '400 - Solicitud Incorrecta',
+        401: '401 - No Autorizado',
+        404: '404 - Página No Encontrada',
+        500: '500 - Error Interno del Servidor'
+    };
+
+    const title = titles[statusCode] || 'Error';
+    const message = err.message || defaultMessages[statusCode];
+    res.status(statusCode).render('error', {
+        titulo: title,
+        mensaje: message,
+    });
+});
+
+
+// Iniciar el servidor
 app.listen(PORT,(err)=>{
     if(err)
         console.error(`Error al iniciar el servidor: ${err}`);

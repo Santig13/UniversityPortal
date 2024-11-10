@@ -2,7 +2,13 @@ function validatePasswords() {
     var password = document.getElementById("password").value;
     var confirmPassword = document.getElementById("confirmPassword").value;
     if (password !== confirmPassword) {
-        alert("Passwords do not match.");
+        setTimeout(function() {
+            const toastBody = document.querySelector('.toast-body');
+            toastBody.textContent = 'Las contraseñas no coinciden';
+            const toast = new bootstrap.Toast(document.getElementById('myToast'));
+            toast.show(); 
+        }, 200);
+        setTimeout(() => toast.hide(), 5000);
         return false;
     }
     return true;
@@ -48,3 +54,4 @@ document.getElementById('confirmButton').addEventListener('click', function(even
         });
     }
 });
+

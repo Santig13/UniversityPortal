@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Error - <%= titulo%></title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="/css/common.css">
+</head>
+<body class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card text-center">
+        <div class="card-body">
+            <h1 class="card-title  d-flex align-items-center justify-content-center">
+                <i class="bi bi-exclamation-triangle text-warning mx-2 mb-1"></i>
+                <span class="mx-2">Error <%= titulo %></span>
+            </h1>
+            <p class="card-text"><%= mensaje %></p>
+            <a href="/" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i> Volver al inicio
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
