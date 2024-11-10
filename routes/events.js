@@ -116,6 +116,25 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                 next(err);
             });
     });
+
+    router.post('/crear', requireAuth, (req, res, next) => {
+        const { titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, organizador_id} = req.body;
+        const sql = 'INSERT INTO eventos(titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, organizador_id) VALUES(?, ?, ?, ?, ?, ?)';
+        pool.getConnection((err, connection) => {
+            if (err) {
+                err.message = 'Error al obtener conexión de la base de datos para crear evento.';
+                return next(err);
+            }
+            connection.query(sql, [titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, req.session.user.id], (err, result) => {
+                connection.release();
+                if (err) {
+                    err.message = 'Error al crear evento en la base de datos.';
+                    return next(err);
+                }
+                res.status(200).json({ id: result.insertId });
+            });
+        });
+    });
     
     return router;
 }

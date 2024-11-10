@@ -143,6 +143,59 @@ header, .footer-nuestro ,.navbar{
     outline: none;
     box-shadow: none; /* Esto también elimina cualquier sombra azul que pueda aparecer */
 }
+.btn-outline-secondary {
+    border-radius: 15px;
+    cursor: pointer;
+    border-color: #B0B0B0 !important;
+    color: #B0B0B0;
+    outline: none;
+}
+
+.btn-outline-secondary:hover {
+    background-image: linear-gradient(160deg, #071014 0%, #B0B0B0 100%) !important;
+    color: #ffffff !important;
+}
+
+.btn-outline-secondary:focus {
+    outline: none;
+    box-shadow: none; /* Esto también elimina cualquier sombra azul que pueda aparecer */
+}
+
+.btn-success {
+    border-radius: 15px;
+    cursor: pointer;
+    color: #ffffff;
+    outline: none;
+}
+
+.btn-success:hover {
+    background-image: linear-gradient(160deg, #071014 0%, #28a745 100%) !important;
+    color: #ffffff !important;
+}
+
+.btn-success:focus {
+    outline: none;
+    box-shadow: none; /* Esto también elimina cualquier sombra azul que pueda aparecer */
+}
+
+.btn-outline-danger{
+    border-radius: 15px;
+    cursor: pointer;
+    border-color: #dc3545 !important;
+    color: #dc3545;
+    outline: none;
+}
+
+.btn-outline-danger:hover {
+    background-image: linear-gradient(160deg, #071014 0%, #dc3545 100%) !important;
+    color: #ffffff !important;
+}
+
+.btn-outline-danger:focus {
+    outline: none;
+    box-shadow: none; /* Esto también elimina cualquier sombra azul que pueda aparecer */
+}
+
 
 span {
     color: #B0B0B0;
@@ -337,3 +390,18 @@ a:hover {
     box-shadow: none; /* Esto también elimina cualquier sombra azul que pueda aparecer */
 }
 
+/* Ocultar el icono predeterminado y agregar un ícono personalizado */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background-image: url('../images/schedule.png') !important;
+    background-size: 20px 20px; /* Ajusta el tamaño del ícono */
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Reemplazar el icono del reloj en el input de tipo time */
+input[type="time"]::-webkit-clear-button {
+    background-image: url('../images/clock.png') !important;
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+}

@@ -1,4 +1,6 @@
 <%- include("partials/header.ejs", { user: user }) %>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
+
 <div class="container mt-2 mb-2">
     <div class="row">
         <!-- Columna de Filtros -->
@@ -34,50 +36,115 @@
 
         <!-- Columna de Lista de Eventos -->
         <div class="col-md-9">
-            <div class="container mt-5 " style="overflow-y: auto; max-height: 75vh;">
-            <h1 class="mb-4">Lista de Eventos</h1>
-            <div id="eventosContainer">
-                <% eventos.forEach(evento => { %>
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title"><%= evento.titulo %></h5>
-                                    <p class="card-text"><strong>Descripción:</strong> <%= evento.descripcion %></p>
-                                    <p class="card-text"><strong>Fecha:</strong> <%= new Date(evento.fecha).toLocaleDateString() %></p>
-                                    <p class="card-text"><strong>Hora:</strong> <%= evento.hora %></p>
-                                    <p class="card-text"><strong>Ubicación:</strong> <%= evento.ubicacion %></p>
-                                    <p class="card-text"><strong>Capacidad Máxima:</strong> <%= evento.capacidad_maxima %></p>
-                                    <p class="card-text"><strong>Organizador ID:</strong> <%= evento.organizador_id %></p>
-                                </div>
-                                <div class="card-footer m-1">
+            <div class="container mt-5" style="overflow-y: auto; max-height: 75vh;">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2">
+                    <h1 class="mb-2 mb-md-0">Lista de Eventos</h1>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                        <i class="bi bi-plus-circle me-1"></i> Añadir Evento
+                    </button>
+                </div>
+                <div id="eventosContainer">
+                    <% eventos.forEach(evento => { %>
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><%= evento.titulo %></h5>
+                                        <p class="card-text"><strong>Descripción:</strong> <%= evento.descripcion %></p>
+                                        <p class="card-text"><strong>Fecha:</strong> <%= new Date(evento.fecha).toLocaleDateString() %></p>
+                                        <p class="card-text"><strong>Hora:</strong> <%= evento.hora %></p>
+                                        <p class="card-text"><strong>Ubicación:</strong> <%= evento.ubicacion %></p>
+                                        <p class="card-text"><strong>Capacidad Máxima:</strong> <%= evento.capacidad_maxima %></p>
+                                        <p class="card-text"><strong>Organizador ID:</strong> <%= evento.organizador_id %></p>
+                                    </div>
+                                    <div class="card-footer m-1 d-flex align-items-center">
                                         <small class="text-muted mx-2">ID del Evento: <%= evento.id %></small>
-                                    <% if (user.rol === 'organizador') { %>
-                                        <button class="btn btn-outline-primary btn-event organizador">Editar</button>
-                                    <% } else if (user.rol === 'participante') { %>
-                                        <% if (!evento.inscrito) { %>
-                                            <button onclick="inscribirUsuario('<%= evento.id %>')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>
-                                        <% } else { %>
-                                            <button class="btn btn-outline-primary btn-event participante" disabled>Inscrito</button>
+                                        <% if (user.rol === 'organizador') { %>
+                                            <button class="btn btn-outline-primary btn-event organizador">
+                                                <i class="bi bi-pencil-square me-1"></i> Editar
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-event organizador ms-2" onclick="eliminarEvento('<%= evento.id %>')">
+                                                <i class="bi bi-trash me-1"></i> Eliminar
+                                            </button>
+                                        <% } else if (user.rol === 'participante') { %>
+                                            <% if (!evento.inscrito) { %>
+                                                <button onclick="inscribirUsuario('<%= evento.id %>')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>
+                                            <% } else { %>
+                                                <button class="btn btn-outline-primary btn-event participante" disabled>Inscrito</button>
+                                            <% } %>
                                         <% } %>
-
-                                    <% } %>
-
-                                    <% if (evento.inscrito) { %>
-                                        <div id="mensaje-<%= evento.id %>" class="text-success">Inscrito en el evento</div>
-                                    <% } else { %>
-                                        <div id="mensaje-<%= evento.id %>"></div>
-                                    <% } %>
+                                        <% if (user.rol === 'participante') { %>
+                                            <% if (evento.inscrito) { %>
+                                                <div id="mensaje-<%= evento.id %>" class="mx-2 text-success">Inscrito en el evento</div>
+                                            <% } else { %>
+                                                <div id="mensaje-<%= evento.id %>"></div>
+                                            <% } %>
+                                        <% } %>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                <% }) %>
+                    <% }) %>
+                </div>
             </div>
-        </div>
         </div>
     </div>
 </div>
+
+<!-- Modal para Crear Evento -->
+<div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createEventModalLabel">Crear Nuevo Evento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body m-1">
+                <form action="/eventos/crear" method="POST">
+                    <!-- Título del Evento -->
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="titulo" name="titulo" required>
+                    </div>
+                    <!-- Descripción del Evento -->
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="1" required></textarea>
+                    </div>
+                    <!-- Fecha del Evento -->
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" id="fecha" name="fecha" required>
+                    </div>
+                    <!-- Hora del Evento -->
+                    <div class="mb-3">
+                        <label for="hora" class="form-label">Hora</label>
+                        <input type="time" class="form-control" id="hora" name="hora" required>
+                    </div>
+                    <!-- Ubicación del Evento -->
+                    <div class="mb-3">
+                        <label for="ubicacion" class="form-label">Ubicación</label>
+                        <input type="text" class="form-control" id="ubicacion" name="ubicacion" required>
+                    </div>
+                    <!-- Capacidad Máxima -->
+                    <div class="mb-3">
+                        <label for="capacidad_maxima" class="form-label">Capacidad Máxima</label>
+                        <input type="number" class="form-control" id="capacidad_maxima" name="capacidad_maxima" required min="1">
+                    </div>
+                    
+                    <!-- Campo oculto para el ID del organizador -->
+                    <input type="hidden" name="organizador_id" value="<%= user.id %>">
+                    <!-- Botones -->
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-outline-primary">Crear Evento</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
     const userRole = "<%= user.rol %>";  // Pasa el rol al cliente
@@ -98,6 +165,7 @@
         event.preventDefault();
         await filtrar();
     });
+
     async function filtrar() {
         const fecha = document.getElementById('fecha').value;
         const tipo = document.getElementById('tipo').value;
@@ -106,7 +174,6 @@
         const queryParams = new URLSearchParams({ fecha, tipo, ubicacion, capacidad }).toString();
         const response = await fetch(`/eventos/filter?${queryParams}`);
         const eventos = await response.json();
-        console.log(eventos);
         renderEventos(eventos);
     }
         
@@ -127,14 +194,17 @@
                                 <p class="card-text"><strong>Capacidad Máxima:</strong> ${evento.capacidad_maxima}</p>
                                 <p class="card-text"><strong>Organizador ID:</strong> ${evento.organizador_id}</p>
                             </div>
-                            <div class="card-footer m-1">
+                            <div class="card-footer m-1 d-flex align-items-center">
                                 <small class="text-muted mx-2">ID del Evento: ${evento.id}</small>
-                                ${userRole === 'organizador' ? `<button class="btn btn-outline-primary btn-event organizador">Editar</button>` : ''}
+                                ${userRole === 'organizador' ? `<button class="btn btn-outline-primary btn-event organizador"> <i class="bi bi-pencil-square me-2"></i>Editar</button>
+                                                                 <button class="btn btn-outline-danger btn-event organizador ms-2" onclick="eliminarEvento(${evento.id})">
+                                                                        <i class="bi bi-trash me-1"></i> Eliminar
+                                                        </button>` : ''}
                                 ${userRole === 'participante' ? 
                                     (!evento.inscrito ? 
                                         `<button onclick="inscribirUsuario('${evento.id}')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>` : 
                                         `<button class="btn btn-outline-primary btn-event participante" disabled>Inscrito</button>`) : ''}
-                                ${evento.inscrito ? 
+                                ${ userRole === 'participante' && evento.inscrito ? 
                                     `<div id="mensaje-${evento.id}" class="text-success">Inscrito en el evento</div>` : 
                                     `<div id="mensaje-${evento.id}"></div>`}
                             </div>
@@ -143,6 +213,24 @@
                 </div>
             `;
             eventosContainer.insertAdjacentHTML('beforeend', eventoHTML);
+        });
+    }
+
+    function eliminarEvento(eventId) { //copilot revisar
+        fetch(`/eventos/${eventId}`, {
+            method: 'DELETE',
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Evento eliminado exitosamente');
+                filtrar(); // Refrescar la lista después de eliminar
+            } else {
+                alert('Error al eliminar el evento');
+            }
+        })
+        .catch(error => {
+            alert('Error al eliminar el evento');
         });
     }
 
@@ -156,35 +244,34 @@
     });
 
     function inscribirUsuario(eventId) {
-    fetch('/usuarios/inscribir', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            userId: '<%= user.id %>',
-            eventId: eventId,
+        fetch('/usuarios/inscribir', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userId: '<%= user.id %>',
+                eventId: eventId,
+            })
         })
-    })
-    .then(response => response.json())
-    .then(data => {
-        const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
-        if (data.success) {
-            mensajeElemento.innerText = 'Inscrito en el evento';
-            mensajeElemento.classList.add('text-success');  
-            // Deshabilitar el botón después de la inscripción
-            const botonApuntarse = mensajeElemento.previousElementSibling;
-            botonApuntarse.disabled = true;
-            botonApuntarse.innerText = 'Inscrito';
-        } 
-    })
-    .catch(error => {
-        const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
-        mensajeElemento.innerText = 'Error al inscribirse en el evento';
-        mensajeElemento.classList.add('text-danger');
-    });
+        .then(response => response.json())
+        .then(data => {
+            const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
+            if (data.success) {
+                mensajeElemento.innerText = 'Inscrito en el evento';
+                mensajeElemento.classList.add('text-success');  
+                // Deshabilitar el botón después de la inscripción
+                const botonApuntarse = mensajeElemento.previousElementSibling;
+                botonApuntarse.disabled = true;
+                botonApuntarse.innerText = 'Inscrito';
+            } 
+        })
+        .catch(error => {
+            const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
+            mensajeElemento.innerText = 'Error al inscribirse en el evento';
+            mensajeElemento.classList.add('text-danger');
+        });
 }
-
 </script>
 
 <%- include("partials/footer.ejs") %>
