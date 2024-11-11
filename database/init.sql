@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS EVENTOS (
     ubicacion VARCHAR(255) NOT NULL,
     capacidad_maxima INT NOT NULL,
     organizador_id INT,
-    FOREIGN KEY (organizador_id) REFERENCES USUARIOS(id)
+    FOREIGN KEY (organizador_id) REFERENCES USUARIOS(id) ON DELETE CASCADE
 );
 -- tabla intermedia N-M para participantes
 CREATE TABLE IF NOT EXISTS Inscripciones (
@@ -47,6 +47,6 @@ CREATE TABLE IF NOT EXISTS Inscripciones (
     estado VARCHAR(100) NOT NULL,
     fecha_inscripcion DATE NOT NULL,
     PRIMARY KEY (usuario_id, evento_id),
-    FOREIGN KEY (usuario_id) REFERENCES USUARIOS(id),
-    FOREIGN KEY (evento_id) REFERENCES EVENTOS(id)
+    FOREIGN KEY (usuario_id) REFERENCES USUARIOS(id) ON DELETE CASCADE,
+    FOREIGN KEY (evento_id) REFERENCES EVENTOS(id) ON DELETE CASCADE
 );

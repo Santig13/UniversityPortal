@@ -51,7 +51,7 @@ function getEventosOrganizador(user, pool) {
 
 function getEventos(query, pool) {
     const { fecha, tipo, ubicacion, capacidad } = query;
-    let sql = 'SELECT * FROM eventos WHERE 1=1';
+    let sql = 'SELECT *, DATE_FORMAT(hora, "%H:%i") as hora FROM eventos WHERE 1=1';
     const params = [];
 
     if (fecha) {
@@ -60,7 +60,7 @@ function getEventos(query, pool) {
     }
     if (tipo) {
         sql += ' AND tipo LIKE ?';
-        params.push(`*%${tipo}%*`);
+        params.push(`%${tipo}%`);
     }
     if (ubicacion) {
         sql += ' AND ubicacion LIKE ?';
@@ -120,7 +120,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
 
     router.post('/crear', requireAuth, validateEvent ,(req, res, next) => {
         const { titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima} = req.body;
-        const sql = 'INSERT INTO eventos(titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, organizador_id) VALUES(?, ?, ?, ?, ?, ?)';
+        const sql = 'INSERT INTO eventos(titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, organizador_id) VALUES(?, ?, ?, ?, ?, ?, ?)';
         pool.getConnection((err, connection) => {
             if (err) {
                 err.message = 'Error al obtener conexión de la base de datos para crear evento.';
@@ -129,10 +129,29 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
             connection.query(sql, [titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, req.session.user.id], (err, result) => {
                 connection.release();
                 if (err) {
+                    console.log(err);
                     err.message = 'Error al crear evento en la base de datos.';
                     return next(err);
                 }
                 res.status(200).json({ id: result.insertId });
+            });
+        });
+    });
+
+    router.delete('/:id', requireAuth, (req, res, next) => {
+        const sql = 'DELETE FROM eventos WHERE id=?';
+        pool.getConnection((err, connection) => {
+            if (err) {
+                err.message = 'Error al obtener conexión de la base de datos para eliminar evento.';
+                return next(err);
+            }
+            connection.query(sql, [req.params.id], (err, result) => {
+                connection.release();
+                if (err) {
+                    err.message = 'Error al eliminar evento en la base de datos.';
+                    return next(err);
+                }
+                res.status(200).json({ success: true });
             });
         });
     });

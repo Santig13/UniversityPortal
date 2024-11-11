@@ -65,7 +65,7 @@
                                             <button class="btn btn-outline-primary btn-event organizador">
                                                 <i class="bi bi-pencil-square me-1"></i> Editar
                                             </button>
-                                            <button class="btn btn-outline-danger btn-event organizador ms-2" onclick="eliminarEvento('<%= evento.id %>')">
+                                            <button class="btn btn-outline-danger btn-event organizador ms-2" data-bs-toggle="modal" data-bs-target="#deleteEventModal" onclick="setEventoId('<%= evento.id %>')">
                                                 <i class="bi bi-trash me-1"></i> Eliminar
                                             </button>
                                         <% } else if (user.rol === 'participante') { %>
@@ -143,9 +143,28 @@
                     <!-- Botones -->
                     <div class="modal-footer border-0">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-outline-primary">Crear Evento</button>
+                        <button id="createEventButton" type="submit" class="btn btn-outline-primary">Crear Evento</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación para Eliminar Evento -->
+<div class="modal fade" id="deleteEventModal" tabindex="-1" aria-labelledby="deleteEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteEventModalLabel">¿Estás seguro de que deseas eliminar este evento?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body m-1">
+                <p>Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button id="confirmDeleteEventButton" type="button" class="btn btn-outline-danger">Eliminar Evento</button>
             </div>
         </div>
     </div>

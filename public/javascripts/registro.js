@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async function(params) {
             
         });
     } catch (error) {
-        console.log(error);
+        showToast('Error al cargar las facultades');
     }
 
     // cambiar el prefijo del tlf
@@ -107,7 +107,6 @@ document.getElementById('registerButton').addEventListener('click', async functi
                 }
             } 
         } catch (error) {
-            console.error('Error:', error);
             showToast('Error en el registro: ' + error.message);
         }
     }
