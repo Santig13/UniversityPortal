@@ -32,10 +32,11 @@ function createAuthRouter(pool, sessionMiddleware) {
                         req.session.user = userWithoutPassword;
                         res.redirect('/dashboard');
                     } else {
-                        res.status(400).redirect('/?fail=true&type=psw');
+                        res.status(400).json({ success: false, message: 'Contraseña incorrecta' });
                     }
                 } else {
-                    res.status(400).redirect('/?fail=true&type=user');
+                    res.status(400).json({ success: false, message: 'El usuario introducido no existe' });
+                    
                 }
             });
         });
@@ -55,6 +56,7 @@ function createAuthRouter(pool, sessionMiddleware) {
     // Ruta registro
     router.post('/register', validateUser, async (req, res, next) => {
         const { nombre, email, telefonoCompleto, facultad, rol, password } = req.body;
+          
         const hashedPassword = await bcrypt.hash(password, 10); // hash password 10 salt rounds
 
         const consultaINSERTuser = 'INSERT INTO usuarios(nombre, email, telefono, facultad_id, rol, accesibilidad_id, password) VALUES(?,?,?,?,?,?,?)';
@@ -68,7 +70,7 @@ function createAuthRouter(pool, sessionMiddleware) {
                     err.message = 'Error al insertar un nuevo usuario en la base de datos.';
                     return next(err);
                 }
-                res.redirect('/?success=true&type=register');
+                res.status(200).json({ success: true, message: 'Usuario registrado exitosamente' });
             });
         }
 

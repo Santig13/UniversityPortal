@@ -2,30 +2,23 @@
 // Mostrar toast con mensaje de éxito o error
 setTimeout(function() {
     const urlParams = new URLSearchParams(window.location.search);
-    console.log(urlParams);  
-    const toastBody = document.querySelector('.toast-body');
-    if (urlParams.get('success') === 'true') {
-        if (urlParams.get('type') === 'register') {
-            toastBody.textContent = 'Registro exitoso';
-        } else if (urlParams.get('type') === 'psw') {
-            toastBody.textContent = 'Cambio de contraseña realizado';
+    // if (urlParams.get('success') === 'true') {
+    //     if (urlParams.get('type') === 'register') {
+    //         toastBody.textContent = 'Registro exitoso';
+    //     } else if (urlParams.get('type') === 'psw') {
+    //         toastBody.textContent = 'Cambio de contraseña realizado';
+    //     }
+    //     const toast = new bootstrap.Toast(document.getElementById('myToast'));
+    //     toast.show(); 
+    //     setTimeout(() => toast.hide(), 5000); // Ocultar toast después de 5 segundos
+    // }
+    let message;
+    if(urlParams.get('fail') === 'true'){
+        if(urlParams.get('type') === 'recover'){
+            message = 'Error en la recuperación de contraseña: El correo introducido no existe';
+            document.getElementById('recoverEmail').value = '';
         }
-        const toast = new bootstrap.Toast(document.getElementById('myToast'));
-        toast.show(); 
-        setTimeout(() => toast.hide(), 5000); // Ocultar toast después de 5 segundos
-    }
-    else if(urlParams.get('fail') === 'true'){
-        if (urlParams.get('type') === 'psw') {
-            toastBody.textContent = 'Contraseña incorrecta';
-        } else if (urlParams.get('type') === 'user') {
-            toastBody.textContent = 'El usuario introducido no existe';
-        }
-        else if(urlParams.get('type') === 'recover'){
-            toastBody.textContent = 'El correo introducido no existe';
-        }
-        const toast = new bootstrap.Toast(document.getElementById('myToast'));
-        toast.show(); 
-        setTimeout(() => toast.hide(), 5000); // Ocultar toast después de 5 segundos
+        showToast(message);
     }
     
 }, 200);
@@ -44,3 +37,42 @@ document.getElementById('togglePassword').addEventListener('click', function () 
     }
 });
 
+
+//hacer post a /login
+document.getElementById('loginButton').addEventListener('click', async function (event) {
+    event.preventDefault();
+    const form = document.getElementById('loginForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+        const response = await fetch('/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            showToast('Error en el inicio de sesión: ' + error.message);
+        }
+        else{
+            // Redirigir al dashboard si el login es exitoso
+            window.location.href = '/dashboard';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('Error en el inicio de sesión: ' + error.message);
+    }
+});
+
+function showToast(message) {
+    const toastElement = document.getElementById('myToast');
+    const toastBody = toastElement.querySelector('.toast-body');
+    toastBody.textContent = message;
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+    setTimeout(() => toast.hide(), 5000); // Ocultar toast después de 5 segundos
+}

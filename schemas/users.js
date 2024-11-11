@@ -31,7 +31,9 @@ const validate = (schema) => (req, res, next) => {
     if (!result.success) {
         return res.status(400).json({ error: result.error.errors });
     }
-    next();
+    else{
+        next(result.error);
+    }
 };
 
 module.exports = {
