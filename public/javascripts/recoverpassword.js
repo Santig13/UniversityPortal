@@ -45,13 +45,23 @@ document.getElementById('confirmButton').addEventListener('click', function(even
                 password: document.getElementById('password').value,  
             }),
             success: function() {
-                window.location.href = '/?success=true&type=psw'; 
+                showToast('Contraseña actualizada exitosamente. Redirigiendo a la página de inicio de sesión...');
+                setTimeout(() => window.location.href = '/', 3000);
             },
             error: function(xhr) {
                 var errorMessage = xhr.status + ': ' + xhr.statusText;
-                alert('Error - ' + errorMessage);  
+                showToast('Error al actualizar la contraseña: ' + errorMessage);
             }
         });
     }
 });
+
+function showToast(message) {
+    const toastElement = document.getElementById('myToast');
+    const toastBody = toastElement.querySelector('.toast-body');
+    toastBody.textContent = message;
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+    setTimeout(() => toast.hide(), 5000); // Ocultar toast después de 5 segundos
+}
 

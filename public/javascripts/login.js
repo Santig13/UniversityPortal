@@ -2,16 +2,6 @@
 // Mostrar toast con mensaje de éxito o error
 setTimeout(function() {
     const urlParams = new URLSearchParams(window.location.search);
-    // if (urlParams.get('success') === 'true') {
-    //     if (urlParams.get('type') === 'register') {
-    //         toastBody.textContent = 'Registro exitoso';
-    //     } else if (urlParams.get('type') === 'psw') {
-    //         toastBody.textContent = 'Cambio de contraseña realizado';
-    //     }
-    //     const toast = new bootstrap.Toast(document.getElementById('myToast'));
-    //     toast.show(); 
-    //     setTimeout(() => toast.hide(), 5000); // Ocultar toast después de 5 segundos
-    // }
     let message;
     if(urlParams.get('fail') === 'true'){
         if(urlParams.get('type') === 'recover'){
@@ -54,9 +44,21 @@ document.getElementById('loginButton').addEventListener('click', async function 
             body: JSON.stringify(data)
         });
 
+        const contentType = response.headers.get('content-type');
         if (!response.ok) {
+            if(contentType && contentType.includes('application/json')){
             const error = await response.json();
             showToast('Error en el inicio de sesión: ' + error.message);
+            }
+            else{
+                const html = await response.text();
+                document.body.innerHTML = html;
+                document.body.innerHTML = html;
+                document.body.style.display = 'flex';
+                document.body.style.justifyContent = 'center';
+                document.body.style.alignItems = 'center';
+                document.body.style.height = '100vh';
+            }
         }
         else{
             // Redirigir al dashboard si el login es exitoso

@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const { validateEvent } = require('../schemas/event.js');
 
 function getEventosPersonales(user, pool) {
     if (user.rol === 'participante') {
@@ -117,8 +118,8 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
             });
     });
 
-    router.post('/crear', requireAuth, (req, res, next) => {
-        const { titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, organizador_id} = req.body;
+    router.post('/crear', requireAuth, validateEvent ,(req, res, next) => {
+        const { titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima} = req.body;
         const sql = 'INSERT INTO eventos(titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, organizador_id) VALUES(?, ?, ?, ?, ?, ?)';
         pool.getConnection((err, connection) => {
             if (err) {

@@ -29,11 +29,11 @@ const loginSchema = z.object({
 const validate = (schema) => (req, res, next) => {
     const result = schema.safeParse(req.body);
     if (!result.success) {
-        return res.status(400).json({ error: result.error.errors });
+        // Transformar los errores en una cadena más legible
+        const errorMessages = result.error.errors.map(err => err.message).join(', ');
+        return res.status(400).json({ success: false, message: errorMessages });
     }
-    else{
-        next(result.error);
-    }
+    next();
 };
 
 module.exports = {
