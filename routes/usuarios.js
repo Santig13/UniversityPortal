@@ -8,7 +8,6 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
 
     // Inscribir usuario en un evento
     router.post('/inscribir', (req, res, next) => {
-        console.log("Datos de inscripción recibidos:", req.body); // Verifica los datos recibidos
         const { userId, eventId } = req.body;
         const fecha_inscripcion = new Date().toISOString().split('T')[0];
         const query = 'INSERT INTO inscripciones (usuario_id, evento_id, estado, fecha_inscripcion) VALUES (?, ?, ?, ?)';
@@ -17,7 +16,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
             if (error) {
                 error.message = 'Error inscribiendo al usuario en el evento';
                 error.status = 500;
-                return next(err);
+                return next(error);
             }
             res.status(200).send({ success: true, message: 'Usuario inscrito en el evento' });
         });
