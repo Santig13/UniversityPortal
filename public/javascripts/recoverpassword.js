@@ -49,8 +49,22 @@ document.getElementById('confirmButton').addEventListener('click', function(even
                 setTimeout(() => window.location.href = '/', 3000);
             },
             error: function(xhr) {
-                var errorMessage = xhr.status + ': ' + xhr.statusText;
-                showToast('Error al actualizar la contraseña: ' + errorMessage);
+
+                const contentType = xhr.getResponseHeader('content-type');
+
+                if(contentType.includes('application/json')) {
+                    var errorMessage = xhr.status + ': ' + xhr.statusText;
+                    showToast('Error al actualizar la contraseña: ' + errorMessage);
+                }
+                else{
+                    document.body.innerHTML = xhr.responseText;
+                    document.body.style.display = 'flex';
+                    document.body.style.justifyContent = 'center';
+                    document.body.style.alignItems = 'center';
+                    document.body.style.height = '100vh';
+                }
+
+               
             }
         });
     }
