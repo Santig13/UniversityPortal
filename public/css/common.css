@@ -39,6 +39,12 @@
     --fc-daygrid-event-dot-width: 5px;
     --fc-daygrid-event-dot-height: 5px;
 }
+.fc-scrollgrid-sync-inner{
+    background-color:#1A2226;
+}
+ .fc-daygrid-day-frame {
+    background-color: white !important;
+ }
 .fc-event,
 .fc-event-start,
 .fc-event-end,
