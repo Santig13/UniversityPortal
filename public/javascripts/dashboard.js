@@ -48,8 +48,8 @@ function renderEventos(eventos) {
                         </div>
                         <div class="card-footer m-1 d-flex align-items-center">
                             <small class="text-muted mx-2">ID del Evento: ${evento.id}</small>
-                            ${userRole === 'organizador' ? `<button class="btn btn-outline-primary btn-event organizador"> <i class="bi bi-pencil-square me-2"></i>Editar</button>
-                                                             <button class="btn btn-outline-danger btn-event organizador ms-2" onclick="eliminarEvento(${evento.id})">
+                            ${(userRole === 'organizador' && userId == evento.organizador_id) ? `<button class="btn btn-outline-primary btn-event organizador"> <i class="bi bi-pencil-square me-2"></i>Editar</button>
+                                                             <button class="btn btn-outline-danger btn-event organizador ms-2 data-bs-toggle="modal" data-bs-target="#deleteEventModal" onclick="setEventoId(${evento.id})">
                                                                     <i class="bi bi-trash me-1"></i> Eliminar
                                                     </button>` : ''}
                             ${userRole === 'participante' ? 
@@ -128,6 +128,7 @@ function setEventoId(id) {
 document.getElementById('confirmDeleteEventButton').addEventListener('click', async function(event) {
     event.preventDefault();
     eliminarEvento(eventoId);
+    console.log("llego aqui")
     const modal = document.getElementById('deleteEventModal');
     const modalInstance = bootstrap.Modal.getInstance(modal);
     if (modalInstance) {
