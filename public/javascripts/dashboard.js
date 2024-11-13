@@ -26,6 +26,14 @@ async function filtrar() {
     const response = await fetch(`/eventos/filter?${queryParams}`);
     const eventos = await response.json();
     renderEventos(eventos);
+
+    // Reasignar los eventos de clic de los botones de eliminación después de refrescar la lista
+    document.querySelectorAll('.btn-outline-danger').forEach(button => {
+        button.addEventListener('click', function() {
+            const eventId = button.getAttribute('data-event-id');
+            setEventoId(eventId);
+        });
+    });
 }
 
 // Funcion para renderizar los eventos despues del filtro
@@ -48,8 +56,8 @@ function renderEventos(eventos) {
                         </div>
                         <div class="card-footer m-1 d-flex align-items-center">
                             <small class="text-muted mx-2">ID del Evento: ${evento.id}</small>
-                            ${(userRole === 'organizador' && userId == evento.organizador_id) ? `<button class="btn btn-outline-primary btn-event organizador"> <i class="bi bi-pencil-square me-2"></i>Editar</button>
-                                                             <button class="btn btn-outline-danger btn-event organizador ms-2 data-bs-toggle="modal" data-bs-target="#deleteEventModal" onclick="setEventoId(${evento.id})">
+                            ${(userRole === 'organizador' && userId == evento.organizador_id) ? ` <button class="btn btn-outline-primary btn-event organizador" data-bs-toggle="modal" data-bs-target="#editEventModal" onclick="fillModal(${JSON.stringify(evento)})"><i class="bi bi-pencil-square me-1"></i> Editar</button>
+                                                             <button class="btn btn-outline-danger btn-event organizador ms-2" data-bs-toggle= "modal" data-bs-target="#deleteEventModal" onclick="setEventoId(${evento.id})">
                                                                     <i class="bi bi-trash me-1"></i> Eliminar
                                                     </button>` : ''}
                             ${userRole === 'participante' ? 
@@ -119,16 +127,37 @@ document.getElementById('createEventButton').addEventListener('click', async fun
 
 let eventoId = null;
 
-// Funcion para guardar el id del evento a eliminar
+// Funcion para guardar el id del evento a eliminar o editar
 function setEventoId(id) {
     eventoId = id;
 }
+
+// Funcion para guardar el id del evento a eliminar o editar
+function fillModal(evento) {
+    if (typeof evento === 'string') {
+        evento = JSON.parse(evento);
+    }
+
+    const modal = document.getElementById('editEventModal');
+    const form = document.getElementById('editEventForm');
+    form.titulo.value = evento.titulo || '';
+    form.descripcion.value = evento.descripcion || '';
+    form.fecha.value = evento.fecha ? new Date(evento.fecha).toISOString().split('T')[0] : '';
+    form.hora.value = evento.hora || '';
+    form.ubicacion.value = evento.ubicacion || '';
+    form.capacidad_maxima.value = evento.capacidad_maxima || '';
+    const modalInstance = bootstrap.Modal.getInstance(modal);
+    if (modalInstance) {
+        modalInstance.show();
+    }
+    eventoId = evento.id;
+}
+
 
 // Funcion para el modal de confirmación de eliminación
 document.getElementById('confirmDeleteEventButton').addEventListener('click', async function(event) {
     event.preventDefault();
     eliminarEvento(eventoId);
-    console.log("llego aqui")
     const modal = document.getElementById('deleteEventModal');
     const modalInstance = bootstrap.Modal.getInstance(modal);
     if (modalInstance) {
@@ -138,8 +167,7 @@ document.getElementById('confirmDeleteEventButton').addEventListener('click', as
 });
 
 // Funcion para eliminar eventos
-function eliminarEvento(eventId) { //copilot revisar
-    console.log(eventId);
+function eliminarEvento(eventId) { 
     fetch(`/eventos/${eventId}`, {
         method: 'DELETE',
     })
@@ -155,6 +183,60 @@ function eliminarEvento(eventId) { //copilot revisar
     .catch(error => {
         showToast('Error al eliminar el evento');
     });
+}
+
+// Funcion para el modal de confirmación de eliminación
+document.getElementById('confirmEditEventButton').addEventListener('click', async function(event) {
+    event.preventDefault();
+    editarEvento();
+    const modal = document.getElementById('editEventModal');
+    const modalInstance = bootstrap.Modal.getInstance(modal);
+    if (modalInstance) {
+        modalInstance.hide();
+    }
+    eventoId = null;
+});
+
+async function editarEvento() {
+
+    const form = document.getElementById('editEventForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    data.capacidad_maxima = parseInt(data.capacidad_maxima, 10);
+
+    try{
+        const response = await fetch(`/eventos/${eventoId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        const contentType = response.headers.get('content-type');
+        if (response.ok) {
+            showToast('Evento editado exitosamente');
+            filtrar(); // Refrescar la lista después de editar
+        } 
+        else {
+            if (contentType && contentType.includes('text/html')) {
+                const html = await response.text();
+                document.body.innerHTML = html;
+                document.body.style.display = 'flex';
+                document.body.style.justifyContent = 'center';
+                document.body.style.alignItems = 'center';
+                document.body.style.height = '100vh';
+            } else {
+                const data = await response.json();
+                showToast('Errores en la edicion del evento: ' + data.message);
+            }
+        }
+    }
+    catch(error){
+        showToast('Error al editar el evento: ' + error.message);
+    }
+
 }
 
 // Funcion para limpiar los campos del formulario de filtro

@@ -155,6 +155,28 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
             });
         });
     });
+
+    router.put('/:id', requireAuth, (req, res, next) => {
+        const { titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima} = req.body;
+        const id = req.params.id;
+        console.log(req.body);
+        console.log(id);
+        const sql = 'UPDATE eventos SET titulo=?, descripcion=?, fecha=?, hora=?, ubicacion=?, capacidad_maxima=? WHERE id=?';
+        pool.getConnection((err, connection) => {
+            if (err) {
+                err.message = 'Error al obtener conexión de la base de datos para actualizar evento.';
+                return next(err);
+            }
+            connection.query(sql, [titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, id], (err, result) => {
+                connection.release();
+                if (err) {
+                    err.message = 'Error al actualizar evento en la base de datos.';
+                    return next(err);
+                }
+                res.status(200).json({ success: true });
+            });
+        });
+    });
     
     return router;
 }

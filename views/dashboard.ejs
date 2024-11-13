@@ -62,7 +62,7 @@
                                     <div class="card-footer m-1 d-flex align-items-center">
                                         <small class="text-muted mx-2">ID del Evento: <%= evento.id %></small>
                                         <% if ((user.rol === 'organizador') && (user.id === evento.organizador_id)){ %>
-                                            <button class="btn btn-outline-primary btn-event organizador">
+                                            <button class="btn btn-outline-primary btn-event organizador" data-bs-toggle="modal" data-bs-target="#editEventModal" onclick="fillModal('<%= JSON.stringify(evento) %>')">
                                                 <i class="bi bi-pencil-square me-1"></i> Editar
                                             </button>
                                             <button class="btn btn-outline-danger btn-event organizador ms-2" data-bs-toggle="modal" data-bs-target="#deleteEventModal" onclick="setEventoId('<%= evento.id %>')">
@@ -165,6 +165,58 @@
             <div class="modal-footer border-0">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button id="confirmDeleteEventButton" type="button" class="btn btn-outline-danger">Eliminar Evento</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar Evento -->
+<div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editEventModalLabel">Editar Evento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body m-1">
+                <form id="editEventForm">
+                    <!-- Título del Evento -->
+                    <div class="mb-3">
+                        <label for="editTitulo" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="editTitulo" name="titulo" required>
+                    </div>
+                    <!-- Descripción del Evento -->
+                    <div class="mb-3">
+                        <label for="editDescripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="editDescripcion" name="descripcion" rows="1" required></textarea>
+                    </div>
+                    <!-- Fecha del Evento -->
+                    <div class="mb-3">
+                        <label for="editFecha" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" id="editFecha" name="fecha" required>
+                    </div>
+                    <!-- Hora del Evento -->
+                    <div class="mb-3">
+                        <label for="editHora" class="form-label">Hora</label>
+                        <input type="time" class="form-control" id="editHora" name="hora" required>
+                    </div>
+                    <!-- Ubicación del Evento -->
+                    <div class="mb-3">
+                        <label for="editUbicacion" class="form-label">Ubicación</label>
+                        <input type="text" class="form-control" id="editUbicacion" name="ubicacion" required>
+                    </div>
+                    <!-- Capacidad Máxima -->
+                    <div class="mb-3">
+                        <label for="editCapacidadMaxima" class="form-label">Capacidad Máxima</label>
+                        <input type="number" class="form-control" id="editCapacidadMaxima" name="capacidad_maxima" required min="1">
+                    </div>
+                    
+                    <!-- Botones -->
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button id="confirmEditEventButton" type="submit" class="btn btn-outline-primary">Guardar Cambios</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

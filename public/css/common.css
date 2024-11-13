@@ -399,7 +399,7 @@ a:hover {
 /* Ocultar el icono predeterminado y agregar un ícono personalizado */
 input[type="date"]::-webkit-calendar-picker-indicator {
     background-image: url('../images/schedule.png') !important;
-    background-size: 20px 20px; /* Ajusta el tamaño del ícono */
+    background-size: 20px 20px; 
     background-repeat: no-repeat;
     background-position: center;
 }
