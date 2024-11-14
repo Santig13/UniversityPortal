@@ -48,16 +48,16 @@ document.getElementById('confirmButton').addEventListener('click', function(even
                 showToast('Contraseña actualizada exitosamente. Redirigiendo a la página de inicio de sesión...');
                 setTimeout(() => window.location.href = '/', 3000);
             },
-            error: function(xhr) {
-
-                const contentType = xhr.getResponseHeader('content-type');
+            error: function(jqXHR) {
+                
+                const contentType = jqXHR.getResponseHeader('content-type');
 
                 if(contentType.includes('application/json')) {
-                    var errorMessage = xhr.status + ': ' + xhr.statusText;
+                    var errorMessage = jqXHR.status + ': ' + jqXHR.statusText;
                     showToast('Error al actualizar la contraseña: ' + errorMessage);
                 }
                 else{
-                    document.body.innerHTML = xhr.responseText;
+                    document.body.innerHTML = jqXHR.responseText;
                     document.body.style.display = 'flex';
                     document.body.style.justifyContent = 'center';
                     document.body.style.alignItems = 'center';

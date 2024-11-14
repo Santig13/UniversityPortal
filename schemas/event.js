@@ -1,29 +1,43 @@
-const z = require('zod');
+const { check, validationResult } = require('express-validator');
 
-// Esquema de validación para evento
-const eventSchema = z.object({
-    titulo: z.string().min(1, { message: 'Título es requerido' }),
-    descripcion: z.string().min(1, { message: 'Descripción es requerida' }),
-    fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'Fecha debe estar en formato YYYY-MM-DD' }), // Valida formato YYYY-MM-DD
-    hora: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, { message: 'Hora debe estar en formato HH:MM' }), // Valida formato HH:MM
-    ubicacion: z.string().min(1, { message: 'Ubicación es requerida' }),
-    capacidad_maxima: z.number().int().positive({ message: 'Capacidad máxima debe ser un número entero positivo' }),
-    organizador_id: z.number().int().positive({ message: 'El id del Organizador es requerido' })
-});
+// Middleware de validación para evento
+const validateEvent = [
+    check('titulo')
+        .notEmpty().withMessage('Título es requerido')
+        .isString().withMessage('Título debe ser un texto'),
 
+    check('descripcion')
+        .notEmpty().withMessage('Descripción es requerida')
+        .isString().withMessage('Descripción debe ser un texto'),
 
-// Middleware de validación
-const validate = (schema) => (req, res, next) => {
-    const result = schema.safeParse(req.body);
-    if (!result.success) {
+    check('fecha')
+        .matches(/^\d{4}-\d{2}-\d{2}$/).withMessage('Fecha debe estar en formato YYYY-MM-DD'),
+
+    check('hora')
+        .matches(/^([01]\d|2[0-3]):([0-5]\d)$/).withMessage('Hora debe estar en formato HH:MM'),
+
+    check('ubicacion')
+        .notEmpty().withMessage('Ubicación es requerida')
+        .isString().withMessage('Ubicación debe ser un texto'),
+
+    check('capacidad_maxima')
+        .isInt({ min: 1 }).withMessage('Capacidad máxima debe ser un número entero positivo'),
+
+    check('organizador_id')
+        .isInt({ min: 1 }).withMessage('El id del Organizador es requerido')
+];
+
+// Middleware para manejar el resultado de validaciones
+const validate = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
         // Transformar los errores en una cadena más legible
-        console.log(result.error.errors);
-        const errorMessages = result.error.errors.map(err => err.message).join(', ');
+        const errorMessages = errors.array().map(err => err.msg).join(', ');
         return res.status(400).json({ success: false, message: errorMessages });
     }
     next();
 };
 
 module.exports = {
-    validateEvent: validate(eventSchema)
+    validateEvent: [...validateEvent, validate]
 };

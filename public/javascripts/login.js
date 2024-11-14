@@ -28,46 +28,35 @@ document.getElementById('togglePassword').addEventListener('click', function () 
 });
 
 
+
 //hacer post a /login
-document.getElementById('loginButton').addEventListener('click', async function (event) {
+document.getElementById('loginButton').addEventListener('click', function (event) {
     event.preventDefault();
     const form = document.getElementById('loginForm');
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
-    try {
-        const response = await fetch('/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-
-        const contentType = response.headers.get('content-type');
-        if (!response.ok) {
-            if(contentType && contentType.includes('application/json')){
-            const error = await response.json();
-            showToast('Error en el inicio de sesión: ' + error.message);
-            }
-            else{
-                const html = await response.text();
-                document.body.innerHTML = html;
-                document.body.innerHTML = html;
+    $.ajax({
+        url: '/auth/login',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function() {
+            // Redirigir al dashboard si el login es exitoso
+            window.location.href = '/dashboard';
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                showToast('Error en el inicio de sesión: ' + jqXHR.responseJSON.message);
+            } else {
+                document.body.innerHTML = xhr.responseText;
                 document.body.style.display = 'flex';
                 document.body.style.justifyContent = 'center';
                 document.body.style.alignItems = 'center';
                 document.body.style.height = '100vh';
             }
         }
-        else{
-            // Redirigir al dashboard si el login es exitoso
-            window.location.href = '/dashboard';
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showToast('Error en el inicio de sesión: ' + error.message);
-    }
+    });
 });
 
 function showToast(message) {

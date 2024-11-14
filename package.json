@@ -15,9 +15,9 @@
     "@fullcalendar/interaction": "^6.1.15",
     "ejs": "^3.1.10",
     "express": "^4.21.1",
+    "express-validator": "^7.2.0",
     "fullcalendar": "^6.1.15",
-    "mysql": "^2.18.1",
-    "zod": "^3.23.8"
+    "mysql": "^2.18.1"
   },
   "devDependencies": {
     "bcrypt": "^5.1.1",

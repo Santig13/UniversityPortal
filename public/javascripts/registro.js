@@ -1,19 +1,21 @@
-document.addEventListener('DOMContentLoaded', async function(params) {
+document.addEventListener('DOMContentLoaded', function(params) {
     // cargar facultades
-    try {
-        const respuesta = await fetch('/facultades');
-        const data = await respuesta.json();
-        const facultadSelect = document.getElementById('facultad');
-        data.forEach(facultad => {
-            const option = document.createElement('option');
-            option.value = facultad.nombre;
-            option.textContent = facultad.nombre;
-            facultadSelect.appendChild(option);
-            
-        });
-    } catch (error) {
-        showToast('Error al cargar las facultades');
-    }
+    $.ajax({
+        url: '/facultades',
+        method: 'GET',
+        success: function(data) {
+            const facultadSelect = document.getElementById('facultad');
+            data.forEach(facultad => {
+                const option = document.createElement('option');
+                option.value = facultad.nombre;
+                option.textContent = facultad.nombre;
+                facultadSelect.appendChild(option);
+            });
+        },
+        error: function() {
+            showToast('Error al cargar las facultades');
+        }
+    });
 
     // cambiar el prefijo del tlf
     document.querySelectorAll('.dropdown-item').forEach(item => {
@@ -56,7 +58,6 @@ document.addEventListener('DOMContentLoaded', async function(params) {
             passwordConfirm.setCustomValidity(''); // Restablecer validez si coinciden
         }
     });
-    
 });
 
 // Hacer post cuando se registre un usuario
@@ -74,41 +75,65 @@ document.getElementById('registerButton').addEventListener('click', async functi
         
         delete data.passwordConfirm; // No enviar la confirmación de la contraseña
         delete data.telefono; // No enviar el teléfono sin prefijo
-    
-        try {
-            const response = await fetch('/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-            
-            const contentType = response.headers.get('content-type');
 
-            if (response.ok) {
-                // Mostrar un mensaje de éxito
+
+        $.ajax({
+            url: '/auth/register',
+            method: 'POST',
+            data: JSON.stringify(data),
+            success: function(jqXHR) {
                 showToast('Registro exitoso. Redirigiendo a la página de inicio de sesión...');
                 setTimeout(() => {
                     window.location.href = '/';
-                }, 2000); // Redirigir después de 2 segundos
-            } else {
-                if(contentType && contentType.includes('text/html')) {
-                    const html = await response.text();
-                    document.body.innerHTML = html;
+                }, 2000); 
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                    showToast('Error en el registro: ' + jqXHR.responseJSON.message);
+                    console.log(jqXHR.responseJSON.message);
+                } else {
+                    document.body.innerHTML = jqXHR.responseText;
                     document.body.style.display = 'flex';
                     document.body.style.justifyContent = 'center';
                     document.body.style.alignItems = 'center';
                     document.body.style.height = '100vh';
-                } 
-                else{
-                    const data = await response.json();
-                    showToast('Errores en el registro: ' + data.message);
                 }
-            } 
-        } catch (error) {
-            showToast('Error en el registro: ' + error.message);
-        }
+            }
+        });
+        // try {
+        //     const response = await fetch('/auth/register', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         },
+        //         body: JSON.stringify(data)
+        //     });
+            
+        //     const contentType = response.headers.get('content-type');
+
+        //     if (response.ok) {
+        //         // Mostrar un mensaje de éxito
+        //         showToast('Registro exitoso. Redirigiendo a la página de inicio de sesión...');
+        //         setTimeout(() => {
+        //             window.location.href = '/';
+        //         }, 2000); // Redirigir después de 2 segundos
+        //     } else {
+        //         if(contentType && contentType.includes('text/html')) {
+        //             const html = await response.text();
+        //             document.body.innerHTML = html;
+        //             document.body.style.display = 'flex';
+        //             document.body.style.justifyContent = 'center';
+        //             document.body.style.alignItems = 'center';
+        //             document.body.style.height = '100vh';
+        //         } 
+        //         else{
+        //             const data = await response.json();
+        //             showToast('Errores en el registro: ' + data.message);
+        //         }
+        //     } 
+        // } catch (error) {
+        //     showToast('Error en el registro: ' + error.message);
+        // }
     }
    
 });
