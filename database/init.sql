@@ -50,3 +50,28 @@ CREATE TABLE IF NOT EXISTS Inscripciones (
     FOREIGN KEY (usuario_id) REFERENCES USUARIOS(id) ON DELETE CASCADE,
     FOREIGN KEY (evento_id) REFERENCES EVENTOS(id) ON DELETE CASCADE
 );
+-- Lista negra de IPs de gente que ha intentado hacer inyección SQL
+CREATE TABLE IF NOT EXISTS LISTA_NEGRA_IPS (
+    ip VARCHAR(45)  PRIMARY KEY,
+    motivo VARCHAR(255) DEFAULT 'Intento de inyección SQL'
+);
+
+-- Lista de espera para personas que intentaron registrarse en eventos con capacidad llena
+CREATE TABLE IF NOT EXISTS LISTA_ESPERA (
+    usuario_id INT NOT NULL,
+    evento_id INT NOT NULL,
+    fecha_registro DATE NOT NULL,
+    PRIMARY KEY (usuario_id, evento_id),
+    FOREIGN KEY (usuario_id) REFERENCES USUARIOS(id) ON DELETE CASCADE,
+    FOREIGN KEY (evento_id) REFERENCES EVENTOS(id) ON DELETE CASCADE
+);
+
+-- Tabla de notificaciones para cada usuario
+CREATE TABLE IF NOT EXISTS NOTIFICACIONES (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    mensaje TEXT NOT NULL,
+    fecha_creacion DATE NOT NULL,
+    leido BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (usuario_id) REFERENCES USUARIOS(id) ON DELETE CASCADE
+);

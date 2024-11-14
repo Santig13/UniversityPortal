@@ -49,7 +49,7 @@ document.getElementById('loginButton').addEventListener('click', function (event
             if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
                 showToast('Error en el inicio de sesión: ' + jqXHR.responseJSON.message);
             } else {
-                document.body.innerHTML = xhr.responseText;
+                document.body.innerHTML = jqXHR.responseText;
                 document.body.style.display = 'flex';
                 document.body.style.justifyContent = 'center';
                 document.body.style.alignItems = 'center';

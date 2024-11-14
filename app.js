@@ -35,7 +35,22 @@ const pool=mysql.createPool({
     database: "AW_24"
 });
 
- 
+const detectIPBloqueadas = (req, res, next) => {
+    const ip = req.ip;
+    pool.query('SELECT * FROM lista_negra_ips WHERE ip = ?', [ip], (err, results) => {
+        if (err) {
+            err.message = 'Error al consultar la lista negra de IPs.';
+            return next(err);
+        }
+        if (results.length > 0) {
+            const error = new Error('Tu IP ha sido bloqueada.');
+            error.statusCode = 403;
+            return next(error);
+        }
+        next();
+    });
+};
+
 // Middleware para parsear datos de formularioy aceptar JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -44,6 +59,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(middlewareSession);
+app.use(detectIPBloqueadas);
 
 // Utiliza el router de autenticación
 app.use('/auth', createAuthRouter(pool, middlewareSession));
@@ -150,8 +166,18 @@ app.use((err, req, res, next) => {
         500: '500 - Error Interno del Servidor'
     };
 
+    
     const title = titles[statusCode] || 'Error';
     const message = err.message || defaultMessages[statusCode];
+    if(message ==="Error de validación: posible intento de inyección SQL"){
+
+        pool.query('INSERT INTO lista_negra_ips (ip) VALUES (?)', [req.ip], (err) => {
+            if (err) {
+                console.error('Error al insertar la IP en la lista negra.', err);
+            }
+        });
+        
+    }
     res.status(statusCode).render('error', {
         titulo: title,
         mensaje: message,
