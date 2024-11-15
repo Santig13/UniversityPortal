@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const { validateEvent } = require('../schemas/event.js');
 const {añadirNotificacion} = require('./notifications.js');
+const moment = require('moment');
 
 function getEventosPersonales(user, pool, callback) {
     if (user.rol === 'participante') {
@@ -179,22 +180,18 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                         err.message = 'Error al eliminar evento en la base de datos.';
                         return next(err);
                     }
-                    const mensaje = `El organizador ha eliminado el evento con id ${req.params.id} ha sido eliminado`;
-                    const fecha = new Date();
-                    const dia = String(fecha.getDate()).padStart(2, '0');
-                    const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript son 0-indexados
-                    const año = fecha.getFullYear();
-                    const fechaHoy = `${año}-${mes}-${dia}`;
+                    const mensaje = `El organizador ha eliminado el evento con id ${req.params.id}`;
+                    const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
 
-                    notificarTodosLosParticipantes(connection, usuarios, mensaje, req.params.id, fechaHoy, (err) => {
+                    notificarTodosLosParticipantes(connection, usuarios, mensaje, req.params.id, fecha, (err) => {
                         connection.release();
                         if (err) {
                             return next(err);
                         }
-                        res.status(200).json({ success: true });
                     });
                     
                 });
+                res.status(200).json({ success: true });
             });
         });
     });
@@ -224,19 +221,17 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                         return next(err);
                     }
                     const mensaje = `El organizador ha modificado el evento con id ${id}`;
-
-                    const fecha = new Date().toISOString().slice(0, 19).replace('T', ' ');
-                    console.log(fecha);
-                
+                    const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
                     
                     notificarTodosLosParticipantes(connection, usuarios, mensaje, req.params.id, fecha, (err) => {
                         connection.release();
                         if (err) {
                             return next(err);
                         }
-                        res.status(200).json({ success: true });
+                        
                     });
                 });
+                res.status(200).json({ success: true });
             });
         });
     });

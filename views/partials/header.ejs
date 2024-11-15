@@ -19,7 +19,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@5.10.1/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@5.10.1/main.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+        <!-- Incluir Moment.js desde CDN -->
+ 
+        
 </head>
 <body class="d-flex flex-column">
    
@@ -63,7 +65,7 @@
                             <img src="/images/user.png" alt="Perfil de usuario">
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/usuario:<%= user.id %>">Ver perfil</a></li>
+                            <li><a class="dropdown-item" href="/usuarios/:<%= user.id %>">Ver perfil</a></li>
                             <li>
                                 <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">Cerrar Sesión</a>
                             </li>
@@ -89,7 +91,7 @@
                             <div class="col">
                                 <div class="container mt-2" style="overflow-y: auto; max-height: 75vh;">
                                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2">
-                                        <h1 class="mb-2 mb-md-0">Lista de Notificaciones</h1>
+                                        <h1 id="tituloNotificaciones" class="mb-2 mb-md-0">Lista de Notificaciones</h1>
                                     </div>
                                     <div id="notificacionesContainer">
                                        
@@ -129,6 +131,7 @@
             </div>
         </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment-with-locales.min.js"></script>
     <script src="/javascripts/header.js"></script>
 </body>
 </html>

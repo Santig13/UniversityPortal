@@ -5,8 +5,8 @@ const session = require('express-session');
 const mysqlSession = require('express-mysql-session');
 const createAuthRouter = require('./routes/auth.js');
 const {createEventosRouter,getEventos,getEventosPersonales} = require('./routes/events.js');
-const createUsuariosRouter = require('./routes/usuarios.js');
-const createNotificationsRouter = require('./routes/notifications.js');
+const createUsuariosRouter  = require('./routes/usuarios.js');
+const {createNotificationsRouter } = require('./routes/notifications.js');
 const mysqlStore = mysqlSession(session);
 
 const sessionStore = new mysqlStore({
@@ -52,6 +52,17 @@ const detectIPBloqueadas = (req, res, next) => {
     });
 };
 
+// Middleware de autenticación
+function requireAuth(req, res, next) {
+    if (req.session.user) {
+        return next(); 
+    } else {
+        const err = new Error('Debes iniciar sesión para acceder a esta página.');
+        err.status = 401;
+        next(err); 
+    }
+}
+
 // Middleware para parsear datos de formularioy aceptar JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -71,8 +82,6 @@ app.use('/notificaciones', createNotificationsRouter(pool, requireAuth, middlewa
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
-
 
 
 //NAVEGACION A LAS PAGINAS
@@ -99,16 +108,7 @@ app.get('/facultades',  (req,res,next)=>{
         });
 });  
 
-// Middleware de autenticación
-function requireAuth(req, res, next) {
-    if (req.session.user) {
-        return next(); 
-    } else {
-        const err = new Error('Debes iniciar sesión para acceder a esta página.');
-        err.status = 401;
-        next(err); 
-    }
-}
+
 // Navegación a la página de dashboard
 app.get('/dashboard', requireAuth, (req, res, next) => {
     getEventos(req.query, pool, (err, eventos) => {
@@ -132,17 +132,6 @@ app.get('/dashboard', requireAuth, (req, res, next) => {
     });
 });
 
-// Navegación a la página de usuario personal
-app.get('/usuario:id', requireAuth, (req, res, next) => {
-    getEventosPersonales(req.session.user, pool, (err, eventos) => {
-        if (err) {
-            err.message = 'Error al recuperar los eventos personales.';
-            err.status = 500;
-            return next(err);
-        }
-        res.render('usuario', { user: req.session.user, eventos });
-    });
-});
 app.get('/calendar', requireAuth, (req, res) => {
     res.render('calendar', {user:req.session.user });
 });

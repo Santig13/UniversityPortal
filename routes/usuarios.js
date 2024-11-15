@@ -1,5 +1,8 @@
 "use strict";
 const { Router } = require('express');
+const { getEventosPersonales } = require('./events');
+const {añadirNotificacion} = require('./notifications');
+const moment = require('moment');
 
 function createUsuariosRouter(pool, requireAuth, middlewareSession){
     const router = Router();
@@ -11,28 +14,58 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
         const { userId, eventId } = req.body;
         const fecha_inscripcion = new Date().toISOString().split('T')[0];
         const query = 'INSERT INTO inscripciones (usuario_id, evento_id, estado, fecha_inscripcion) VALUES (?, ?, ?, ?)';
-    
-        pool.query(query, [userId, eventId, "1", fecha_inscripcion], (error, results) => {
-            if (error) {
-                error.message = 'Error inscribiendo al usuario en el evento';
-                error.status = 500;
-                return next(error);
+        
+        pool.getConnection((err, connection) => {
+            if(err){
+                err.message = 'Error al obtener conexión de la base de datos para inscribir usuario en evento';
+                return next(err);
             }
+            connection.query(query, [userId, eventId, "1", fecha_inscripcion], (error, results) => {
+                connection.release();
+                if (error) {
+                    error.message = 'Error inscribiendo al usuario en el evento';
+                    error.status = 500;
+                    return next(error);
+                }
+                const mensaje = `Te has inscrito en el evento con id ${eventId}`;
+                const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
+                añadirNotificacion(connection, userId, mensaje, fecha, (err) => {
+                    if (err) {
+                        return callback(err);
+                    }
+                });
+                
+            });
             res.status(200).send({ success: true, message: 'Usuario inscrito en el evento' });
         });
+       
     });
 
     // Desinscribir usuario de un evento
     router.delete('/desinscribir', (req, res, next) => {
         const { userId, eventId } = req.body;
         const query = 'DELETE FROM inscripciones WHERE usuario_id = ? AND evento_id = ?';
-    
-        pool.query(query, [userId, eventId], (error, results) => {
-            if (error) {
-                error.message = 'Error desinscribiendo al usuario del evento';
-                error.status = 500;
-                return next(error);
+        pool.getConnection((err, connection) => {
+            if(err){
+                err.message = 'Error al obtener conexión de la base de datos para desinscribir usuario de evento';
+                return next(err);
             }
+            connection.query(query, [userId, eventId], (error, results) => {
+                connection.release();
+                if (error) {
+                    error.message = 'Error desinscribiendo al usuario del evento';
+                    error.status = 500;
+                    return next(error);
+                }
+                const mensaje = `Te has desinscrito del evento con id ${eventId}`;
+                
+                const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
+                añadirNotificacion(connection, userId, mensaje, fecha, (err) => {
+                    if (err) {
+                        return callback(err);
+                    }
+                });
+            });
             res.status(200).send({ success: true, message: 'Usuario desinscrito del evento' });
         });
     });
@@ -49,6 +82,19 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
                 return next(err);
             }
             res.status(200).json(results);
+        });
+    });
+
+    
+    // Navegación a la página de usuario personal
+    router.get('/:id', requireAuth, (req, res, next) => {
+        getEventosPersonales(req.session.user, pool, (err, eventos) => {
+            if (err) {
+                err.message = 'Error al recuperar los eventos personales.';
+                err.status = 500;
+                return next(err);
+            }
+            res.render('usuario', { user: req.session.user, eventos });
         });
     });
 

@@ -1,24 +1,5 @@
-/* 
-<% notificaciones.forEach(notificacion => { %>
-                                <div class="row mb-4">
-                                    <div class="col-12">
-                                        <div class="card <%= notificacion.leido ? '' : 'notificacion-no-leida' %>">
-                                            <div class="card-body ">
-                                                <% if (!notificacion.leido) { %>
-                                                    <div class="circulo-azul me-3"></div>
-                                                <% } %>
-                                                <h5 class="card-title">Notificación</h5>
-                                                <p class="card-text"><strong>Mensaje:</strong> <%= notificacion.mensaje %></p>
-                                                <p class="card-text"><strong>Fecha de Creación:</strong> <%= new Date(notificacion.fecha_creacion).toLocaleDateString() %></p>
-                                            </div>
-                                            <div class="card-footer m-1 d-flex align-items-center">
-                                                <small class="text-muted mx-2">ID de la Notificación: <%= notificacion.id %></small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            <% }) %>
-*/
+
+
 document.addEventListener("DOMContentLoaded", function () {
     const notificationsLink = document.getElementById('link-notificaciones');
    
@@ -31,9 +12,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 notificacionesContainer.innerHTML = '';
                 let html = '';
                 if(notificaciones.length === 0){
-                    notificacionesContainer.innerHTML = '<h5 class="text-center">No hay notificaciones</h5>';
+                    const tituloNotificaciones = document.getElementById('tituloNotificaciones');
+                    tituloNotificaciones.classList.add('d-none');
+                    notificacionesContainer.innerHTML = '<h4 class="text-center">No hay notificaciones</h4>';
                 }
                 notificaciones.forEach(notificacion => {
+                    moment.locale('es');
                     html +=  `
                     <div class="row mb-4">
                         <div class="col-12">
@@ -43,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                     <div>
                                         <h5 class="card-title">Notificación</h5>
                                         <p class="card-text"><strong>Mensaje:</strong> ${notificacion.mensaje}</p>
-                                        <p class="card-text"><strong>Fecha de Creación:</strong> ${new Date(notificacion.fecha_creacion).toISOString().slice(0, 19).replace('T', ' ')}</p>
+                                        <p class="card-text"><strong>Fecha de Creación:</strong> ${moment(notificacion.fecha_creacion).fromNow()}</p>
                                     </div>
                                 </div>
                                 <div class="card-footer m-1 d-flex align-items-center">
@@ -85,45 +69,3 @@ function marcarComoLeido(notificacionId) {
         }
     });
 }
-/*
-document.getElementById('#link-notificaciones').addEventListener('click', function () {
-    $.ajax({
-        url: '/notificaciones',
-        method: 'GET',
-        success: function (data, jqXHR) {
-            if(data.success){
-                const notificacionesContainer = document.getElementById('notificacionesContainer');
-                notificacionesContainer.innerHTML = '';
-                data.array.forEach(notificacion => {
-                    const html =  `
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="card ${notificacion.leido ? '' : 'notificacion-no-leida'}">
-                                <div class="card-body d-flex align-items-center">
-                                    ${!notificacion.leido ? '<div class="circulo-azul me-3"></div>' : ''}
-                                    <div>
-                                        <h5 class="card-title">Notificación</h5>
-                                        <p class="card-text"><strong>Mensaje:</strong> ${notificacion.mensaje}</p>
-                                        <p class="card-text"><strong>Fecha de Creación:</strong> ${new Date(notificacion.fecha_creacion).toLocaleDateString()}</p>
-                                    </div>
-                                </div>
-                                <div class="card-footer m-1 d-flex align-items-center">
-                                    <small class="text-muted mx-2">ID de la Notificación: ${notificacion.id}</small>
-                                    ${!notificacion.leido ? `<button class="btn btn-outline-primary btn-event ms-auto" onclick="marcarComoLeido(${notificacion.id})">Marcar como leído</button>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                });
-                notificacionesContainer.insertAdjacentHTML('beforeend', html);
-            }
-            else{
-                
-            }
-        },
-        error: function (error) {
-            console.log(error);
-        }
-    });
-});*/

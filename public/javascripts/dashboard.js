@@ -64,7 +64,7 @@ function renderEventos(eventos) {
                         </div>
                         <div class="card-footer m-1 d-flex align-items-center">
                             <small class="text-muted mx-2">ID del Evento: ${evento.id}</small>
-                            ${(userRole === 'organizador' && userId == evento.organizador_id) ? ` <button class="btn btn-outline-primary btn-event organizador" data-bs-toggle="modal" data-bs-target="#editEventModal" onclick="fillModal(${JSON.stringify(evento)})"><i class="bi bi-pencil-square me-1"></i> Editar</button>
+                            ${(userRole === 'organizador' && userId == evento.organizador_id) ? ` <button class="btn btn-outline-primary btn-event organizador" data-bs-toggle="modal" data-bs-target="#editEventModal" onclick="fillModal(${JSON.stringify(evento).replace(/"/g, '&quot;')})"><i class="bi bi-pencil-square me-1"></i> Editar</button>
                                                              <button class="btn btn-outline-danger btn-event organizador ms-2" data-bs-toggle= "modal" data-bs-target="#deleteEventModal" data-event-id="${evento.id}" onclick="setEventoId('${evento.id}')" style="display: inline-block;">
                                                                     <i class="bi bi-trash me-1"></i> Eliminar
                                                     </button>` : ''}
@@ -253,6 +253,7 @@ function inscribirUsuario(eventId) {
                 mensajeElemento.innerText = 'Inscrito en el evento';
                 mensajeElemento.classList.add('text-success');
                 mensajeElemento.classList.add('mx-2');
+                showToast('Inscrito en el evento');
                 // // Deshabilitar el botón después de la inscripción
                 // const botonApuntarse = mensajeElemento.previousElementSibling;
                 // botonApuntarse.innerText = 'Desapuntarse';
