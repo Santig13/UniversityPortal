@@ -411,3 +411,14 @@ input[type="time"]::-webkit-clear-button {
     background-repeat: no-repeat;
     background-position: center;
 }
+/*Estilos para notificaciones*/
+.notificacion-no-leida {
+    border: 2px solid blue;
+}
+.circulo-azul {
+    width: 10px;
+    height: 10px;
+    background-color: blue;
+    border-radius: 50%;
+    margin-left: auto;
+}
