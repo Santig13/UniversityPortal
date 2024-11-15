@@ -23,8 +23,6 @@ const validateEvent = [
     check('capacidad_maxima')
         .isInt({ min: 1 }).withMessage('Capacidad máxima debe ser un número entero positivo'),
 
-    check('organizador_id')
-        .isInt({ min: 1 }).withMessage('El id del Organizador es requerido')
 ];
 
 // Middleware para manejar el resultado de validaciones

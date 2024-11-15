@@ -56,8 +56,7 @@ function createAuthRouter(pool, sessionMiddleware) {
 
     // Ruta registro
     router.post('/register', validateUser, async (req, res, next) => {
-        const { nombre, email, telefonoCompleto, facultad, rol, password } = req.body;
-        console.log(req.body); 
+        const { nombre, email, telefonoCompleto, facultad, rol, password } = req.body; 
         const hashedPassword = await bcrypt.hash(password, 10); // hash password 10 salt rounds
 
         const consultaINSERTuser = 'INSERT INTO usuarios(nombre, email, telefono, facultad_id, rol, accesibilidad_id, password) VALUES(?,?,?,?,?,?,?)';

@@ -110,40 +110,37 @@ function requireAuth(req, res, next) {
 
 // Navegación a la página de dashboard
 app.get('/dashboard', requireAuth, (req, res, next) => {
-    getEventos(req.query, pool)
-        .then((eventos) => {
-            getEventosPersonales(req.session.user, pool).then((eventosPersonales) => {
-                eventos = eventos.map(evento => {
-                    evento.inscrito = eventosPersonales.some(e => e.id === evento.id);
-                    return evento;
-                });
-            res.render('dashboard', { user: req.session.user, eventos });
-
-            }).catch((error) => {
-                error.message = "Error al recuperar los eventos personales.";
-                error.status = 500;
-                return next(error);
+    getEventos(req.query, pool, (err, eventos) => {
+        if (err) {
+            err.message = "Error al recuperar los eventos.";
+            err.status = 500;
+            return next(err);
+        }
+        getEventosPersonales(req.session.user, pool, (err, eventosPersonales) => {
+            if (err) {
+                err.message = "Error al recuperar los eventos personales.";
+                err.status = 500;
+                return next(err);
+            }
+            eventos = eventos.map(evento => {
+                evento.inscrito = eventosPersonales.some(e => e.id === evento.id);
+                return evento;
             });
-        })
-        .catch((error) => {
-            error.message = "Error al recuperar los eventos.";
-            error.status = 500;
-            return next(error);
+            res.render('dashboard', { user: req.session.user, eventos });
         });
+    });
 });
 
 // Navegación a la página de usuario personal
 app.get('/usuario:id', requireAuth, (req, res, next) => {
-    getEventosPersonales(req.session.user, pool)
-        .then((eventos) => {
-            res.render('usuario', { user: req.session.user, eventos });
-        })
-        .catch((error) => {
-            console.error(error);
-            const err = new Error('Error al recuperar los eventos personales.');
+    getEventosPersonales(req.session.user, pool, (err, eventos) => {
+        if (err) {
+            err.message = 'Error al recuperar los eventos personales.';
             err.status = 500;
-            next(err);
-        });
+            return next(err);
+        }
+        res.render('usuario', { user: req.session.user, eventos });
+    });
 });
 app.get('/calendar', requireAuth, (req, res) => {
     res.render('calendar', {user:req.session.user });

@@ -21,6 +21,21 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
             res.status(200).send({ success: true, message: 'Usuario inscrito en el evento' });
         });
     });
+
+    // Desinscribir usuario de un evento
+    router.delete('/desinscribir', (req, res, next) => {
+        const { userId, eventId } = req.body;
+        const query = 'DELETE FROM inscripciones WHERE usuario_id = ? AND evento_id = ?';
+    
+        pool.query(query, [userId, eventId], (error, results) => {
+            if (error) {
+                error.message = 'Error desinscribiendo al usuario del evento';
+                error.status = 500;
+                return next(error);
+            }
+            res.status(200).send({ success: true, message: 'Usuario desinscrito del evento' });
+        });
+    });
     
 
     // Listar eventos en los que el usuario está inscrito

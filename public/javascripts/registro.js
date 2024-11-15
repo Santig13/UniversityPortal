@@ -116,7 +116,6 @@ document.getElementById('registerButton').addEventListener('click', async functi
         error: function(jqXHR, textStatus, errorThrown) {
             if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
                 showToast('Error en el registro: ' + jqXHR.responseJSON.message);
-                console.log(jqXHR.responseJSON.message);
             } else {
                 document.body.innerHTML = jqXHR.responseText;
                 document.body.style.display = 'flex';

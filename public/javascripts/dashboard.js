@@ -14,25 +14,33 @@ document.addEventListener("DOMContentLoaded", function() {
 // Funcion para filtrar eventos
 document.getElementById('filterForm').addEventListener('submit', async function(event) {
     event.preventDefault();
-    await filtrar();
+    filtrar();
 });
 
-async function filtrar() {
+ function filtrar() {
     const fecha = document.getElementById('fecha').value;
     const tipo = document.getElementById('tipo').value;
     const ubicacion = document.getElementById('ubicacion').value;
     const capacidad = document.getElementById('capacidad').value;
     const queryParams = new URLSearchParams({ fecha, tipo, ubicacion, capacidad }).toString();
-    const response = await fetch(`/eventos/filter?${queryParams}`);
-    const eventos = await response.json();
-    renderEventos(eventos);
 
-    // Reasignar los eventos de clic de los botones de eliminación después de refrescar la lista
-    document.querySelectorAll('.btn-outline-danger').forEach(button => {
-        button.addEventListener('click', function() {
-            const eventId = button.getAttribute('data-event-id');
-            setEventoId(eventId);
-        });
+    $.ajax({
+        url: `/eventos/filter?${queryParams}`,
+        method: 'GET',
+        success: function(eventos) {
+            renderEventos(eventos);
+
+            // Reasignar los eventos de clic de los botones de eliminación después de refrescar la lista
+            document.querySelectorAll('.btn-outline-danger').forEach(button => {
+                button.addEventListener('click', function() {
+                    const eventId = button.getAttribute('data-event-id');
+                    setEventoId(eventId);
+                });
+            });
+        },
+        error: function() {
+            showToast('Error al filtrar los eventos');
+        }
     });
 }
 
@@ -57,13 +65,13 @@ function renderEventos(eventos) {
                         <div class="card-footer m-1 d-flex align-items-center">
                             <small class="text-muted mx-2">ID del Evento: ${evento.id}</small>
                             ${(userRole === 'organizador' && userId == evento.organizador_id) ? ` <button class="btn btn-outline-primary btn-event organizador" data-bs-toggle="modal" data-bs-target="#editEventModal" onclick="fillModal(${JSON.stringify(evento)})"><i class="bi bi-pencil-square me-1"></i> Editar</button>
-                                                             <button class="btn btn-outline-danger btn-event organizador ms-2" data-bs-toggle= "modal" data-bs-target="#deleteEventModal" onclick="setEventoId(${evento.id})">
+                                                             <button class="btn btn-outline-danger btn-event organizador ms-2" data-bs-toggle= "modal" data-bs-target="#deleteEventModal" data-event-id="${evento.id}" onclick="setEventoId('${evento.id}')" style="display: inline-block;">
                                                                     <i class="bi bi-trash me-1"></i> Eliminar
                                                     </button>` : ''}
                             ${userRole === 'participante' ? 
                                 (!evento.inscrito ? 
                                     `<button onclick="inscribirUsuario('${evento.id}')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>` : 
-                                    `<button class="btn btn-outline-primary btn-event participante" disabled>Inscrito</button>`) : ''}
+                                    `<button onclick="desinscribirUsuario('${evento.id}')" class="btn btn-outline-danger btn-event participante">Desapuntarse</button>`) : ''}
                             ${ userRole === 'participante' && evento.inscrito ? 
                                 `<div id="mensaje-${evento.id}" class=" mx-2 text-success">Inscrito en el evento</div>` : 
                                 `<div id="mensaje-${evento.id}"></div>`}
@@ -86,43 +94,34 @@ document.getElementById('createEventButton').addEventListener('click', async fun
     data.capacidad_maxima = parseInt(data.capacidad_maxima, 10);
     data.organizador_id = parseInt(data.organizador_id, 10);
 
-    try {
-        const response = await fetch('/eventos/crear', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data) 
-        });
-
-        const contentType = response.headers.get('content-type');
-        if (response.ok) {
+    $.ajax({
+        url: '/eventos/crear',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(response) {
             showToast('Evento creado exitosamente');
             filtrar(); // Refrescar la lista después de crear
-        } 
-        else {
-            if (contentType && contentType.includes('text/html')) {
-                const html = await response.text();
-                document.body.innerHTML = html;
+            const modal = document.getElementById('createEventModal');
+            const modalInstance = bootstrap.Modal.getInstance(modal);
+            if (modalInstance) {
+                form.reset();
+                modalInstance.hide();
+            }
+        },
+        error: function(jqXHR) {
+            if (jqXHR.getResponseHeader('content-type').includes('text/html')) {
+                document.body.innerHTML = jqXHR.responseText;
                 document.body.style.display = 'flex';
                 document.body.style.justifyContent = 'center';
                 document.body.style.alignItems = 'center';
                 document.body.style.height = '100vh';
             } else {
-                const data = await response.json();
+                const data = JSON.parse(jqXHR.responseText);
                 showToast('Errores en la creacion del evento: ' + data.message);
             }
         }
-            const modal = document.getElementById('createEventModal');
-            const modalInstance = bootstrap.Modal.getInstance(modal);
-
-            if (modalInstance) {
-                form.reset();
-                modalInstance.hide();
-            }
-    } catch (error) {
-        showToast('Error en la creación del evento: ' + error.message);
-    }
+    });
 });
 
 let eventoId = null;
@@ -168,20 +167,20 @@ document.getElementById('confirmDeleteEventButton').addEventListener('click', as
 
 // Funcion para eliminar eventos
 function eliminarEvento(eventId) { 
-    fetch(`/eventos/${eventId}`, {
+    $.ajax({
+        url: `/eventos/${eventId}`,
         method: 'DELETE',
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showToast('Evento eliminado exitosamente');
-            filtrar(); // Refrescar la lista después de eliminar
-        } else {
+        success: function(data) {
+            if (data.success) {
+                showToast('Evento eliminado exitosamente');
+                filtrar(); // Refrescar la lista después de eliminar
+            } else {
+                showToast('Error al eliminar el evento');
+            }
+        },
+        error: function() {
             showToast('Error al eliminar el evento');
         }
-    })
-    .catch(error => {
-        showToast('Error al eliminar el evento');
     });
 }
 
@@ -197,46 +196,35 @@ document.getElementById('confirmEditEventButton').addEventListener('click', asyn
     eventoId = null;
 });
 
-async function editarEvento() {
-
+function editarEvento() {
     const form = document.getElementById('editEventForm');
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
     data.capacidad_maxima = parseInt(data.capacidad_maxima, 10);
 
-    try{
-        const response = await fetch(`/eventos/${eventoId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-
-        const contentType = response.headers.get('content-type');
-        if (response.ok) {
+    $.ajax({
+        url: `/eventos/${eventoId}`,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(response) {
             showToast('Evento editado exitosamente');
             filtrar(); // Refrescar la lista después de editar
-        } 
-        else {
-            if (contentType && contentType.includes('text/html')) {
-                const html = await response.text();
-                document.body.innerHTML = html;
+        },
+        error: function(jqXHR) {
+            if (jqXHR.getResponseHeader('content-type').includes('text/html')) {
+                document.body.innerHTML = jqXHR.responseText;
                 document.body.style.display = 'flex';
                 document.body.style.justifyContent = 'center';
                 document.body.style.alignItems = 'center';
                 document.body.style.height = '100vh';
             } else {
-                const data = await response.json();
+                const data = JSON.parse(jqXHR.responseText);
                 showToast('Errores en la edicion del evento: ' + data.message);
             }
         }
-    }
-    catch(error){
-        showToast('Error al editar el evento: ' + error.message);
-    }
-
+    });
 }
 
 // Funcion para limpiar los campos del formulario de filtro
@@ -246,41 +234,69 @@ document.getElementById('filterForm').addEventListener('reset', async function(e
     document.getElementById('tipo').value = '';
     document.getElementById('ubicacion').value = '';
     document.getElementById('capacidad').value = '';
-    await filtrar();
+    filtrar();
 });
 
 // Funcion para inscribir un usuario en un evento
 function inscribirUsuario(eventId) {
-    fetch('/usuarios/inscribir', {
+    $.ajax({
+        url: '/usuarios/inscribir',
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+        contentType: 'application/json',
+        data: JSON.stringify({
             userId: userId,
             eventId: eventId,
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
-        if (data.success) {
-            mensajeElemento.innerText = 'Inscrito en el evento';
-            mensajeElemento.classList.add('text-success');  
-            mensajeElemento.classList.add('mx-2'); 
-            // Deshabilitar el botón después de la inscripción
-            const botonApuntarse = mensajeElemento.previousElementSibling;
-            botonApuntarse.disabled = true;
-            botonApuntarse.innerText = 'Inscrito';
-        } 
-        else{
+        }),
+        success: function(data) {
+            const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
+            if (data.success) {
+                mensajeElemento.innerText = 'Inscrito en el evento';
+                mensajeElemento.classList.add('text-success');
+                mensajeElemento.classList.add('mx-2');
+                // // Deshabilitar el botón después de la inscripción
+                // const botonApuntarse = mensajeElemento.previousElementSibling;
+                // botonApuntarse.innerText = 'Desapuntarse';
+                filtrar(); // Refrescar la lista después de inscribirse
+            } else {
+                showToast('Error al inscribirse en el evento');
+            }
+        },
+        error: function() {
             showToast('Error al inscribirse en el evento');
         }
-    })
-    .catch(error => {
-        showToast('Error al inscribirse en el evento');
     });
+}
 
+function desinscribirUsuario(eventId){
+    $.ajax({
+        url: '/usuarios/desinscribir',
+        method: 'DELETE',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            userId: userId,
+            eventId: eventId,
+        }),
+        success: function(data) {
+            const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
+            if (data.success) {
+                mensajeElemento.innerText = '';
+                mensajeElemento.classList.remove('text-success');
+                mensajeElemento.classList.remove('mx-2');
+                // Deshabilitar el botón después de la inscripción
+                // const botonApuntarse = mensajeElemento.previousElementSibling;
+                // botonApuntarse.innerText = 'Apuntarse';
+                // botonApuntarse.addClassName('btn-outline-primary');
+                // botonApuntarse.removeClassName('btn-outline-danger');
+                filtrar(); // Refrescar la lista después de desapuntarse
+                showToast('Desapuntado del evento');
+            } else {
+                showToast('Error al desapuntarse en el evento');
+            }
+        },
+        error: function() {
+            showToast('Error al desapuntarse en el evento');
+        }
+    });
 }
 
 // Funcion para mostrar un toast

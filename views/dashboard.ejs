@@ -72,7 +72,7 @@
                                             <% if (!evento.inscrito) { %>
                                                 <button onclick="inscribirUsuario('<%= evento.id %>')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>
                                             <% } else { %>
-                                                <button class="btn btn-outline-primary btn-event participante" disabled>Inscrito</button>
+                                                <button onclick= "desinscribirUsuario('<%= evento.id %>')" class="btn btn-outline-danger btn-event participante" >Desapuntarse</button>
                                             <% } %>
                                         <% } %>
                                         <% if (user.rol === 'participante') { %>
@@ -229,6 +229,7 @@
     //paso el rol y el id del usuario al script de dashboard.js
 </script>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="/javascripts/dashboard.js"></script>
 
 
