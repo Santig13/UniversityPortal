@@ -20,12 +20,10 @@ const validateEvent = [
         .custom(detectSQLInjection),
 
     check('fecha')
-        .matches(/^\d{4}-\d{2}-\d{2}$/).withMessage('Fecha debe estar en formato YYYY-MM-DD')
-        .custom(detectSQLInjection),
+        .matches(/^\d{4}-\d{2}-\d{2}$/).withMessage('Fecha debe estar en formato YYYY-MM-DD'),
 
     check('hora')
-        .matches(/^([01]\d|2[0-3]):([0-5]\d)$/).withMessage('Hora debe estar en formato HH:MM')
-        .custom(detectSQLInjection),
+        .matches(/^([01]\d|2[0-3]):([0-5]\d)$/).withMessage('Hora debe estar en formato HH:MM'),
 
     check('ubicacion')
         .notEmpty().withMessage('Ubicación es requerida')
@@ -35,7 +33,6 @@ const validateEvent = [
     check('capacidad_maxima')
         .isInt({ min: 1 }).withMessage('Capacidad máxima debe ser un número entero positivo')
         .custom(detectSQLInjection),
-
 ];
 
 // Middleware general para manejar resultados de validación

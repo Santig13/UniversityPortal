@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const { validateEvent } = require('../schemas/event.js');
+const {añadirNotificacion} = require('./notifications.js');
 
 function getEventosPersonales(user, pool, callback) {
     if (user.rol === 'participante') {
@@ -124,7 +125,6 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
             connection.query(sql, [titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, req.session.user.id], (err, result) => {
                 connection.release();
                 if (err) {
-                    console.log(err);
                     err.message = 'Error al crear evento en la base de datos.';
                     return next(err);
                 }
@@ -132,6 +132,28 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
             });
         });
     });
+
+    function usuariosInscritos(connection, evento_id, callback) {
+        const sql = 'SELECT usuario_id FROM inscripciones WHERE evento_id=?';
+        connection.query(sql, [ evento_id], (err, result) => {
+            if (err) {
+                return callback(err);
+            }
+            const usuarios = result.map(row => row.usuario_id);
+            return callback(null, usuarios);
+        });
+    }
+
+    function notificarTodosLosParticipantes(connection, usuarios,mensaje,id, fecha, callback) {
+        usuarios.forEach(usuario_id => {
+            añadirNotificacion(connection, usuario_id, mensaje, fecha, (err) => {
+                if (err) {
+                    err.message = 'Error al eliminar evento en la base de datos.';
+                    return callback(err);
+                }
+            });
+        });
+    }
 
     // Ruta para borrar un evento
     router.delete('/:id', requireAuth, (req, res, next) => {
@@ -141,13 +163,38 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                 err.message = 'Error al obtener conexión de la base de datos para eliminar evento.';
                 return next(err);
             }
-            connection.query(sql, [req.params.id], (err, result) => {
-                connection.release();
+           
+            let usuarios;
+            usuariosInscritos(connection, req.params.id, (err, result) => {
                 if (err) {
-                    err.message = 'Error al eliminar evento en la base de datos.';
+                    connection.release();
                     return next(err);
                 }
-                res.status(200).json({ success: true });
+               
+                usuarios = result;
+            
+                connection.query(sql, [req.params.id], (err, result) => {
+                    if (err) {
+                        connection.release();
+                        err.message = 'Error al eliminar evento en la base de datos.';
+                        return next(err);
+                    }
+                    const mensaje = `El organizador ha eliminado el evento con id ${req.params.id} ha sido eliminado`;
+                    const fecha = new Date();
+                    const dia = String(fecha.getDate()).padStart(2, '0');
+                    const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript son 0-indexados
+                    const año = fecha.getFullYear();
+                    const fechaHoy = `${año}-${mes}-${dia}`;
+
+                    notificarTodosLosParticipantes(connection, usuarios, mensaje, req.params.id, fechaHoy, (err) => {
+                        connection.release();
+                        if (err) {
+                            return next(err);
+                        }
+                        res.status(200).json({ success: true });
+                    });
+                    
+                });
             });
         });
     });
@@ -162,13 +209,34 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                 err.message = 'Error al obtener conexión de la base de datos para actualizar evento.';
                 return next(err);
             }
-            connection.query(sql, [titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, id], (err, result) => {
-                connection.release();
+            let usuarios;
+            usuariosInscritos(connection, id, (err, result) => {
                 if (err) {
-                    err.message = 'Error al actualizar evento en la base de datos.';
+                    connection.release();
                     return next(err);
                 }
-                res.status(200).json({ success: true });
+                usuarios = result;
+            
+                connection.query(sql, [titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, id], (err, result) => {
+                    connection.release();
+                    if (err) {
+                        err.message = 'Error al actualizar evento en la base de datos.';
+                        return next(err);
+                    }
+                    const mensaje = `El organizador ha modificado el evento con id ${id}`;
+
+                    const fecha = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                    console.log(fecha);
+                
+                    
+                    notificarTodosLosParticipantes(connection, usuarios, mensaje, req.params.id, fecha, (err) => {
+                        connection.release();
+                        if (err) {
+                            return next(err);
+                        }
+                        res.status(200).json({ success: true });
+                    });
+                });
             });
         });
     });

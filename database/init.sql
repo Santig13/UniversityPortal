@@ -75,3 +75,17 @@ CREATE TABLE IF NOT EXISTS NOTIFICACIONES (
     leido BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (usuario_id) REFERENCES USUARIOS(id) ON DELETE CASCADE
 );
+/*
+INSERT INTO EVENTOS (titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, organizador_id)
+VALUES 
+('Charla de Tecnología Avanzada', 'Sesión sobre las últimas tendencias en IA y Big Data', '2024-12-01', '10:00:00', 'Auditorio Central', 100, 5),
+('Taller de Programación en Python', 'Un taller práctico sobre desarrollo de software usando Python', '2024-11-20', '14:00:00', 'Laboratorio 3', 30, 5),
+('Conferencia de Marketing Digital', 'Aprende sobre estrategias y tendencias en marketing digital.', '2024-11-15', '09:00:00', 'Sala de Conferencias 1', 50, 5),
+('Feria de Innovación y Emprendimiento', 'Exposición de proyectos innovadores y startups.', '2024-12-10', '12:00:00', 'Explanada Principal', 200, 5),
+('Seminario de Ciberseguridad', 'Discusión sobre técnicas y desafíos en seguridad informática.', '2024-11-25', '16:00:00', 'Salón de Clases B', 40, 5),
+('Jornada de Networking', 'Encuentro para hacer contactos en diferentes áreas profesionales.', '2024-12-05', '18:00:00', 'Salón de Eventos', 150, 5),
+('Workshop de Diseño Gráfico', 'Taller intensivo sobre herramientas de diseño gráfico.', '2024-11-30', '10:30:00', 'Aula de Arte', 25, 5),
+('Simposio de Inteligencia Artificial', 'Presentación de investigaciones recientes en IA.', '2024-12-08', '11:00:00', 'Sala de Conferencias 2', 80, 5),
+('Curso de Desarrollo Web', 'Aprende a construir sitios web interactivos desde cero.', '2024-11-18', '15:00:00', 'Laboratorio 1', 35, 5),
+('Charla sobre Economía Circular', 'Discusión sobre sostenibilidad y economía circular.', '2024-12-03', '13:00:00', 'Auditorio Pequeño', 60, 5);
+    */

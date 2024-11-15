@@ -6,6 +6,7 @@ const mysqlSession = require('express-mysql-session');
 const createAuthRouter = require('./routes/auth.js');
 const {createEventosRouter,getEventos,getEventosPersonales} = require('./routes/events.js');
 const createUsuariosRouter = require('./routes/usuarios.js');
+const createNotificationsRouter = require('./routes/notifications.js');
 const mysqlStore = mysqlSession(session);
 
 const sessionStore = new mysqlStore({
@@ -61,10 +62,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(middlewareSession);
 app.use(detectIPBloqueadas);
 
-// Utiliza el router de autenticación
+// Rutas
 app.use('/auth', createAuthRouter(pool, middlewareSession));
 app.use('/eventos', createEventosRouter(pool, requireAuth, middlewareSession));
 app.use('/usuarios', createUsuariosRouter(pool, requireAuth, middlewareSession));
+app.use('/notificaciones', createNotificationsRouter(pool, requireAuth, middlewareSession));
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
@@ -107,33 +109,6 @@ function requireAuth(req, res, next) {
         next(err); 
     }
 }
-//Navegacion a notificaciones
-app.get('/notificaciones', requireAuth, (req, res, next) => {
-    const sql = 'SELECT * FROM notificaciones WHERE usuario_id  = ?';
-    pool.query(sql, [req.session.user.id], (err, results) => {
-        if (err) {
-            err.message = 'Error al recuperar las notificaciones.';
-            err.status = 500;
-            return next(err);
-        }
-        res.render('notifications', { user: req.session.user, notificaciones: results });
-    });
-});
-
-//Marcar como leidas las notificaciones
-app.post('/notificaciones/leido', requireAuth, (req, res, next) => {
-    const sql = 'UPDATE notificaciones SET leido = 0 WHERE usuario_id  = ?';
-    
-    pool.query(sql, [req.session.user.id], (err) => {
-        if (err) {
-            err.message = 'Error al marcar las notificaciones como leídas.';
-            err.status = 500;
-            return next(err);
-        }
-        res.status(200).send('Notificaciones marcadas como leídas.');
-    });
-});
-
 // Navegación a la página de dashboard
 app.get('/dashboard', requireAuth, (req, res, next) => {
     getEventos(req.query, pool, (err, eventos) => {
