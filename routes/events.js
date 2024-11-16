@@ -236,6 +236,33 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
         });
     });
     
+    router.get('/:id/participantes', (req, res, next) => {
+        const { id } = req.params;
+        console.log(id);
+        const sql = `
+            SELECT usuarios.nombre, usuarios.telefono, usuarios.email, facultades.nombre AS facultad
+            FROM inscripciones
+            JOIN usuarios ON inscripciones.usuario_id = usuarios.id
+            JOIN facultades ON usuarios.facultad_id = facultades.id
+            WHERE inscripciones.evento_id = ?
+        `;
+        pool.getConnection((err, connection) => {
+            if (err) {
+                err.message = 'Error al obtener conexión de la base de datos para obtener participantes.';
+                return next(err);
+            }
+            connection.query(sql, [id], (err, rows) => {
+                console.log(rows);
+                connection.release();
+                if (err) {
+                    err.message = 'Error al consultar participantes en la base de datos.';
+                    return next(err);
+                }
+                res.status(200).json({ participantes: rows });
+            });
+        });
+    });
+
     return router;
 }
 

@@ -67,11 +67,13 @@ function renderEventos(eventos) {
                             ${(userRole === 'organizador' && userId == evento.organizador_id) ? ` <button class="btn btn-outline-primary btn-event organizador" data-bs-toggle="modal" data-bs-target="#editEventModal" onclick="fillModal(${JSON.stringify(evento).replace(/"/g, '&quot;')})"><i class="bi bi-pencil-square me-1"></i> Editar</button>
                                                              <button class="btn btn-outline-danger btn-event organizador ms-2" data-bs-toggle= "modal" data-bs-target="#deleteEventModal" data-event-id="${evento.id}" onclick="setEventoId('${evento.id}')" style="display: inline-block;">
                                                                     <i class="bi bi-trash me-1"></i> Eliminar
-                                                    </button>` : ''}
+                                                    </button><button class="btn btn-outline-info btn-event organizador ms-2" data-bs-toggle="modal" data-bs-target="#participantsModal" onclick="showParticipants('${evento.id}')">
+                                                    <i class="bi bi-people me-1"></i> Participantes
+                                                </button>` : ''}
                             ${userRole === 'participante' ? 
                                 (!evento.inscrito ? 
-                                    `<button onclick="inscribirUsuario('${evento.id}')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>` : 
-                                    `<button onclick="desinscribirUsuario('${evento.id}')" class="btn btn-outline-danger btn-event participante">Desapuntarse</button>`) : ''}
+                                    `<button onclick="inscribirUsuario('${evento.id}','${evento.organizador_id}')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>` : 
+                                    `<button onclick="desinscribirUsuario('${evento.id}','${evento.organizador_id}')" class="btn btn-outline-danger btn-event participante">Desapuntarse</button>`) : ''}
                             ${ userRole === 'participante' && evento.inscrito ? 
                                 `<div id="mensaje-${evento.id}" class=" mx-2 text-success">Inscrito en el evento</div>` : 
                                 `<div id="mensaje-${evento.id}"></div>`}
@@ -238,7 +240,7 @@ document.getElementById('filterForm').addEventListener('reset', async function(e
 });
 
 // Funcion para inscribir un usuario en un evento
-function inscribirUsuario(eventId) {
+function inscribirUsuario(eventId, organizador_id) {
     $.ajax({
         url: '/usuarios/inscribir',
         method: 'POST',
@@ -246,6 +248,7 @@ function inscribirUsuario(eventId) {
         data: JSON.stringify({
             userId: userId,
             eventId: eventId,
+            organizador_id: organizador_id,
         }),
         success: function(data) {
             const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
@@ -268,7 +271,7 @@ function inscribirUsuario(eventId) {
     });
 }
 
-function desinscribirUsuario(eventId){
+function desinscribirUsuario(eventId,organizador_id){
     $.ajax({
         url: '/usuarios/desinscribir',
         method: 'DELETE',
@@ -276,6 +279,7 @@ function desinscribirUsuario(eventId){
         data: JSON.stringify({
             userId: userId,
             eventId: eventId,
+            organizador_id: organizador_id,
         }),
         success: function(data) {
             const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
@@ -288,6 +292,7 @@ function desinscribirUsuario(eventId){
                 // botonApuntarse.innerText = 'Apuntarse';
                 // botonApuntarse.addClassName('btn-outline-primary');
                 // botonApuntarse.removeClassName('btn-outline-danger');
+                //console.log('Desapuntado del evento');
                 filtrar(); // Refrescar la lista después de desapuntarse
                 showToast('Desapuntado del evento');
             } else {
@@ -298,8 +303,47 @@ function desinscribirUsuario(eventId){
             showToast('Error al desapuntarse en el evento');
         }
     });
+} 
+function showParticipants(eventoId) {
+    $.ajax({
+        url: `/eventos/${eventoId}/participantes`,
+        method: 'GET',
+        success: function (response) {
+            const participantesContainer = document.getElementById('participantesContainer');
+            participantesContainer.innerHTML = '';
+            let html = '';
+            if (response.participantes.length === 0) {
+                const tituloNotificaciones = document.getElementById('tituloNotificaciones');
+                tituloNotificaciones.classList.add('d-none');
+                participantesContainer.innerHTML = '<h4 class="text-center">No hay participantes</h4>';
+            } else {
+                response.participantes.forEach(participante => {
+                    html += `
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div id="participante-${participante.id}" class="card">
+                                <div class="card-body d-flex align-items-center">
+                                    <div>
+                                        <h5 class="card-title">Participante</h5>
+                                        <p class="card-text"><strong>Nombre:</strong> ${participante.nombre}</p>
+                                        <p class="card-text"><strong>Teléfono:</strong> ${participante.telefono}</p>
+                                        <p class="card-text"><strong>Email:</strong> ${participante.email}</p>
+                                        <p class="card-text"><strong>Facultad:</strong> ${participante.facultad}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                });
+                participantesContainer.insertAdjacentHTML('beforeend', html);
+            }
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
 }
-
 // Funcion para mostrar un toast
 function showToast(message) {
     const toastElement = document.getElementById('myToast');

@@ -11,48 +11,61 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
 
     // Inscribir usuario en un evento
     router.post('/inscribir', (req, res, next) => {
-        const { userId, eventId } = req.body;
+        const { userId, eventId,organizador_id} = req.body;
         const fecha_inscripcion = new Date().toISOString().split('T')[0];
         const query = 'INSERT INTO inscripciones (usuario_id, evento_id, estado, fecha_inscripcion) VALUES (?, ?, ?, ?)';
-        
+       
         pool.getConnection((err, connection) => {
             if(err){
                 err.message = 'Error al obtener conexión de la base de datos para inscribir usuario en evento';
                 return next(err);
             }
             connection.query(query, [userId, eventId, "1", fecha_inscripcion], (error, results) => {
-                connection.release();
+                
                 if (error) {
+                    connection.release();
                     error.message = 'Error inscribiendo al usuario en el evento';
                     error.status = 500;
                     return next(error);
                 }
+
                 const mensaje = `Te has inscrito en el evento con id ${eventId}`;
                 const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
                 añadirNotificacion(connection, userId, mensaje, fecha, (err) => {
                     if (err) {
-                        return callback(err);
+                        connection.release();
+                        return next(err);
                     }
+               
+                    const mensaje2 = `El usuario con id ${userId} se ha inscrito a su evento con id ${eventId}`;
+                    añadirNotificacion(connection, organizador_id, mensaje2, fecha, (err) => {
+                        connection.release();
+                        if (err) {
+                            return next(err);
+                        }
+                       
+                        res.status(200).send({ success: true, message: 'Usuario inscrito en el evento' });
+                    });
                 });
-                
             });
-            res.status(200).send({ success: true, message: 'Usuario inscrito en el evento' });
+           
         });
        
     });
 
     // Desinscribir usuario de un evento
     router.delete('/desinscribir', (req, res, next) => {
-        const { userId, eventId } = req.body;
+        const { userId, eventId,organizador_id } = req.body;
         const query = 'DELETE FROM inscripciones WHERE usuario_id = ? AND evento_id = ?';
+        
         pool.getConnection((err, connection) => {
             if(err){
                 err.message = 'Error al obtener conexión de la base de datos para desinscribir usuario de evento';
                 return next(err);
             }
             connection.query(query, [userId, eventId], (error, results) => {
-                connection.release();
                 if (error) {
+                    connection.release();
                     error.message = 'Error desinscribiendo al usuario del evento';
                     error.status = 500;
                     return next(error);
@@ -62,11 +75,20 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
                 const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
                 añadirNotificacion(connection, userId, mensaje, fecha, (err) => {
                     if (err) {
-                        return callback(err);
+                        connection.release();
+                        return next(err);
                     }
+                    const mensaje2 = `El usuario con id ${userId} se ha desinscrito de su evento con id ${eventId}`;
+                    añadirNotificacion(connection, organizador_id, mensaje2, fecha, (err) => {
+                        connection.release();
+                        if (err) {
+                            return next(err);
+                        }
+                       
+                        res.status(200).send({ success: true, message: 'Usuario inscrito en el evento' });
+                    });
                 });
             });
-            res.status(200).send({ success: true, message: 'Usuario desinscrito del evento' });
         });
     });
     

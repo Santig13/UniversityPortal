@@ -10,7 +10,6 @@ function añadirNotificacion(connection, usuario_id, mensaje, fecha, callback) {
     });
 }
 
-
 function createNotificationsRouter(pool, requireAuth, middlewareSession) {
     const router = Router();
 
