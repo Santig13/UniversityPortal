@@ -238,7 +238,6 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
     
     router.get('/:id/participantes', (req, res, next) => {
         const { id } = req.params;
-        console.log(id);
         const sql = `
             SELECT usuarios.nombre, usuarios.telefono, usuarios.email, facultades.nombre AS facultad
             FROM inscripciones
@@ -252,7 +251,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                 return next(err);
             }
             connection.query(sql, [id], (err, rows) => {
-                console.log(rows);
+                
                 connection.release();
                 if (err) {
                     err.message = 'Error al consultar participantes en la base de datos.';

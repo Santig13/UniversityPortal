@@ -62,12 +62,12 @@ function renderEventos(eventos) {
                             <p class="card-text"><strong>Capacidad Máxima:</strong> ${evento.capacidad_maxima}</p>
                             <p class="card-text"><strong>Organizador ID:</strong> ${evento.organizador_id}</p>
                         </div>
-                        <div class="card-footer m-1 d-flex align-items-center">
-                            <small class="text-muted mx-2">ID del Evento: ${evento.id}</small>
-                            ${(userRole === 'organizador' && userId == evento.organizador_id) ? ` <button class="btn btn-outline-primary btn-event organizador" data-bs-toggle="modal" data-bs-target="#editEventModal" onclick="fillModal(${JSON.stringify(evento).replace(/"/g, '&quot;')})"><i class="bi bi-pencil-square me-1"></i> Editar</button>
-                                                             <button class="btn btn-outline-danger btn-event organizador ms-2" data-bs-toggle= "modal" data-bs-target="#deleteEventModal" data-event-id="${evento.id}" onclick="setEventoId('${evento.id}')" style="display: inline-block;">
+                        <div class="card-footer m-1 d-flex flex-wrap align-items-center justify-content-lg-start">
+                            <small class="text-muted mx-2 mt-1">ID del Evento: ${evento.id}</small>
+                            ${(userRole === 'organizador' && userId == evento.organizador_id) ? ` <button class="btn btn-outline-primary btn-event organizador mt-1" data-bs-toggle="modal" data-bs-target="#editEventModal" onclick="fillModal(${JSON.stringify(evento).replace(/"/g, '&quot;')})"><i class="bi bi-pencil-square me-1"></i> Editar</button>
+                                                             <button class="btn btn-outline-danger btn-event organizador ms-2 mt-1" data-bs-toggle= "modal" data-bs-target="#deleteEventModal" data-event-id="${evento.id}" onclick="setEventoId('${evento.id}')" style="display: inline-block;">
                                                                     <i class="bi bi-trash me-1"></i> Eliminar
-                                                    </button><button class="btn btn-outline-info btn-event organizador ms-2" data-bs-toggle="modal" data-bs-target="#participantsModal" onclick="showParticipants('${evento.id}')">
+                                                    </button><button class="btn btn-outline-info btn-event organizador ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#participantsModal" onclick="showParticipants('${evento.id}')">
                                                     <i class="bi bi-people me-1"></i> Participantes
                                                 </button>` : ''}
                             ${userRole === 'participante' ? 
@@ -257,9 +257,7 @@ function inscribirUsuario(eventId, organizador_id) {
                 mensajeElemento.classList.add('text-success');
                 mensajeElemento.classList.add('mx-2');
                 showToast('Inscrito en el evento');
-                // // Deshabilitar el botón después de la inscripción
-                // const botonApuntarse = mensajeElemento.previousElementSibling;
-                // botonApuntarse.innerText = 'Desapuntarse';
+              
                 filtrar(); // Refrescar la lista después de inscribirse
             } else {
                 showToast('Error al inscribirse en el evento');
@@ -287,12 +285,7 @@ function desinscribirUsuario(eventId,organizador_id){
                 mensajeElemento.innerText = '';
                 mensajeElemento.classList.remove('text-success');
                 mensajeElemento.classList.remove('mx-2');
-                // Deshabilitar el botón después de la inscripción
-                // const botonApuntarse = mensajeElemento.previousElementSibling;
-                // botonApuntarse.innerText = 'Apuntarse';
-                // botonApuntarse.addClassName('btn-outline-primary');
-                // botonApuntarse.removeClassName('btn-outline-danger');
-                //console.log('Desapuntado del evento');
+                
                 filtrar(); // Refrescar la lista después de desapuntarse
                 showToast('Desapuntado del evento');
             } else {

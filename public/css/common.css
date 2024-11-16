@@ -263,6 +263,7 @@ a:hover {
     margin-left: auto;
     display: flex;
     align-items: center;
+    justify-content: center ;
 }
 
 .navbar-button {
@@ -405,12 +406,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* Reemplazar el icono del reloj en el input de tipo time */
-input[type="time"]::-webkit-clear-button {
+input[type="time"]::-webkit-calendar-picker-indicator {
     background-image: url('../images/clock.png') !important;
     background-size: 20px 20px;
     background-repeat: no-repeat;
     background-position: center;
 }
+
+
 /*Estilos para notificaciones*/
 .notificacion-no-leida {
     border: 2px solid blue;
