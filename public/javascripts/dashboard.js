@@ -63,7 +63,7 @@ function renderEventos(eventos) {
                             <p class="card-text"><strong>Organizador ID:</strong> ${evento.organizador_id}</p>
                         </div>
                         <div class="card-footer m-1 d-flex flex-wrap align-items-center justify-content-lg-start">
-                            <small class="text-muted mx-2 mt-1">ID del Evento: ${evento.id}</small>
+                            <small class="text-muted mx-2 mt-1">ID Evento: ${evento.id}</small>
                             ${(userRole === 'organizador' && userId == evento.organizador_id) ? ` <button class="btn btn-outline-primary btn-event organizador mt-1" data-bs-toggle="modal" data-bs-target="#editEventModal" onclick="fillModal(${JSON.stringify(evento).replace(/"/g, '&quot;')})"><i class="bi bi-pencil-square me-1"></i> Editar</button>
                                                              <button class="btn btn-outline-danger btn-event organizador ms-2 mt-1" data-bs-toggle= "modal" data-bs-target="#deleteEventModal" data-event-id="${evento.id}" onclick="setEventoId('${evento.id}')" style="display: inline-block;">
                                                                     <i class="bi bi-trash me-1"></i> Eliminar
@@ -253,10 +253,16 @@ function inscribirUsuario(eventId, organizador_id) {
         success: function(data) {
             const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
             if (data.success) {
-                mensajeElemento.innerText = 'Inscrito en el evento';
-                mensajeElemento.classList.add('text-success');
-                mensajeElemento.classList.add('mx-2');
-                showToast('Inscrito en el evento');
+                if(data.message == 'Se te ha añadido a la lista de espera'){
+                    mensajeElemento.innerText = 'En lista de espera';
+                    mensajeElemento.classList.add('text-warning');
+                    mensajeElemento.classList.add('mx-2');
+                }else{
+                    mensajeElemento.innerText = 'Inscrito en el evento';
+                    mensajeElemento.classList.add('text-success');
+                    mensajeElemento.classList.add('mx-2');
+                }
+                showToast(data.message);
               
                 filtrar(); // Refrescar la lista después de inscribirse
             } else {
@@ -287,7 +293,7 @@ function desinscribirUsuario(eventId,organizador_id){
                 mensajeElemento.classList.remove('mx-2');
                 
                 filtrar(); // Refrescar la lista después de desapuntarse
-                showToast('Desapuntado del evento');
+                showToast(data.message);
             } else {
                 showToast('Error al desapuntarse en el evento');
             }
@@ -306,7 +312,7 @@ function showParticipants(eventoId) {
             participantesContainer.innerHTML = '';
             let html = '';
             if (response.participantes.length === 0) {
-                const tituloNotificaciones = document.getElementById('tituloNotificaciones');
+                const tituloNotificaciones = document.getElementById('tituloParticipantes');
                 tituloNotificaciones.classList.add('d-none');
                 participantesContainer.innerHTML = '<h4 class="text-center">No hay participantes</h4>';
             } else {

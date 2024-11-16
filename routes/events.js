@@ -85,6 +85,35 @@ function getEventos(query, pool, callback) {
     });
 }
 
+// Funcion que comprueba si hay hueco en un evento
+function comprobarCapacidad(connection, evento_id, callback) {
+
+    const sql = `
+        SELECT COUNT(inscripciones.usuario_id) AS inscritos, eventos.capacidad_maxima 
+        FROM Inscripciones 
+        JOIN EVENTOS ON Inscripciones.evento_id = EVENTOS.id 
+        WHERE EVENTOS.id = ? 
+        GROUP BY eventos.capacidad_maxima
+    `;
+    
+    connection.query(sql, [evento_id], (err, result) => {
+        if (err) {
+            return callback(err);
+        }
+
+        if (result.length === 0) {
+            return callback(null, { hayEspacio: true, inscritos: 0, capacidadMaxima: 0 });
+        }
+
+        const { inscritos, capacidad_maxima } = result[0];
+        return callback(null, {
+            hayEspacio: inscritos < capacidad_maxima,
+            inscritos,
+            capacidadMaxima: capacidad_maxima
+        });
+    });
+}
+
 function createEventosRouter(pool, requireAuth, middlewareSession) {
     const router = Router();
     
@@ -144,6 +173,8 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
             return callback(null, usuarios);
         });
     }
+    
+    
 
     function notificarTodosLosParticipantes(connection, usuarios,mensaje,id, fecha, callback) {
         usuarios.forEach(usuario_id => {
@@ -268,5 +299,6 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
 module.exports = {
     createEventosRouter,
     getEventos,
-    getEventosPersonales
+    getEventosPersonales,
+    comprobarCapacidad,
 };
