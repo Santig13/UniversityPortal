@@ -124,9 +124,15 @@ app.get('/dashboard', requireAuth, (req, res, next) => {
                 return next(err);
             }
             eventos = eventos.map(evento => {
-                evento.inscrito = eventosPersonales.some(e => e.id === evento.id);
+                const inscripcion = eventosPersonales.find(e => e.id === evento.id);
+                if (inscripcion) {
+                    evento.estadoInscripcion = inscripcion.estado;
+                } else {
+                    evento.estadoInscripcion = null;
+                }
                 return evento;
             });
+           
             res.render('dashboard', { user: req.session.user, eventos });
         });
     });

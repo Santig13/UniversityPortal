@@ -70,13 +70,15 @@ function renderEventos(eventos) {
                                                     </button><button class="btn btn-outline-info btn-event organizador ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#participantsModal" onclick="showParticipants('${evento.id}')">
                                                     <i class="bi bi-people me-1"></i> Participantes
                                                 </button>` : ''}
-                            ${userRole === 'participante' ? 
-                                (!evento.inscrito ? 
-                                    `<button onclick="inscribirUsuario('${evento.id}','${evento.organizador_id}')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>` : 
-                                    `<button onclick="desinscribirUsuario('${evento.id}','${evento.organizador_id}')" class="btn btn-outline-danger btn-event participante">Desapuntarse</button>`) : ''}
-                            ${ userRole === 'participante' && evento.inscrito ? 
-                                `<div id="mensaje-${evento.id}" class=" mx-2 text-success">Inscrito en el evento</div>` : 
-                                `<div id="mensaje-${evento.id}"></div>`}
+                           ${userRole === 'participante' ? 
+                            (evento.estadoInscripcion === 'inscrito' ? 
+                                `<button onclick="desinscribirUsuario('${evento.id}','${evento.organizador_id}')" class="btn btn-outline-danger btn-event participante">Desapuntarse</button>
+                                <div id="mensaje-${evento.id}" class="mx-2 text-success">Inscrito en el evento</div>` : 
+                            (evento.estadoInscripcion === 'lista de espera' ? 
+                                `<button onclick="abandonarListaEspera('${evento.id}','${evento.organizador_id}')" class="btn btn-outline-warning btn-event participante">Abandonar</button>
+                                <div id="mensaje-${evento.id}" class="mx-2 text-warning">En lista de espera</div>` : 
+                                `<button onclick="inscribirUsuario('${evento.id}','${evento.organizador_id}')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>
+                                <div id="mensaje-${evento.id}"></div>`)) : ''}
                         </div>
                     </div>
                 </div>
@@ -204,7 +206,8 @@ function editarEvento() {
     const data = Object.fromEntries(formData.entries());
 
     data.capacidad_maxima = parseInt(data.capacidad_maxima, 10);
-
+    console.log(data);
+    console.log("hola");
     $.ajax({
         url: `/eventos/${eventoId}`,
         method: 'PUT',
@@ -303,6 +306,35 @@ function desinscribirUsuario(eventId,organizador_id){
         }
     });
 } 
+function abandonarListaEspera(eventId,organizador_id){
+    $.ajax({
+        url: '/usuarios/abandonar',
+        method: 'DELETE',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            userId: userId,
+            eventId: eventId,
+            organizador_id: organizador_id,
+        }),
+        success: function(data) {
+            const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
+            if (data.success) {
+                mensajeElemento.innerText = '';
+                mensajeElemento.classList.remove('text-warning');
+                mensajeElemento.classList.remove('mx-2');
+                filtrar(); // Refrescar la lista después de abandonar la lista de espera
+                showToast(data.message);
+            } else {
+                showToast('Error al abandonar la lista de espera');
+            }
+        },
+        error: function() {
+            showToast('Error al abandonar la lista de espera');
+        }
+
+    });
+}
+
 function showParticipants(eventoId) {
     $.ajax({
         url: `/eventos/${eventoId}/participantes`,

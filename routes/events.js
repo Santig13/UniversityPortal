@@ -10,9 +10,13 @@ function getEventosPersonales(user, pool, callback) {
         getEventosOrganizador(user, pool, callback);
     }
 }
-
 function getEventosParticipante(user, pool, callback) {
-    const sql = 'SELECT * FROM eventos WHERE id IN (SELECT evento_id FROM inscripciones WHERE usuario_id=?)';
+     const sql = `
+        SELECT eventos.*, inscripciones.estado
+        FROM eventos
+        JOIN inscripciones ON eventos.id = inscripciones.evento_id
+        WHERE inscripciones.usuario_id = ?
+    `;
     pool.getConnection((err, connection) => {
         if (err) {
             err.message = 'Error al obtener conexión de la base de datos para obtener eventos del participante.';
@@ -100,7 +104,7 @@ function comprobarCapacidad(connection, evento_id, callback) {
         if (err) {
             return callback(err);
         }
-
+       
         if (result.length === 0) {
             return callback(null, { hayEspacio: true, inscritos: 0, capacidadMaxima: 0 });
         }
@@ -135,7 +139,12 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                     return next(err);
                 }
                 eventos = eventos.map(evento => {
-                    evento.inscrito = eventosPersonales.some(e => e.id === evento.id);
+                    const inscripcion = eventosPersonales.find(e => e.id === evento.id);
+                    if (inscripcion) {
+                        evento.estadoInscripcion = inscripcion.estado;
+                    } else {
+                        evento.estadoInscripcion = null;
+                    }
                     return evento;
                 });
                 res.status(200).json(eventos);
@@ -232,6 +241,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
         const { titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima} = req.body;
         const id = req.params.id;
         const sql = 'UPDATE eventos SET titulo=?, descripcion=?, fecha=?, hora=?, ubicacion=?, capacidad_maxima=? WHERE id=?';
+        console.log(req.body);
         pool.getConnection((err, connection) => {
             if (err) {
                 err.message = 'Error al obtener conexión de la base de datos para actualizar evento.';

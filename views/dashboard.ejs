@@ -73,16 +73,14 @@
                                                 <i class="bi bi-people me-1"></i> Participantes
                                             </button>
                                         <% } else if (user.rol === 'participante') { %>
-                                            <% if (!evento.inscrito) { %>
-                                                <button onclick="inscribirUsuario('<%= evento.id %>','<%= evento.organizador_id %>')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>
-                                            <% } else { %>
+                                            <% if (evento.estadoInscripcion==='inscrito') { %>
                                                 <button onclick= "desinscribirUsuario('<%= evento.id %>','<%= evento.organizador_id %>')" class="btn btn-outline-danger btn-event participante" >Desapuntarse</button>
-                                            <% } %>
-                                        <% } %>
-                                        <% if (user.rol === 'participante') { %>
-                                            <% if (evento.inscrito) { %>
                                                 <div id="mensaje-<%= evento.id %>" class="mx-2 text-success">Inscrito en el evento</div>
+                                            <% } else if  (evento.estadoInscripcion==='lista de espera') { %>
+                                                <button onclick= "abandonarListaEspera('<%= evento.id %>','<%= evento.organizador_id %>')" class="btn btn-outline-warning btn-event participante" >Abandonar</button>
+                                                <div id="mensaje-<%= evento.id %>" class="mx-2 text-warning">En lista de espera</div>
                                             <% } else { %>
+                                                <button onclick="inscribirUsuario('<%= evento.id %>','<%= evento.organizador_id %>')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>
                                                 <div id="mensaje-<%= evento.id %>"></div>
                                             <% } %>
                                         <% } %>
