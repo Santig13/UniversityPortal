@@ -342,14 +342,16 @@ function showParticipants(eventoId) {
         success: function (response) {
             const participantesContainer = document.getElementById('participantesContainer');
             participantesContainer.innerHTML = '';
-            let html = '';
+            let inscritosHtml = '';
+            let listaEsperaHtml = '';
+
             if (response.participantes.length === 0) {
                 const tituloNotificaciones = document.getElementById('tituloParticipantes');
                 tituloNotificaciones.classList.add('d-none');
                 participantesContainer.innerHTML = '<h4 class="text-center">No hay participantes</h4>';
             } else {
                 response.participantes.forEach(participante => {
-                    html += `
+                    const participanteHtml = `
                     <div class="row mb-4">
                         <div class="col-12">
                             <div id="participante-${participante.id}" class="card">
@@ -366,8 +368,19 @@ function showParticipants(eventoId) {
                         </div>
                     </div>
                     `;
+                    if (participante.estado === 'inscrito') {
+                        inscritosHtml += participanteHtml;
+                    } else if (participante.estado === 'lista de espera') {
+                        listaEsperaHtml += participanteHtml;
+                    }
                 });
-                participantesContainer.insertAdjacentHTML('beforeend', html);
+
+                if (inscritosHtml) {
+                    participantesContainer.insertAdjacentHTML('beforeend', `<h4 class="text-center">Lista de Participantes</h4>${inscritosHtml}`);
+                }
+                if (listaEsperaHtml) {
+                    participantesContainer.insertAdjacentHTML('beforeend', `<h4 class="text-center">Lista de Espera</h4>${listaEsperaHtml}`);
+                }
             }
         },
         error: function (error) {

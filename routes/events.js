@@ -280,7 +280,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
     router.get('/:id/participantes', (req, res, next) => {
         const { id } = req.params;
         const sql = `
-            SELECT usuarios.nombre, usuarios.telefono, usuarios.email, facultades.nombre AS facultad
+            SELECT usuarios.nombre, usuarios.telefono, usuarios.email, facultades.nombre AS facultad,inscripciones.estado
             FROM inscripciones
             JOIN usuarios ON inscripciones.usuario_id = usuarios.id
             JOIN facultades ON usuarios.facultad_id = facultades.id

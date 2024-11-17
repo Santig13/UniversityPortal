@@ -20,7 +20,6 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
         let estado = "inscrito";
         let mensaje2 = `El usuario con id ${userId} se ha inscrito a su evento con id ${eventId}`;
 
-        console.log("userId: "+userId);
         pool.getConnection((err, connection) => {
             if (err) {
                 err.message = 'Error al obtener conexión de la base de datos para inscribir usuario en evento';
