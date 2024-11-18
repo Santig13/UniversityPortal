@@ -15,6 +15,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
         const { userId, eventId, organizador_id } = req.body;
         const fecha_inscripcion = moment().format('YYYY-MM-DD');
         const query = 'INSERT INTO inscripciones (usuario_id, evento_id, estado, fecha_inscripcion) VALUES (?, ?, ?, ?)';
+
         let message = 'Te has inscrito en el evento';
         let mensaje =`Te has inscrito en el evento con id ${eventId}`;
         let estado = "inscrito";
@@ -31,7 +32,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
                     connection.release();
                     return next(err);
                 }
-              console.log("resultado: "+resultado.hayEspacio);
+              
                 // Si no hay espacio, cambia rel estado de la inscripcion y los mensajes
                 if (!resultado.hayEspacio) {
                     message = 'Se te ha añadido a la lista de espera';

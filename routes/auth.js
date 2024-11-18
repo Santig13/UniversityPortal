@@ -18,24 +18,34 @@ function createAuthRouter(pool, sessionMiddleware) {
             }
 
             connection.query('SELECT * FROM usuarios WHERE email = ?', [email], async (err, rows) => {
-                connection.release();
+                
                 if (err) {
                     err.message = 'Error al consultar la base de datos para encontrar al usuario.';
                     return next(err);
                 }
-
+                
                 if (rows.length > 0) {
-                    const user = rows[0];
-                    const isMatch = await bcrypt.compare(password, user.password);
-                    const { password: _, ...userWithoutPassword } = user;
+                    const sql2 = 'SELECT * FROM accesibilidad WHERE id = ?';
+                    connection.query(sql2, [rows[0].accesibilidad_id], async (err, accesibilidad) => {
+                        connection.release();
+                        if (err) {
+                            err.message = 'Error al consultar la base de datos para encontrar la accesibilidad del usuario.';
+                            return next(err);
+                        }
+                        
+                        const user = rows[0];
+                        const isMatch = await bcrypt.compare(password, user.password);
+                        const { password: _, ...userWithoutPassword } = user;
 
-                    if (isMatch) {
-                        req.session.user = userWithoutPassword;
-                        res.redirect('/dashboard');
-                    } else {
-                        res.status(400).json({ success: false, message: 'Contraseña incorrecta' });
-                    }
+                        if (isMatch) {
+                            req.session.user = userWithoutPassword;
+                            res.redirect('/dashboard');
+                        } else {
+                            res.status(400).json({ success: false, message: 'Contraseña incorrecta' });
+                        }
+                    });
                 } else {
+                    connection.release();
                     res.status(400).json({ success: false, message: 'El usuario introducido no existe' });
                     
                 }

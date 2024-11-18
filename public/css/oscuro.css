@@ -1,19 +1,46 @@
 /* Estilos comunes para todas las páginas */
 
- 
 /* Estilos para el calendario */
 :root {
-    --primary-color: #0056B3;
-    --info-color: #004494;
-    --secondary-color: #6c757d;
-    --success-color: #28a745;
-    --danger-color: #dc3545;
-    --light-color: #f8f9fa;
-    --dark-color: #151719;
-    --font-family: 'Arial', sans-serif;
+    --fc-small-font-size: .85em;
+    --fc-page-bg-color: #fff;
+    --fc-neutral-bg-color: rgba(208, 208, 208, 0.3);
+    --fc-neutral-text-color: #808080;
+    --fc-border-color: #ddd;
+  
+    --fc-button-text-color: #fff;
+    --fc-button-bg-color: #2C3E50;
+    --fc-button-border-color: #2C3E50;
+    --fc-button-hover-bg-color: #1e2b37;
+    --fc-button-hover-border-color: #1a252f;
+    --fc-button-active-bg-color: #1a252f;
+    --fc-button-active-border-color: #151e27;
+  
+    --fc-event-bg-color: #3788d8;
+    --fc-event-border-color: #3788d8;
+    --fc-event-text-color: #fff;
+    --fc-event-selected-overlay-color: rgba(0, 0, 0, 0.25);
+  
+    --fc-more-link-bg-color: #d0d0d0;
+    --fc-more-link-text-color: inherit;
+  
+    --fc-event-resizer-thickness: 8px;
+    --fc-event-resizer-dot-total-width: 8px;
+    --fc-event-resizer-dot-border-width: 1px;
+  
+    --fc-non-business-color: rgba(215, 215, 215, 0.3);
+    --fc-bg-event-color: rgb(143, 223, 130);
+    --fc-bg-event-opacity: 0.3;
+    --fc-highlight-color: rgba(188, 232, 241, 0.3);
+    --fc-today-bg-color: rgba(255, 220, 40, 0.15);
+    --fc-now-indicator-color: red;
+
+    --fc-border-color: black;
+    --fc-daygrid-event-dot-width: 5px;
+    --fc-daygrid-event-dot-height: 5px;
 }
 .fc-scrollgrid-sync-inner{
-    background-color:#f8f9fa;
+    background-color:#1A2226;
 }
  .fc-daygrid-day-frame {
     background-color: white !important;
@@ -24,35 +51,33 @@
 .fc-event-future,
 .fc-daygrid-event,
 .fc-daygrid-dot-event {
-    background-color: #3788d8 !important;
-    border-color:  #3788d8 !important;
+    background-color: #1A2226 !important;
+    border-color:  #1A2226 !important;
 }
 div .fc-event-time {
     display: none;
 }
 /* Estilos comunes para todas las páginas */
 body {
-    background-color: #e0eaf1; /* Fondo más azulado */
-    background-image: linear-gradient(160deg, #e0eaf1 0%, #8bb8d6 100%); /* Degradado más azulado */
+    background-color: #071014;
+    background-image: linear-gradient(160deg, #071014 0%, #0db8de 100%);
     font-family: 'Arial', sans-serif;
-    color: #2d3d44; /* Texto oscuro para buen contraste */
+    color: #ECF0F5;
     min-height: 100vh;
 }
 
-header, .footer-nuestro, .navbar {
-    background-color: #92bbcf; /* Azul muy claro y suave para el header y navbar */
-    background-image: linear-gradient(160deg, #7aa1b4 0%, #a3c6db 100%);
-    color: #2d3d44; /* Texto oscuro para el contraste, manteniendo la legibilidad */
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+header, .footer-nuestro ,.navbar{
+    background: #1A2226;
     text-align: center;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
 .blue-text {
-    color: var(--primary-color);
+    color: #0DB8DE;
 }
 
 .dark-box {
-    background: #ffffff;
+    background: #1A2226;
     text-align: center;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
     border-radius: 15px;
@@ -64,59 +89,59 @@ header, .footer-nuestro, .navbar {
     margin-top: 20px;
     margin-bottom: 20px;
     font-weight: bold;
-    color:var(--primary-color);
+    color: #0DB8DE;
 }
 
 .form-control {
-    background-color: #ffffff;
+    background-color: #1A2226;
     border: none;
-    border-bottom: 2px solid var(--primary-color);
+    border-bottom: 2px solid #0DB8DE;
     border-radius: 0;
     padding-left: 0;
-    color: #151719;
+    color: #ECF0F5;
     margin-bottom: 20px;
 
 }
 
 .form-control:focus {
     box-shadow: none;
-    background-color: #ffffff;
-    color: #151719;
+    background-color: #1A2226;
+    color: #ECF0F5;
 }
 
 .form-label {
     font-size: 15px;
-    color: #6c757d;
+    color: #B0B0B0;
     letter-spacing: 1px;
 }
 
 /* Estilo para el <select> */
 .form-select {
-    background-color: #ffffff;
+    background-color: #1A2226;
     border: none;
-    border-bottom: 2px solid var(--primary-color);
-    color: #151719;
+    border-bottom: 2px solid #0DB8DE;
+    color: #ECF0F5;
     padding: 0.5em;
 }
 
 .form-select:focus {
     box-shadow: none;
-    border-color: var(--primary-color);
-    background-color: #ffffff;
-    color: #151719;
+    border-color: #0DB8DE;
+    background-color: #1A2226;
+    color: #ECF0F5;
 }
 
 
 .btn-outline-primary {
     border-radius: 15px;
     cursor: pointer;
-    border-color: var(--primary-color) !important;
-    color: var(--primary-color);
+    border-color: #0DB8DE !important;
+    color: #0DB8DE;
     outline: none;
 }
 
 .btn-outline-primary:hover {
-    background-image: linear-gradient(160deg, #f8f9fa 0%, var(--primary-color) 100%) !important;
+    background-image: linear-gradient(160deg, #071014 0%, #0db8de 100%) !important;
     color: #ffffff !important;
 }
 
@@ -127,33 +152,17 @@ header, .footer-nuestro, .navbar {
 .btn-outline-secondary {
     border-radius: 15px;
     cursor: pointer;
-    border-color: #6c757d !important;
-    color: #6c757d;
+    border-color: #B0B0B0 !important;
+    color: #B0B0B0;
     outline: none;
 }
 
 .btn-outline-secondary:hover {
-    background-image: linear-gradient(160deg, #f8f9fa 0%, #6c757d 100%) !important;
+    background-image: linear-gradient(160deg, #071014 0%, #B0B0B0 100%) !important;
     color: #ffffff !important;
 }
 
 .btn-outline-secondary:focus {
-    outline: none;
-    box-shadow: none; /* Esto también elimina cualquier sombra azul que pueda aparecer */
-}
-
-.btn-outline-info{
-    border-radius: 15px;
-    cursor: pointer;
-    border-color: var(--info-color) !important;
-    color: var(--info-color);
-    outline: none;
-}
-.btn-outline-info:hover {
-    background-image: linear-gradient(160deg, #f8f9fa 0%, var(--info-color) 100%) !important;
-    color: #ffffff !important;
-}
-.btn-outline-info:focus {
     outline: none;
     box-shadow: none; /* Esto también elimina cualquier sombra azul que pueda aparecer */
 }
@@ -166,7 +175,7 @@ header, .footer-nuestro, .navbar {
 }
 
 .btn-success:hover {
-    background-image: linear-gradient(160deg, #f8f9fa 0%, #28a745 100%) !important;
+    background-image: linear-gradient(160deg, #071014 0%, #28a745 100%) !important;
     color: #ffffff !important;
 }
 
@@ -184,7 +193,7 @@ header, .footer-nuestro, .navbar {
 }
 
 .btn-outline-danger:hover {
-    background-image: linear-gradient(160deg, #f8f9fa 0%, #dc3545 100%) !important;
+    background-image: linear-gradient(160deg, #071014 0%, #dc3545 100%) !important;
     color: #ffffff !important;
 }
 
@@ -195,37 +204,37 @@ header, .footer-nuestro, .navbar {
 
 
 span {
-    color: #6c757d;
+    color: #B0B0B0;
 }
 
 a {
-    color: var(--primary-color);
+    color: #0DB8DE;
     text-decoration: none;
 }
 
 a:hover {
-    color: #0056b3;
+    color: #2d77c2;
 }
 
 /* Estilos personalizados para el toast */
 .custom-toast {
-    background-color: #ffffff; /* Fondo claro */
-    color: #151719; /* Color del texto oscuro */
+    background-color: #1A2226; /* Fondo oscuro como el de otros componentes */
+    color: #ECF0F5; /* Color del texto claro */
     border-radius: 20px; /* Bordes completamente redondeados */
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23); /* Sombra para dar profundidad */
 
 }
 
 .toast-header {
-    background-color: var(--primary-color); /* Encabezado con color azul */
+    background-color: #0DB8DE; /* Encabezado con color azul */
     color: #fff; /* Texto blanco en el encabezado */
     border-radius: 20px 20px 0 0;
 
 }
 
 .toast-body {
-    background-color: #ffffff; /* Fondo claro */
-    color: #151719; /* Texto oscuro */
+    background-color: #1A2226; /* Fondo oscuro */
+    color: #ECF0F5; /* Texto claro */
     font-size: 16px; /* Tamaño de fuente adecuado */
     text-align: center; /* Texto centrado */
     border-radius: 0 0 20px 20px;
@@ -233,19 +242,19 @@ a:hover {
 
 /* Estilos para nav-links */
 .nav-link {
-    color: var(--primary-color); /* Azul como el título del header del login */
+    color: #0DB8DE; /* Azul como el título del header del login */
     font-weight: bold;
     transition: color 0.3s ease;
 }
 
 .nav-link:hover {
-    color: #0056b3; /* Azul más oscuro para hover */
+    color: #2d77c2; /* Azul más oscuro para hover */
     transform: scale(1.1);
 }
 
 /* Estilos para el span del navbar (texto) */
 #texto-navbar {
-    color: var(--primary-color); /* Azul como el título del header */
+    color: #0DB8DE; /* Azul como el título del header */
     font-weight: bold;
 }
 
@@ -278,9 +287,9 @@ a:hover {
 
 /* Estilos personalizados para el botón toggler */
 .navbar-toggler {
-    border: 2px solid var(--primary-color); /* Borde azul */
+    border: 2px solid #0DB8DE; /* Borde azul */
     border-radius: 5px;
-    background-color: #ffffff; /* Fondo claro */
+    background-color: #1A2226; /* Fondo oscuro */
     padding: 6px 10px;
     transition: background-color 0.3s ease, transform 0.2s ease;
     outline: none; /* Elimina el borde de enfoque por defecto */
@@ -297,7 +306,7 @@ a:hover {
 }
 
 .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 123, 255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"); /* Líneas del ícono en azul */
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(13, 184, 222, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"); /* Líneas del ícono en azul */
     background-repeat: no-repeat;
     background-position: center;
     background-size: 20px 20px;
@@ -305,8 +314,8 @@ a:hover {
 
     
 .card {
-    background-color: #ffffff; /* Fondo claro */
-    border: 1px solid var(--primary-color); /* Borde azul */
+    background-color: #1A2226; /* Fondo oscuro */
+    border: 1px solid #0DB8DE; /* Borde azul */
     border-radius: 15px; /* Más redondeado */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease-in-out;
@@ -317,16 +326,16 @@ a:hover {
 }
 
 .card-title {
-    color: #151719; /* Texto oscuro */
+    color: #ECF0F5; /* Texto claro */
 }
 
 .card-text {
-    color: #343a40; /* Texto gris oscuro */
+    color: #B0B0B0; /* Texto gris claro */
 }
 
 .card-footer {
-    background-color: #ffffff; /* Fondo claro */
-    border-top: 1px solid var(--primary-color); /* Borde azul */
+    background-color: #1A2226; /* Fondo oscuro */
+    border-top: 1px solid #0DB8DE; /* Borde azul */
     border-radius: 20px; /* Más redondeado */
 }
 
@@ -337,17 +346,17 @@ a:hover {
 
 /* Estilos personalizados para el modal */
 .modal-content {
-    background-color: #ffffff; /* Fondo claro */
-    color: #151719; /* Texto oscuro */
+    background-color: #1A2226; /* Fondo oscuro similar al tema */
+    color: #ECF0F5; /* Texto claro */
     border-radius: 15px; /* Bordes redondeados */
-    border: 1px solid var(--primary-color); /* Borde azul */
+    border: 1px solid #0DB8DE; /* Borde azul */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra para darle profundidad */
 }
 
 .modal-header {
-    background-color: var(--primary-color); /* Fondo azul para la cabecera */
+    background-color: #0DB8DE; /* Fondo azul para la cabecera */
     color: #ffffff; /* Texto blanco */
-    border-bottom: 1px solid var(--primary-color); /* Borde inferior azul */
+    border-bottom: 1px solid #0DB8DE; /* Borde inferior azul */
     border-top-left-radius: 15px; /* Bordes redondeados coherentes con el modal */
     border-top-right-radius: 15px;
 }
@@ -357,14 +366,14 @@ a:hover {
 }
 
 .modal-body {
-    background-color: #ffffff; /* Fondo claro */
-    color: #151719; /* Texto oscuro */
+    background-color: #1A2226; /* Fondo oscuro */
+    color: #ECF0F5; /* Texto claro */
     padding: 20px;
 }
 
 .modal-footer {
-    background-color: #ffffff; /* Fondo claro */
-    border-top: 1px solid var(--primary-color); /* Borde superior azul */
+    background-color: #1A2226; /* Fondo oscuro */
+    border-top: 1px solid #0DB8DE; /* Borde superior azul */
     border-bottom-left-radius: 15px; /* Bordes redondeados */
     border-bottom-right-radius: 15px;
 }
@@ -372,7 +381,7 @@ a:hover {
 /* Estilo del botón de cerrar */
 .btn-close {
     background-color: transparent;
-    color: #151719;
+    color: #ECF0F5;
     border: none;
     transition: transform 0.2s ease;
     outline: 0;
@@ -380,7 +389,7 @@ a:hover {
 
 .btn-close:hover {
     transform: scale(1.1);
-    color: #000000; /* Color más oscuro para hover */
+    color: #ffffff; /* Color más claro para hover */
 }
 
 .btn-close:focus {
@@ -416,3 +425,4 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     border-radius: 50%;
     margin-left: auto;
 }
+
