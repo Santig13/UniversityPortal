@@ -1,13 +1,10 @@
-/* Estilos comunes para todas las páginas */
-
-/* Estilos para el calendario */
+/* Variables de colores y fuentes */
 :root {
     --fc-small-font-size: .85em;
     --fc-page-bg-color: #fff;
     --fc-neutral-bg-color: rgba(208, 208, 208, 0.3);
     --fc-neutral-text-color: #808080;
     --fc-border-color: #ddd;
-  
     --fc-button-text-color: #fff;
     --fc-button-bg-color: #2C3E50;
     --fc-button-border-color: #2C3E50;
@@ -15,48 +12,35 @@
     --fc-button-hover-border-color: #1a252f;
     --fc-button-active-bg-color: #1a252f;
     --fc-button-active-border-color: #151e27;
-  
     --fc-event-bg-color: #3788d8;
     --fc-event-border-color: #3788d8;
     --fc-event-text-color: #fff;
     --fc-event-selected-overlay-color: rgba(0, 0, 0, 0.25);
-  
     --fc-more-link-bg-color: #d0d0d0;
     --fc-more-link-text-color: inherit;
-  
     --fc-event-resizer-thickness: 8px;
     --fc-event-resizer-dot-total-width: 8px;
     --fc-event-resizer-dot-border-width: 1px;
-  
     --fc-non-business-color: rgba(215, 215, 215, 0.3);
     --fc-bg-event-color: rgb(143, 223, 130);
     --fc-bg-event-opacity: 0.3;
     --fc-highlight-color: rgba(188, 232, 241, 0.3);
     --fc-today-bg-color: rgba(255, 220, 40, 0.15);
     --fc-now-indicator-color: red;
-
     --fc-border-color: black;
     --fc-daygrid-event-dot-width: 5px;
     --fc-daygrid-event-dot-height: 5px;
+    --primary-color: rgba(9, 85, 208, 1);
+    --info-color: #004494;
+    --secondary-color: #343a40;
+    --success-color: #28a745;
+    --danger-color: #a71d2a;
+    --light-color: #f8f9fa;
+    --dark-color: #151719;
+    --warning-color: #ffc107;
+    --font-family: 'Arial', sans-serif;
 }
-.fc-scrollgrid-sync-inner{
-    background-color:#1A2226;
-}
- .fc-daygrid-day-frame {
-    background-color: white !important;
- }
-.fc-event,
-.fc-event-start,
-.fc-event-end,
-.fc-event-future,
-.fc-daygrid-event,
-.fc-daygrid-dot-event {
-    background-color: #1A2226 !important;
-    border-color:  #1A2226 !important;
-}
-div .fc-event-time {
-    display: none;
-}
+
 /* Estilos comunes para todas las páginas */
 body {
     background-color: #071014;
@@ -66,7 +50,7 @@ body {
     min-height: 100vh;
 }
 
-header, .footer-nuestro ,.navbar{
+header, .footer-nuestro, .navbar {
     background: #1A2226;
     text-align: center;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
@@ -76,10 +60,34 @@ header, .footer-nuestro ,.navbar{
     color: #0DB8DE;
 }
 
+/* Estilos para el calendario */
+.fc-scrollgrid-sync-inner {
+    background-color: #1A2226;
+}
+
+.fc-daygrid-day-frame {
+    background-color: white !important;
+}
+
+.fc-event,
+.fc-event-start,
+.fc-event-end,
+.fc-event-future,
+.fc-daygrid-event,
+.fc-daygrid-dot-event {
+    background-color: #1A2226 !important;
+    border-color: #1A2226 !important;
+}
+
+div .fc-event-time {
+    display: none;
+}
+
+/* Estilos para el login */
 .login-box {
     background: #1A2226;
     text-align: center;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
     border-radius: 15px;
 }
 
@@ -100,7 +108,6 @@ header, .footer-nuestro ,.navbar{
     padding-left: 0;
     color: #ECF0F5;
     margin-bottom: 20px;
-
 }
 
 .form-control:focus {
@@ -131,7 +138,7 @@ header, .footer-nuestro ,.navbar{
     color: #ECF0F5;
 }
 
-
+/* Estilos para botones */
 .btn-outline-primary {
     border-radius: 15px;
     cursor: pointer;
@@ -147,8 +154,9 @@ header, .footer-nuestro ,.navbar{
 
 .btn-outline-primary:focus {
     outline: none;
-    box-shadow: none; /* Esto también elimina cualquier sombra azul que pueda aparecer */
+    box-shadow: none;
 }
+
 .btn-outline-secondary {
     border-radius: 15px;
     cursor: pointer;
@@ -164,7 +172,7 @@ header, .footer-nuestro ,.navbar{
 
 .btn-outline-secondary:focus {
     outline: none;
-    box-shadow: none; /* Esto también elimina cualquier sombra azul que pueda aparecer */
+    box-shadow: none;
 }
 
 .btn-success {
@@ -181,10 +189,10 @@ header, .footer-nuestro ,.navbar{
 
 .btn-success:focus {
     outline: none;
-    box-shadow: none; /* Esto también elimina cualquier sombra azul que pueda aparecer */
+    box-shadow: none;
 }
 
-.btn-outline-danger{
+.btn-outline-danger {
     border-radius: 15px;
     cursor: pointer;
     border-color: #dc3545 !important;
@@ -199,14 +207,32 @@ header, .footer-nuestro ,.navbar{
 
 .btn-outline-danger:focus {
     outline: none;
-    box-shadow: none; /* Esto también elimina cualquier sombra azul que pueda aparecer */
+    box-shadow: none;
 }
 
-
-span {
-    color: #B0B0B0;
+.btn-outline-warning {
+    border-radius: 15px;
+    border-color: var(--warning-color) !important;
+    color: var(--warning-color);
 }
 
+.btn-outline-warning:hover {
+    background-image: linear-gradient(160deg, #071014 0%, #ffc107 100%) !important;
+    color: #ffffff !important;
+}
+
+.btn-outline-info {
+    border-color: var( --fc-event-border-color) !important;
+    color: var(--fc-event-border-color);
+    border-radius: 15px;
+}
+
+.btn-outline-info:hover {
+    background-image: linear-gradient(160deg, #b0d4f1 0%, var(--fc-event-border-color) 100%) !important;
+    color: #ffffff !important;
+}
+
+/* Estilos para enlaces */
 a {
     color: #0DB8DE;
     text-decoration: none;
@@ -218,43 +244,41 @@ a:hover {
 
 /* Estilos personalizados para el toast */
 .custom-toast {
-    background-color: #1A2226; /* Fondo oscuro como el de otros componentes */
-    color: #ECF0F5; /* Color del texto claro */
-    border-radius: 20px; /* Bordes completamente redondeados */
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23); /* Sombra para dar profundidad */
-
+    background-color: #1A2226;
+    color: #ECF0F5;
+    border-radius: 20px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
 .toast-header {
-    background-color: #0DB8DE; /* Encabezado con color azul */
-    color: #fff; /* Texto blanco en el encabezado */
-    border-radius: 20px 20px 0 0;
-
+    background-color: #0DB8DE;
+    color: #fff;
+    border-radius: 18px 18px 0 0;
 }
 
 .toast-body {
-    background-color: #1A2226; /* Fondo oscuro */
-    color: #ECF0F5; /* Texto claro */
-    font-size: 16px; /* Tamaño de fuente adecuado */
-    text-align: center; /* Texto centrado */
+    background-color: #1A2226;
+    color: #ECF0F5;
+    font-size: 16px;
+    text-align: center;
     border-radius: 0 0 20px 20px;
 }
 
 /* Estilos para nav-links */
 .nav-link {
-    color: #0DB8DE; /* Azul como el título del header del login */
+    color: #0DB8DE;
     font-weight: bold;
     transition: color 0.3s ease;
 }
 
 .nav-link:hover {
-    color: #2d77c2; /* Azul más oscuro para hover */
+    color: #2d77c2;
     transform: scale(1.1);
 }
 
 /* Estilos para el span del navbar (texto) */
 #texto-navbar {
-    color: #0DB8DE; /* Azul como el título del header */
+    color: #0DB8DE;
     font-weight: bold;
 }
 
@@ -263,7 +287,7 @@ a:hover {
     margin-left: auto;
     display: flex;
     align-items: center;
-    justify-content: center ;
+    justify-content: center;
 }
 
 .navbar-button {
@@ -287,13 +311,13 @@ a:hover {
 
 /* Estilos personalizados para el botón toggler */
 .navbar-toggler {
-    border: 2px solid #0DB8DE; /* Borde azul */
+    border: 2px solid #0DB8DE;
     border-radius: 5px;
-    background-color: #1A2226; /* Fondo oscuro */
+    background-color: #1A2226;
     padding: 6px 10px;
     transition: background-color 0.3s ease, transform 0.2s ease;
-    outline: none; /* Elimina el borde de enfoque por defecto */
-    box-shadow: none; /* Elimina sombras al ser clicado */
+    outline: none;
+    box-shadow: none;
 }
 
 .navbar-toggler:hover {
@@ -301,22 +325,22 @@ a:hover {
 }
 
 .navbar-toggler:focus {
-    outline: none; /* Elimina el borde de enfoque */
-    box-shadow: none; /* Elimina sombras que puedan aparecer */
+    outline: none;
+    box-shadow: none;
 }
 
 .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(13, 184, 222, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"); /* Líneas del ícono en azul */
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(13, 184, 222, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: center;
     background-size: 20px 20px;
 }
 
-    
+/* Estilos para las tarjetas */
 .card {
-    background-color: #1A2226; /* Fondo oscuro */
-    border: 1px solid #0DB8DE; /* Borde azul */
-    border-radius: 15px; /* Más redondeado */
+    background-color: #1A2226;
+    border: 1px solid #0DB8DE;
+    border-radius: 15px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease-in-out;
 }
@@ -326,38 +350,47 @@ a:hover {
 }
 
 .card-title {
-    color: #ECF0F5; /* Texto claro */
+    color: #ECF0F5;
 }
 
 .card-text {
-    color: #B0B0B0; /* Texto gris claro */
+    color: #B0B0B0;
 }
 
 .card-footer {
-    background-color: #1A2226; /* Fondo oscuro */
-    border-top: 1px solid #0DB8DE; /* Borde azul */
-    border-radius: 20px; /* Más redondeado */
+    background-color: #1A2226;
+    border-top: 1px solid #0DB8DE;
+    border-radius: 20px;
+}
+
+.card-header {
+    background-color: #1A2226;
+    color: #ffffff;
+    border-bottom: 1px solid #0DB8DE;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    padding: 10px;
+    font-weight: bold;
 }
 
 .text-muted {
     color: #6c757d !important;
 }
 
-
 /* Estilos personalizados para el modal */
 .modal-content {
-    background-color: #1A2226; /* Fondo oscuro similar al tema */
-    color: #ECF0F5; /* Texto claro */
-    border-radius: 15px; /* Bordes redondeados */
-    border: 1px solid #0DB8DE; /* Borde azul */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra para darle profundidad */
+    background-color: #1A2226;
+    color: #ECF0F5;
+    border-radius: 15px;
+    border: 1px solid #0DB8DE;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
-    background-color: #0DB8DE; /* Fondo azul para la cabecera */
-    color: #ffffff; /* Texto blanco */
-    border-bottom: 1px solid #0DB8DE; /* Borde inferior azul */
-    border-top-left-radius: 15px; /* Bordes redondeados coherentes con el modal */
+    background-color: #0DB8DE;
+    color: #ffffff;
+    border-bottom: 1px solid #0DB8DE;
+    border-top-left-radius: 15px;
     border-top-right-radius: 15px;
 }
 
@@ -366,15 +399,15 @@ a:hover {
 }
 
 .modal-body {
-    background-color: #1A2226; /* Fondo oscuro */
-    color: #ECF0F5; /* Texto claro */
+    background-color: #1A2226;
+    color: #ECF0F5;
     padding: 20px;
 }
 
 .modal-footer {
-    background-color: #1A2226; /* Fondo oscuro */
-    border-top: 1px solid #0DB8DE; /* Borde superior azul */
-    border-bottom-left-radius: 15px; /* Bordes redondeados */
+    background-color: #1A2226;
+    border-top: 1px solid #0DB8DE;
+    border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
 }
 
@@ -389,18 +422,18 @@ a:hover {
 
 .btn-close:hover {
     transform: scale(1.1);
-    color: #ffffff; /* Color más claro para hover */
+    color: #ffffff;
 }
 
 .btn-close:focus {
     outline: none;
-    box-shadow: none; /* Esto también elimina cualquier sombra azul que pueda aparecer */
+    box-shadow: none;
 }
 
 /* Ocultar el icono predeterminado y agregar un ícono personalizado */
 input[type="date"]::-webkit-calendar-picker-indicator {
     background-image: url('../images/schedule.png') !important;
-    background-size: 20px 20px; 
+    background-size: 20px 20px;
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -413,11 +446,11 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     background-position: center;
 }
 
-
-/*Estilos para notificaciones*/
+/* Estilos para notificaciones */
 .notificacion-no-leida {
     border: 2px solid blue;
 }
+
 .circulo-azul {
     width: 10px;
     height: 10px;
@@ -425,4 +458,3 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     border-radius: 50%;
     margin-left: auto;
 }
-

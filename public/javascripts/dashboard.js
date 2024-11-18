@@ -53,8 +53,10 @@ function renderEventos(eventos) {
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card">
+                    <div class="card-header m-1">
+                                        <h5 class="card-title">${evento.titulo}</h5>
+                    </div>
                         <div class="card-body">
-                            <h5 class="card-title">${evento.titulo}</h5>
                             <p class="card-text"><strong>Descripción:</strong> ${evento.descripcion}</p>
                             <p class="card-text"><strong>Fecha:</strong> ${new Date(evento.fecha).toLocaleDateString()}</p>
                             <p class="card-text"><strong>Hora:</strong> ${evento.hora}</p>
@@ -206,8 +208,6 @@ function editarEvento() {
     const data = Object.fromEntries(formData.entries());
 
     data.capacidad_maxima = parseInt(data.capacidad_maxima, 10);
-    console.log(data);
-    console.log("hola");
     $.ajax({
         url: `/eventos/${eventoId}`,
         method: 'PUT',
@@ -336,6 +336,7 @@ function abandonarListaEspera(eventId,organizador_id){
 }
 
 function showParticipants(eventoId) {
+
     $.ajax({
         url: `/eventos/${eventoId}/participantes`,
         method: 'GET',
@@ -347,7 +348,6 @@ function showParticipants(eventoId) {
 
             if (response.participantes.length === 0) {
                 const tituloNotificaciones = document.getElementById('tituloParticipantes');
-                tituloNotificaciones.classList.add('d-none');
                 participantesContainer.innerHTML = '<h4 class="text-center">No hay participantes</h4>';
             } else {
                 response.participantes.forEach(participante => {

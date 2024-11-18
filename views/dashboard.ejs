@@ -4,8 +4,8 @@
 <div class="container mt-2 mb-2">
     <div class="row">
         <!-- Columna de Filtros -->
-        <div class="col-md-3">
-            <h2 class="mb-3 mt-5">Filtrar Eventos</h2>
+        <div class="col-md-3 py-2">
+            <h2 class="mb-2 mt-5">Filtrar Eventos</h2>
             <form id="filterForm" class="p-4 rounded login-box shadow-sm">
                 <div class="mb-3">
                     <label for="fecha" class="form-label">Fecha</label>
@@ -51,8 +51,10 @@
                         <div class="row mb-4">
                             <div class="col-12">
                                 <div class="card">
-                                    <div class="card-body">
+                                    <div class="card-header m-1">
                                         <h5 class="card-title"><%= evento.titulo %></h5>
+                                    </div>
+                                    <div class="card-body">
                                         <p class="card-text"><strong>Descripción:</strong> <%= evento.descripcion %></p>
                                         <p class="card-text"><strong>Fecha:</strong> <%= new Date(evento.fecha).toLocaleDateString() %></p>
                                         <p class="card-text"><strong>Hora:</strong> <%= evento.hora %></p>
@@ -248,7 +250,7 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>  
         </div>
     </div>

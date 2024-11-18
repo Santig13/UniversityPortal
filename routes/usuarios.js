@@ -43,7 +43,6 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
                 
                 connection.query(query, [userId, eventId, estado, fecha_inscripcion], (error, results) => {
                     if (error) {
-                        console.log(error);
                         connection.release();
                         error.message = 'Error inscribiendo al usuario en el evento';
                         error.status = 500;
@@ -101,7 +100,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
                             return next(err);
                         }
                     
-                        res.status(200).send({ success: true, message: 'has abandonado la lisra de espera del evento' });
+                        res.status(200).send({ success: true, message: 'Has abandonado la lista de espera del evento' });
                     });
                 });
             });

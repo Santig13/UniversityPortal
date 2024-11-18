@@ -241,7 +241,6 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
         const { titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima} = req.body;
         const id = req.params.id;
         const sql = 'UPDATE eventos SET titulo=?, descripcion=?, fecha=?, hora=?, ubicacion=?, capacidad_maxima=? WHERE id=?';
-        console.log(req.body);
         pool.getConnection((err, connection) => {
             if (err) {
                 err.message = 'Error al obtener conexión de la base de datos para actualizar evento.';

@@ -61,6 +61,10 @@ div .fc-event-time {
     display: none;
 }
 
+div .fc-event-title {
+    color: #ffffff;
+}
+
 /* Estilos para el login */
 .login-box {
     background-color: #f0f8ff;
@@ -191,6 +195,17 @@ div .fc-event-time {
     border-color: var(--success-color)
 }
 
+.btn-outline-warning {
+    border-radius: 15px;
+    border-color: var(--warning-color) !important;
+    color: var(--warning-color);
+}
+
+.btn-outline-warning:hover {
+    background-image: linear-gradient(160deg, #4f5530 0%, #ffc107 100%) !important;
+    color: #ffffff !important;
+}
+
 /* Estilos para enlaces */
 a {
     color: var(--primary-color);
@@ -212,7 +227,7 @@ a:hover {
 .toast-header {
     background-color: var(--primary-color);
     color: #fff;
-    border-radius: 20px 20px 0 0;
+    border-radius: 18px 18px 0 0;
 }
 
 .toast-body {
@@ -321,6 +336,15 @@ a:hover {
     border-top: 1px solid var(--primary-color);
     border-radius: 20px;
 }
+.card-header {
+    background-color: #f0f8ff;
+    color: #ffffff;
+    border-bottom: 1px solid var(--primary-color);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    padding: 10px;
+    font-weight: bold;
+}
 
 .text-muted {
     color: var(--secondary-color) !important;
@@ -339,8 +363,8 @@ a:hover {
     background-color: var(--primary-color);
     color: #f0f8ff;
     border-bottom: 1px solid var(--primary-color);
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
 }
 
 .modal-title {
