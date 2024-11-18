@@ -25,7 +25,7 @@ function createAuthRouter(pool, sessionMiddleware) {
                 }
                 
                 if (rows.length > 0) {
-                    const sql2 = 'SELECT * FROM accesibilidad WHERE id = ?';
+                    const sql2 = 'SELECT * FROM accesibilidades WHERE id = ?';
                     connection.query(sql2, [rows[0].accesibilidad_id], async (err, accesibilidad) => {
                         connection.release();
                         if (err) {
@@ -38,7 +38,12 @@ function createAuthRouter(pool, sessionMiddleware) {
                         const { password: _, ...userWithoutPassword } = user;
 
                         if (isMatch) {
-                            req.session.user = userWithoutPassword;
+                            // Añadir campos de accesibilidad al usuario
+                            const userWithAccesibilidad = {
+                                ...userWithoutPassword,
+                                accesibilidad: accesibilidad[0]
+                            };
+                            req.session.user = userWithAccesibilidad;
                             res.redirect('/dashboard');
                         } else {
                             res.status(400).json({ success: false, message: 'Contraseña incorrecta' });

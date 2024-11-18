@@ -3,7 +3,7 @@
  
 /* Estilos para el calendario */
 :root {
-    --primary-color: #0056B3;
+    --primary-color: rgba(9, 85, 208, 1);
     --info-color: #004494;
     --secondary-color: #6c757d;
     --success-color: #28a745;
@@ -33,18 +33,25 @@ div .fc-event-time {
 /* Estilos comunes para todas las páginas */
 body {
     background-color: #e0eaf1; /* Fondo más azulado */
-    background-image: linear-gradient(160deg, #e0eaf1 0%, #8bb8d6 100%); /* Degradado más azulado */
+    background-image: linear-gradient(160deg, #e0eaf1 0%, #8bb8d6 100%); 
     font-family: 'Arial', sans-serif;
     color: #2d3d44; /* Texto oscuro para buen contraste */
     min-height: 100vh;
 }
 
 header, .footer-nuestro, .navbar {
-    background-color: #92bbcf; /* Azul muy claro y suave para el header y navbar */
-    background-image: linear-gradient(160deg, #7aa1b4 0%, #a3c6db 100%);
-    color: #2d3d44; /* Texto oscuro para el contraste, manteniendo la legibilidad */
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+    background-color: #e0f0ff; /* Azul claro pero más oscuro que el fondo */
+    color: #2d3d44; /* Mantén el texto oscuro */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil para dar profundidad */
     text-align: center;
+}
+
+header, .navbar{
+    border-bottom: 2px solid #b0d4f1; /* Línea inferior azul más intensa */
+}
+
+.footer-nuestro{
+    border-top: 2px solid #b0d4f1; /* Línea inferior azul más intensa */
 }
 
 .blue-text {
@@ -52,9 +59,11 @@ header, .footer-nuestro, .navbar {
 }
 
 .dark-box {
-    background: #ffffff;
+    background-color: #f0f8ff; /* Azul muy claro */
     text-align: center;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    /* box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23); */
+    border: 1px solid #d1e6f7; /* Azul suave */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombras más marcadas para profundidad */
     border-radius: 15px;
 }
 
@@ -68,7 +77,7 @@ header, .footer-nuestro, .navbar {
 }
 
 .form-control {
-    background-color: #ffffff;
+    background-color: #f0f8ff; /* Azul muy claro */
     border: none;
     border-bottom: 2px solid var(--primary-color);
     border-radius: 0;
@@ -86,7 +95,7 @@ header, .footer-nuestro, .navbar {
 
 .form-label {
     font-size: 15px;
-    color: #6c757d;
+    color: #4A5055;
     letter-spacing: 1px;
 }
 
@@ -116,6 +125,8 @@ header, .footer-nuestro, .navbar {
 }
 
 .btn-outline-primary:hover {
+    background-color: var(--primary-color); 
+    box-shadow: 0 4px 8px rgba(9, 85, 208, 0.3) !important; /* Efecto de elevación */
     background-image: linear-gradient(160deg, #f8f9fa 0%, var(--primary-color) 100%) !important;
     color: #ffffff !important;
 }
@@ -195,7 +206,7 @@ header, .footer-nuestro, .navbar {
 
 
 span {
-    color: #6c757d;
+    color: #4A5055;
 }
 
 a {

@@ -171,9 +171,22 @@ app.use((err, req, res, next) => {
         });
         
     }
+
+    let accesibilidad;
+    if(req.session.user){
+        accesibilidad = req.session.user.accesibilidad;
+    }
+    else{
+        accesibilidad = {
+            paleta: 'oscura',
+            tamañoTexto: 'normal',
+            navegacion: 'teclado y raton'
+        }
+    }
     res.status(statusCode).render('error', {
         titulo: title,
         mensaje: message,
+        accesibilidad: accesibilidad
     });
 });
 
