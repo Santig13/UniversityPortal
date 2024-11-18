@@ -69,3 +69,20 @@ function marcarComoLeido(notificacionId) {
         }
     });
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const darkModeSwitch = document.getElementById("darkModeSwitch");
+    const themeStylesheet = document.getElementById("theme-stylesheet");
+
+    // Verificar si el tema actual es oscuro y configurar el estado inicial del switch
+    const currentTheme = themeStylesheet.getAttribute("href").includes("oscuro") ? "oscura" : "clara";
+    darkModeSwitch.checked = currentTheme === "oscura";
+
+    // Cambiar el tema al hacer clic en el switch
+    darkModeSwitch.addEventListener("change", function () {
+        const newTheme = this.checked ? "oscuro" : "claro";
+
+        // Cambiar dinámicamente el href de la hoja de estilos
+        themeStylesheet.href = `/css/${newTheme}.css`;
+    });
+});

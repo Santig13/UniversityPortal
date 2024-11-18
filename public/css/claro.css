@@ -1,0 +1,409 @@
+/* Variables de colores y fuentes */
+:root {
+    --primary-color: rgba(9, 85, 208, 1);
+    --info-color: #004494;
+    --secondary-color: #343a40;
+    --success-color: #28a745;
+    --danger-color: #a71d2a;
+    --light-color: #f8f9fa;
+    --dark-color: #151719;
+    --font-family: 'Arial', sans-serif;
+}
+
+/* Estilos comunes para todas las páginas */
+body {
+    background-color: #e0eaf1;
+    background-image: linear-gradient(160deg, #e0eaf1 0%, #8bb8d6 100%);
+    font-family: var(--font-family);
+    color: #2d3d44;
+    min-height: 100vh;
+}
+
+header, .footer-nuestro, .navbar {
+    background-color: #e0f0ff;
+    color: #2d3d44;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+header, .navbar {
+    border-bottom: 2px solid #b0d4f1;
+}
+
+.footer-nuestro {
+    border-top: 2px solid #b0d4f1;
+}
+
+.blue-text {
+    color: var(--primary-color);
+}
+
+/* Estilos para el calendario */
+.fc-scrollgrid-sync-inner {
+    background-color: var(--light-color);
+}
+
+.fc-daygrid-day-frame {
+    background-color: white !important;
+}
+
+.fc-event,
+.fc-event-start,
+.fc-event-end,
+.fc-event-future,
+.fc-daygrid-event,
+.fc-daygrid-dot-event {
+    background-color: #3788d8 !important;
+    border-color: #3788d8 !important;
+}
+
+div .fc-event-time {
+    display: none;
+}
+
+/* Estilos para el login */
+.login-box {
+    background-color: #f0f8ff;
+    text-align: center;
+    border: 1px solid #d1e6f7;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    border-radius: 15px;
+}
+
+.form-title {
+    font-size: 30px;
+    letter-spacing: 2px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.form-control {
+    background-color: #f0f8ff;
+    border: none;
+    border-bottom: 2px solid var(--primary-color);
+    border-radius: 0;
+    padding-left: 0;
+    color: var(--dark-color);
+    margin-bottom: 20px;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    background-color: #f0f8ff;
+    color: var(--dark-color);
+}
+
+.form-label {
+    font-size: 15px;
+    color: #4A5055;
+    letter-spacing: 1px;
+}
+
+/* Estilo para el <select> */
+.form-select {
+    background-color: #f0f8ff;
+    border: none;
+    border-bottom: 2px solid var(--primary-color);
+    color: var(--dark-color);
+    padding: 0.5em;
+}
+
+.form-select:focus {
+    box-shadow: none;
+    border-color: var(--primary-color);
+    background-color: #f0f8ff;
+    color: var(--dark-color);
+}
+
+/* Estilos para botones */
+.btn-outline-primary,
+.btn-outline-secondary,
+.btn-outline-info,
+.btn-outline-danger,
+.btn-success {
+    border-radius: 15px;
+    cursor: pointer;
+    outline: none;
+}
+
+.btn-outline-primary {
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    box-shadow: 0 4px 8px rgba(9, 85, 208, 0.3) !important;
+    background-image: linear-gradient(160deg, #78a8d8 0%, var(--primary-color) 100%) !important;
+    color: #ffffff !important;
+}
+
+.btn-outline-primary:focus,
+.btn-outline-secondary:focus,
+.btn-outline-info:focus,
+.btn-outline-danger:focus,
+.btn-success:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.btn-outline-secondary {
+    border-color: var(--secondary-color) !important;
+    color: var(--secondary-color);
+}
+
+.btn-outline-secondary:hover {
+    background-image: linear-gradient(160deg, #c1c1c2 0%, var(--secondary-color) 100%) !important;
+    color: #ffffff !important;
+}
+
+.btn-outline-info {
+    border-color: var(--info-color) !important;
+    color: var(--info-color);
+}
+
+.btn-outline-info:hover {
+    background-image: linear-gradient(160deg, #b0d4f1 0%, var(--info-color) 100%) !important;
+    color: #ffffff !important;
+}
+
+.btn-outline-danger {
+    border-color: var(--danger-color) !important;
+    color: var(--danger-color);
+}
+
+.btn-outline-danger:hover {
+    background-image: linear-gradient(160deg, #ff6f61 0%, var(--danger-color) 100%) !important;
+    color: #ffffff !important;
+}
+
+.btn-success {
+    background-color: #f0f8ff;
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-success:hover {
+    background-image: linear-gradient(160deg, #28a745 0%, var(--success-color) 100%) !important;
+    color: #ffffff !important;
+    border-color: var(--success-color)
+}
+
+/* Estilos para enlaces */
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+a:hover {
+    color: #0056b3;
+}
+
+/* Estilos personalizados para el toast */
+.custom-toast {
+    background-color: #f0f8ff;
+    color: var(--dark-color);
+    border-radius: 20px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.toast-header {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-radius: 20px 20px 0 0;
+}
+
+.toast-body {
+    background-color: #f0f8ff;
+    color: var(--dark-color);
+    font-size: 16px;
+    text-align: center;
+    border-radius: 0 0 20px 20px;
+}
+
+/* Estilos para nav-links */
+.nav-link {
+    color: var(--primary-color);
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #0056b3;
+    transform: scale(1.1);
+}
+
+/* Estilos para el span del navbar (texto) */
+#texto-navbar {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* Estilos para los botones de perfil y notificaciones en la navbar */
+.navbar-buttons {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-button {
+    background: transparent;
+    border: none;
+    margin-left: 15px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.navbar-button img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+}
+
+.navbar-button:hover img {
+    transform: scale(1.1);
+}
+
+/* Estilos personalizados para el botón toggler */
+.navbar-toggler {
+    border: 2px solid var(--primary-color);
+    border-radius: 5px;
+    background-color: #ffffff;
+    padding: 6px 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    outline: none;
+    box-shadow: none;
+}
+
+.navbar-toggler:hover {
+    transform: scale(1.05);
+}
+
+.navbar-toggler:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 123, 255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 20px 20px;
+}
+
+/* Estilos para las tarjetas */
+.card {
+    background-color: #f0f8ff;
+    border: 1px solid var(--primary-color);
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.card-title {
+    color: var(--dark-color);
+}
+
+.card-text {
+    color: #343a40;
+}
+
+.card-footer {
+    background-color: #f0f8ff;
+    border-top: 1px solid var(--primary-color);
+    border-radius: 20px;
+}
+
+.text-muted {
+    color: var(--secondary-color) !important;
+}
+
+/* Estilos personalizados para el modal */
+.modal-content {
+    background-color: #f0f8ff;;
+    color: var(--dark-color);
+    border-radius: 15px;
+    border: 1px solid var(--primary-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    background-color: var(--primary-color);
+    color: #f0f8ff;
+    border-bottom: 1px solid var(--primary-color);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.modal-title {
+    font-weight: bold;
+}
+
+.modal-body {
+    background-color: #f0f8ff;
+    color: var(--dark-color);
+    padding: 20px;
+}
+
+.modal-footer {
+    background-color: #f0f8ff;
+    border-top: 1px solid var(--primary-color);
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+/* Estilo del botón de cerrar */
+.btn-close {
+    background-color: transparent;
+    color: var(--dark-color);
+    border: none;
+    transition: transform 0.2s ease;
+    outline: 0;
+}
+
+.btn-close:hover {
+    transform: scale(1.1);
+    color: #000000;
+}
+
+.btn-close:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Ocultar el icono predeterminado y agregar un ícono personalizado */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background-image: url('../images/schedule.png') !important;
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Reemplazar el icono del reloj en el input de tipo time */
+input[type="time"]::-webkit-calendar-picker-indicator {
+    background-image: url('../images/clock.png') !important;
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Estilos para notificaciones */
+.notificacion-no-leida {
+    border: 2px solid blue;
+}
+
+.circulo-azul {
+    width: 10px;
+    height: 10px;
+    background-color: blue;
+    border-radius: 50%;
+    margin-left: auto;
+}

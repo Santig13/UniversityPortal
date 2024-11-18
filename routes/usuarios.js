@@ -42,7 +42,6 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
                 } 
                 
                 connection.query(query, [userId, eventId, estado, fecha_inscripcion], (error, results) => {
-                    console.log("hola");
                     if (error) {
                         console.log(error);
                         connection.release();
