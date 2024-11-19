@@ -1,0 +1,60 @@
+ <!-- Columna de Lista de Eventos -->
+ <div class="col-md-9">
+    <div class="container mt-5" style="overflow-y: auto; max-height: 75vh;">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2">
+            <h1 class="mb-2 mb-md-0">Lista de Eventos</h1>
+            <% if (user.rol === 'organizador') { %>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                    <i class="bi bi-plus-circle me-1"></i> Añadir Evento
+                </button>
+            <% } %>
+        </div>
+        <div id="eventosContainer">
+            <% eventos.forEach(evento => { %>
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header m-1">
+                                <h5 class="card-title"><%= evento.titulo %></h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text"><strong>Descripción:</strong> <%= evento.descripcion %></p>
+                                <p class="card-text"><strong>Fecha:</strong> <%= new Date(evento.fecha).toLocaleDateString() %></p>
+                                <p class="card-text"><strong>Hora:</strong> <%= evento.hora %></p>
+                                <p class="card-text"><strong>Ubicación:</strong> <%= evento.ubicacion %></p>
+                                <p class="card-text"><strong>Capacidad Máxima:</strong> <%= evento.capacidad_maxima %></p>
+                                <p class="card-text"><strong>Organizador ID:</strong> <%= evento.organizador_id %></p>
+                            </div>
+                            <div class="card-footer m-1 d-flex flex-wrap align-items-center justify-content-lg-start">
+                                <small class="text-muted mx-2 mt-1">ID Evento: <%= evento.id %></small>
+                                <% if ((user.rol === 'organizador') && (user.id === evento.organizador_id)){ %>
+                                    <button class="btn btn-outline-primary btn-event organizador mt-1" data-bs-toggle="modal" data-bs-target="#editEventModal" onclick="fillModal('<%= JSON.stringify(evento) %>')">
+                                        <i class="bi bi-pencil-square me-1"></i> Editar
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-event organizador ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#deleteEventModal" onclick="setEventoId('<%= evento.id %>')">
+                                        <i class="bi bi-trash me-1"></i> Eliminar
+                                    </button>
+                                    <button class="btn btn-outline-info btn-event organizador ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#participantsModal" onclick="showParticipants('<%= evento.id %>')">
+                                        <i class="bi bi-people me-1"></i> Participantes
+                                    </button>
+                                <% } else if (user.rol === 'participante') { %>
+                                    <% if (evento.estadoInscripcion==='inscrito') { %>
+                                        <button onclick= "desinscribirUsuario('<%= evento.id %>','<%= evento.organizador_id %>')" class="btn btn-outline-danger btn-event participante" >Desapuntarse</button>
+                                        <div id="mensaje-<%= evento.id %>" class="mx-2 text-success">Inscrito en el evento</div>
+                                    <% } else if  (evento.estadoInscripcion==='lista de espera') { %>
+                                        <button onclick= "abandonarListaEspera('<%= evento.id %>','<%= evento.organizador_id %>')" class="btn btn-outline-warning btn-event participante" >Abandonar</button>
+                                        <div id="mensaje-<%= evento.id %>" class="mx-2 text-warning">En lista de espera</div>
+                                    <% } else { %>
+                                        <button onclick="inscribirUsuario('<%= evento.id %>','<%= evento.organizador_id %>')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>
+                                        <div id="mensaje-<%= evento.id %>"></div>
+                                    <% } %>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</div>
+</div>

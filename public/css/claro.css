@@ -10,6 +10,10 @@
     --font-family: 'Arial', sans-serif;
 }
 
+.text-warning{
+    color: #574000 !important;
+}
+
 /* Estilos comunes para todas las páginas */
 body {
     background-color: #e0eaf1;
