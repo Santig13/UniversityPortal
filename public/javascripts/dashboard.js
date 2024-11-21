@@ -1,15 +1,4 @@
-// Funcion para mostrar los botones de acuerdo al rol del usuario
-document.addEventListener("DOMContentLoaded", function() {
-    const buttons = document.querySelectorAll(".btn-event");
-
-    buttons.forEach(button => {
-        if (button.classList.contains(userRole)) {
-            button.style.display = "inline-block";
-        } else {
-            button.style.display = "none";
-        }
-    });
-});
+// Funcion para mostrar los botones de acuerdo al rol del usuari
 
 // Funcion para filtrar eventos
 document.getElementById('filterForm').addEventListener('submit', async function(event) {
@@ -18,10 +7,10 @@ document.getElementById('filterForm').addEventListener('submit', async function(
 });
 
  function filtrar() {
-    const fecha = document.getElementById('fecha').value;
-    const tipo = document.getElementById('tipo').value;
-    const ubicacion = document.getElementById('ubicacion').value;
-    const capacidad = document.getElementById('capacidad').value;
+    const fecha = document.getElementById('fecha').value||"";
+    const tipo = document.getElementById('tipo').value || "";
+    const ubicacion = document.getElementById('ubicacion').value || "";
+    const capacidad = document.getElementById('capacidad').value || "";
     const queryParams = new URLSearchParams({ fecha, tipo, ubicacion, capacidad }).toString();
 
     $.ajax({
@@ -59,7 +48,8 @@ function renderEventos(eventos) {
                         <div class="card-body">
                             <p class="card-text"><strong>Descripción:</strong> ${evento.descripcion}</p>
                             <p class="card-text"><strong>Fecha:</strong> ${new Date(evento.fecha).toLocaleDateString()}</p>
-                            <p class="card-text"><strong>Hora:</strong> ${evento.hora}</p>
+                            <p class="card-text"><strong>Hora de inicio:</strong> ${evento.hora_ini}</p>
+                            <p class="card-text"><strong>Hora de fin:</strong> ${evento.hora_fin}</p>
                             <p class="card-text"><strong>Ubicación:</strong> ${evento.ubicacion}</p>
                             <p class="card-text"><strong>Capacidad Máxima:</strong> ${evento.capacidad_maxima}</p>
                             <p class="card-text"><strong>Organizador ID:</strong> ${evento.organizador_id}</p>
@@ -148,7 +138,8 @@ function fillModal(evento) {
     form.titulo.value = evento.titulo || '';
     form.descripcion.value = evento.descripcion || '';
     form.fecha.value = evento.fecha ? new Date(evento.fecha).toISOString().split('T')[0] : '';
-    form.hora.value = evento.hora || '';
+    form.hora_ini.value = evento.hora_ini || '';
+    form.hora_fin.value = evento.hora_fin || '';
     form.ubicacion.value = evento.ubicacion || '';
     form.capacidad_maxima.value = evento.capacidad_maxima || '';
     const modalInstance = bootstrap.Modal.getInstance(modal);

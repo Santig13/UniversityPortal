@@ -22,9 +22,16 @@ const validateEvent = [
     check('fecha')
         .matches(/^\d{4}-\d{2}-\d{2}$/).withMessage('Fecha debe estar en formato YYYY-MM-DD'),
 
-    check('hora')
+    check('hora_ini')
         .matches(/^([01]\d|2[0-3]):([0-5]\d)$/).withMessage('Hora debe estar en formato HH:MM'),
-
+    check('hora_fin')
+        .matches(/^([01]\d|2[0-3]):([0-5]\d)$/).withMessage('Hora debe estar en formato HH:MM')
+        .custom((value, { req }) => {
+            if (value <= req.body.hora_ini) {
+                throw new Error('Hora fin debe ser mayor a hora inicio');
+            }
+            return true;
+        }),
     check('ubicacion')
         .notEmpty().withMessage('Ubicación es requerida')
         .isString().withMessage('Ubicación debe ser un texto')

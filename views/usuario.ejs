@@ -34,33 +34,12 @@
 
         
         <!-- Columna de Lista de Eventos -->
-        <div class="col-md-9">
-            <div class="container mt-5" style="overflow-y: auto; max-height: 75vh;">
-            <% if (user.rol === 'organizador') { %>
-                <h1 class="mb-2">Lista de Eventos que has creado</h1>
-            <% } else if (user.rol === 'participante') { %>
-                <h1 class="mb-2">Eventos en los que estás inscrito </h1>
-            <% } %>
-            <% eventos.forEach(evento => { %>
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title"><%= evento.titulo %></h5>
-                                <p class="card-text"><strong>Descripción:</strong> <%= evento.descripcion %></p>
-                                <p class="card-text"><strong>Fecha:</strong> <%= new Date(evento.fecha).toLocaleDateString() %></p>
-                                <p class="card-text"><strong>Hora:</strong> <%= evento.hora %></p>
-                                <p class="card-text"><strong>Ubicación:</strong> <%= evento.ubicacion %></p>
-                                <p class="card-text"><strong>Capacidad Máxima:</strong> <%= evento.capacidad_maxima %></p>
-                                <p class="card-text"><strong>Organizador ID:</strong> <%= evento.organizador_id %></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <% }) %>
-        </div>
-        </div>
+
+            <%- include ("partials/eventos.ejs", { eventos: eventos, user: user, profile: true }) %>
+      
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/javascripts/dashboard.js"></script>
 
 <%- include("partials/footer.ejs") %>

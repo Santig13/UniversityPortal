@@ -68,7 +68,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
         });
     });
 
-    // Desinscribir usuario de un evento
+    // Desinscribir usuario de la lista de espera un evento
     router.delete('/abandonar', (req, res, next) => {
         const { userId, eventId,organizador_id } = req.body;
         const query = 'DELETE FROM inscripciones WHERE usuario_id = ? AND evento_id = ? AND estado = "lista de espera"';

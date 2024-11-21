@@ -57,8 +57,8 @@ header, .navbar {
 .fc-event-future,
 .fc-daygrid-event,
 .fc-daygrid-dot-event {
-    background-color: #3788d8 !important;
-    border-color: #3788d8 !important;
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
 }
 
 div .fc-event-time {

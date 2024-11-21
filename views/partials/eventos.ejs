@@ -1,13 +1,54 @@
+
+<div class="col-md-3 py-2 <%= profile ? 'd-none': ''%>">
+    <h2 class="mb-2 mt-5">Filtrar Eventos</h2>
+    <form id="filterForm" class="p-4 rounded login-box shadow-sm">
+        <div class="mb-3">
+            <label for="fecha" class="form-label">Fecha</label>
+            <input type="date" class="form-control" id="fecha" name="fecha" placeholder="none">
+        </div>
+        
+        <div class="mb-3">
+            <label for="tipo" class="form-label">Tipo de evento</label>
+            <input type="text" class="form-control" id="tipo" name="tipo" placeholder="Ej: Conferencia, Taller">
+        </div>
+        <div class="mb-3">
+            <label for="ubicacion" class="form-label">Ubicación</label>
+            <input type="text" class="form-control" id="ubicacion" name="ubicacion" placeholder="Ej: Auditorio, Sala A">
+        </div>
+        <div class="mb-3">
+            <label for="capacidad" class="form-label">Capacidad máxima</label>
+            <input type="number" class="form-control" id="capacidad" name="capacidad" placeholder="Ej: 50">
+        </div>
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-outline-primary">
+                <i class="bi bi-search me-1"></i> Filtrar
+            </button>
+            <button type="reset" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle me-1"></i> Limpiar
+            </button>
+        </div>
+    </form>
+</div>
  <!-- Columna de Lista de Eventos -->
  <div class="col-md-9">
     <div class="container mt-5" style="overflow-y: auto; max-height: 75vh;">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2">
-            <h1 class="mb-2 mb-md-0">Lista de Eventos</h1>
+
+            <% if(profile) { %>
+                <% if (user.rol === 'organizador') { %>
+                    <h1 class="mb-2">Lista de Eventos que has creado</h1>
+                <% } else if (user.rol === 'participante') { %>
+                    <h1 class="mb-2">Eventos en los que estás inscrito </h1>
+                <% } %>
+            <% } else { %>
+                <h1 class="mb-2">Lista de Eventos</h1>
+            <% } %>
             <% if (user.rol === 'organizador') { %>
-                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                <button id="btn_modal_crear" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createEventModal">
                     <i class="bi bi-plus-circle me-1"></i> Añadir Evento
                 </button>
             <% } %>
+
         </div>
         <div id="eventosContainer">
             <% eventos.forEach(evento => { %>
@@ -20,7 +61,8 @@
                             <div class="card-body">
                                 <p class="card-text"><strong>Descripción:</strong> <%= evento.descripcion %></p>
                                 <p class="card-text"><strong>Fecha:</strong> <%= new Date(evento.fecha).toLocaleDateString() %></p>
-                                <p class="card-text"><strong>Hora:</strong> <%= evento.hora %></p>
+                                <p class="card-text"><strong>Hora de inicio:</strong> <%= evento.hora_ini %></p>
+                                <p class="card-text"><strong>Hora de fin:</strong> <%= evento.hora_fin %></p>
                                 <p class="card-text"><strong>Ubicación:</strong> <%= evento.ubicacion %></p>
                                 <p class="card-text"><strong>Capacidad Máxima:</strong> <%= evento.capacidad_maxima %></p>
                                 <p class="card-text"><strong>Organizador ID:</strong> <%= evento.organizador_id %></p>
@@ -57,4 +99,170 @@
         </div>
     </div>
 </div>
+</div>
+
+
+<!-- Modal para Crear Evento -->
+<div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createEventModalLabel">Crear Nuevo Evento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body m-1">
+                <form id="createEventForm">
+                    <!-- Título del Evento -->
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="titulo" name="titulo" required>
+                    </div>
+                    <!-- Descripción del Evento -->
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="1" required></textarea>
+                    </div>
+                    <!-- Fecha del Evento -->
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" id="fecha" name="fecha" required>
+                    </div>
+                    <!-- Hora del Evento -->
+                    <div class="mb-3">
+                        <label for="hora_ini" class="form-label">Hora de inicio</label>
+                        <input type="time" class="form-control" id="hora_ini" name="hora_ini" required>
+                    </div>
+                     <!-- Hora del Evento -->
+                     <div class="mb-3">
+                        <label for="hora_fin" class="form-label">Hora de fin</label>
+                        <input type="time" class="form-control" id="hora_fin" name="hora_fin" required>
+                    </div>
+                    <!-- Ubicación del Evento -->
+                    <div class="mb-3">
+                        <label for="ubicacion" class="form-label">Ubicación</label>
+                        <input type="text" class="form-control" id="ubicacion" name="ubicacion" required>
+                    </div>
+                    <!-- Capacidad Máxima -->
+                    <div class="mb-3">
+                        <label for="capacidad_maxima" class="form-label">Capacidad Máxima</label>
+                        <input type="number" class="form-control" id="capacidad_maxima" name="capacidad_maxima" required min="1">
+                    </div>
+                    
+                    <!-- Campo oculto para el ID del organizador -->
+                    <input type="hidden" name="organizador_id" value="<%= user.id %>">
+                    <!-- Botones -->
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button id="createEventButton" type="submit" class="btn btn-outline-primary">Crear Evento</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación para Eliminar Evento -->
+<div class="modal fade" id="deleteEventModal" tabindex="-1" aria-labelledby="deleteEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteEventModalLabel">¿Estás seguro de que deseas eliminar este evento?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body m-1">
+                <p>Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button id="confirmDeleteEventButton" type="button" class="btn btn-outline-danger">Eliminar Evento</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar Evento -->
+<div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editEventModalLabel">Editar Evento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body m-1">
+                <form id="editEventForm">
+                    <!-- Título del Evento -->
+                    <div class="mb-3">
+                        <label for="editTitulo" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="editTitulo" name="titulo" required>
+                    </div>
+                    <!-- Descripción del Evento -->
+                    <div class="mb-3">
+                        <label for="editDescripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="editDescripcion" name="descripcion" rows="1" required></textarea>
+                    </div>
+                    <!-- Fecha del Evento -->
+                    <div class="mb-3">
+                        <label for="editFecha" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" id="editFecha" name="fecha" required>
+                    </div>
+                    <!-- Hora del Evento -->
+                    <div class="mb-3">
+                        <label for="editHora" class="form-label">Hora de inicio</label>
+                        <input type="time" class="form-control" id="editHora" name="hora_ini" required>
+                    </div>
+                     <!-- Hora del Evento -->
+                     <div class="mb-3">
+                        <label for="editHora" class="form-label">Hora de fin</label>
+                        <input type="time" class="form-control" id="editHora" name="hora_fin" required>
+                    </div>
+                    <!-- Ubicación del Evento -->
+                    <div class="mb-3">
+                        <label for="editUbicacion" class="form-label">Ubicación</label>
+                        <input type="text" class="form-control" id="editUbicacion" name="ubicacion" required>
+                    </div>
+                    <!-- Capacidad Máxima -->
+                    <div class="mb-3">
+                        <label for="editCapacidadMaxima" class="form-label">Capacidad Máxima</label>
+                        <input type="number" class="form-control" id="editCapacidadMaxima" name="capacidad_maxima" required min="1">
+                    </div>
+                    
+                    <!-- Botones -->
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button id="confirmEditEventButton" type="submit" class="btn btn-outline-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver Participantes -->
+<div class="modal fade" id="participantsModal" tabindex="-1" aria-labelledby="notificationsModalLabel" aria-hidden="true" >
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notificationsModalLabel">Participantes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container" >
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="container mt-2" style="overflow-y: auto; max-height: 75vh;">
+                
+                                <div id="participantesContainer">
+                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>  
+        </div>
+    </div>
 </div>

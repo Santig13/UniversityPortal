@@ -53,7 +53,7 @@ function getEventosOrganizador(user, pool, callback) {
 
 function getEventos(query, pool, callback) {
     const { fecha, tipo, ubicacion, capacidad } = query;
-    let sql = 'SELECT *, DATE_FORMAT(hora, "%H:%i") as hora FROM eventos WHERE 1=1';
+    let sql = 'SELECT *, DATE_FORMAT(hora_ini, "%H:%i") as hora_ini, DATE_FORMAT(hora_fin, "%H:%i") as hora_fin FROM eventos WHERE 1=1';
     const params = [];
 
     if (fecha) {
@@ -89,6 +89,23 @@ function getEventos(query, pool, callback) {
     });
 }
 
+//Funcion que comprueba si un evento se solapa con otro evento en la misma ubicacion y fecha
+function solapan(connection,ubicacion,fecha,hora_ini,hora_fin, callback) {
+    const sql = `
+        SELECT * FROM eventos
+        WHERE ubicacion = ? AND fecha = ? AND  hora_fin >= ?
+    `;  
+    console.log(ubicacion,fecha,hora_ini,hora_fin);
+    connection.query(sql, [ubicacion, fecha, hora_ini], (err, result) => {
+        if (err) {
+            return callback(err);
+        }
+        if (result.length > 0) {
+            return callback(new Error('El evento se solapa con otro evento en la misma ubicación y fecha.'));
+        }
+        return callback(null, result);
+    });
+}
 // Funcion que comprueba si hay hueco en un evento
 function comprobarCapacidad(connection, evento_id, callback) {
 
@@ -154,20 +171,31 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
 
     // Ruta para crear un evento
     router.post('/crear', requireAuth, validateEvent ,(req, res, next) => {
-        const { titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima} = req.body;
-        const sql = 'INSERT INTO eventos(titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, organizador_id) VALUES(?, ?, ?, ?, ?, ?, ?)';
+        const { titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima} = req.body;
+        const sql = 'INSERT INTO eventos(titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima, organizador_id) VALUES(?, ?, ?, ?,?, ?, ?, ?)';
         pool.getConnection((err, connection) => {
             if (err) {
                 err.message = 'Error al obtener conexión de la base de datos para crear evento.';
                 return next(err);
             }
-            connection.query(sql, [titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, req.session.user.id], (err, result) => {
-                connection.release();
+            //console.log(req.body);
+
+            solapan(connection,ubicacion,fecha,hora_ini,hora_fin, (err, result) => {
                 if (err) {
-                    err.message = 'Error al crear evento en la base de datos.';
-                    return next(err);
+                  
+                  res.status(400).json({ success: false, message: err.message });
                 }
-                res.status(200).json({ id: result.insertId });
+                if(result.length > 0){
+                    connection.query(sql, [titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima, req.session.user.id], (err, result) => {
+                        connection.release();
+                        if (err) {
+                            err.message = 'Error al crear evento en la base de datos.';
+                            return next(err);
+                        }
+                        res.status(200).json({ id: result.insertId });
+                    });
+
+                }
             });
         });
     });
@@ -238,9 +266,9 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
 
     // Ruta para editar un evento
     router.put('/:id', requireAuth, validateEvent, (req, res, next) => {
-        const { titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima} = req.body;
+        const { titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima} = req.body;
         const id = req.params.id;
-        const sql = 'UPDATE eventos SET titulo=?, descripcion=?, fecha=?, hora=?, ubicacion=?, capacidad_maxima=? WHERE id=?';
+        const sql = 'UPDATE eventos SET titulo=?, descripcion=?, fecha=?, hora_ini=?,hora_fin=?, ubicacion=?, capacidad_maxima=? WHERE id=?';
         pool.getConnection((err, connection) => {
             if (err) {
                 err.message = 'Error al obtener conexión de la base de datos para actualizar evento.';
@@ -254,7 +282,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                 }
                 usuarios = result;
             
-                connection.query(sql, [titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, id], (err, result) => {
+                connection.query(sql, [titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima, id], (err, result) => {
                     connection.release();
                     if (err) {
                         err.message = 'Error al actualizar evento en la base de datos.';
