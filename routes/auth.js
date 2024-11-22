@@ -1,8 +1,32 @@
 const { Router } = require('express');
 const bcrypt = require('bcrypt');
+const UAParser = require('ua-parser-js');
 const { validateLogIn, validateUser } = require('../schemas/users');
 
 
+//Funcion para registrar ip negador fecha y user en una tabla 
+function registroUso(connection,req,callback) {
+    const ip = req.ip;
+    const fecha = new Date();
+    const user = req.session.user.id;
+    const userAgent = req.headers['user-agent'];
+    const parser = new UAParser(userAgent);
+    const browser = parser.getBrowser(); // Detecta el navegador
+    const os = parser.getOS(); // Detecta el sistema operativo
+    const sql = 'INSERT INTO registro_uso(ip, fecha, usuario_id,navegador,OS) VALUES(?,?,?,?,?)';
+    console.log(ip);
+    console.log(fecha);
+    console.log(user);
+    console.log(browser.name);
+    console.log(os.name);
+    connection.query(sql, [ip, fecha, user,browser.name,os.name], (err) => {
+        if (err) {
+            err.message = 'Error al registrar el uso de la aplicación.';
+            return callback(err);
+        }
+        return callback(null);
+    });
+}
 function createAuthRouter(pool, sessionMiddleware) {
     const router = Router();
 
@@ -32,7 +56,8 @@ function createAuthRouter(pool, sessionMiddleware) {
                             err.message = 'Error al consultar la base de datos para encontrar la accesibilidad del usuario.';
                             return next(err);
                         }
-                        
+                      
+                            
                         const user = rows[0];
                         const isMatch = await bcrypt.compare(password, user.password);
                         const { password: _, ...userWithoutPassword } = user;
@@ -44,7 +69,13 @@ function createAuthRouter(pool, sessionMiddleware) {
                                 accesibilidad: accesibilidad[0]
                             };
                             req.session.user = userWithAccesibilidad;
-                            res.redirect('/dashboard');
+                            registroUso(connection,req, (err)=>{
+                                if (err) {
+                                    err.message = 'Error al registrar el uso de la aplicación.';
+                                    return next(err);
+                                }
+                                res.redirect('/dashboard');
+                            });
                         } else {
                             res.status(400).json({ success: false, message: 'Contraseña incorrecta' });
                         }

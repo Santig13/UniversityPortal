@@ -40,7 +40,7 @@ const detectIPBloqueadas = (req, res, next) => {
     const ip = req.ip;
     pool.query('SELECT * FROM lista_negra_ips WHERE ip = ?', [ip], (err, results) => {
         if (err) {
-            err.message = 'Error al consultar la lista negra de IPs.';
+            err.message = 'Error al acceder a la base de datos.';
             return next(err);
         }
         if (results.length > 0) {
@@ -140,6 +140,18 @@ app.get('/dashboard', requireAuth, (req, res, next) => {
 
 app.get('/calendar', requireAuth, (req, res) => {
     res.render('calendar', {user:req.session.user });
+});
+
+app.get('/estadisticas', requireAuth, (req, res, next) => {
+    // Obtener las estadísticas de uso desde el registro de uso
+    const sql = 'SELECT * FROM registro_uso';
+    pool.query(sql, (err, results) => {
+        if (err) {
+            err.message = 'Error al recuperar las estadísticas de uso.';
+            return next(err);
+        }
+        res.render('estadisticas', { user: req.session.user, estadisticas: results });
+    });
 });
 
 // Middleware para manejar errores unificados

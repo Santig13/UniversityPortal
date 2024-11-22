@@ -76,6 +76,15 @@ CREATE TABLE IF NOT EXISTS NOTIFICACIONES (
     leido BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (usuario_id) REFERENCES USUARIOS(id) ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS registro_uso (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    ip VARCHAR(100) NOT NULL,
+    fecha TIMESTAMP NOT NULL,
+    navegador VARCHAR(100) NOT NULL,
+    OS VARCHAR(100) NOT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES USUARIOS(id) ON DELETE CASCADE
+);
 /*
 INSERT INTO EVENTOS (titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, organizador_id)
 VALUES 

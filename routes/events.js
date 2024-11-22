@@ -256,10 +256,11 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                         if (err) {
                             return next(err);
                         }
+                        res.status(200).json({ success: true });
                     });
                     
                 });
-                res.status(200).json({ success: true });
+              
             });
         });
     });
@@ -281,25 +282,26 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                     return next(err);
                 }
                 usuarios = result;
-            
-                connection.query(sql, [titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima, id], (err, result) => {
-                    connection.release();
-                    if (err) {
-                        err.message = 'Error al actualizar evento en la base de datos.';
-                        return next(err);
-                    }
-                    const mensaje = `El organizador ha modificado el evento con id ${id}`;
-                    const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
-                    
-                    notificarTodosLosParticipantes(connection, usuarios, mensaje, req.params.id, fecha, (err) => {
+                const sql2 = 'SELECT * FROM eventos WHERE ubicacion = ? AND fecha = ? AND hora_fin => ? AND id != ?';
+                connection.query(sql2, [ubicacion, fecha, hora_ini, id], (err, result) => {
+                    connection.query(sql, [titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima, id], (err, result) => {
                         connection.release();
                         if (err) {
+                            err.message = 'Error al actualizar evento en la base de datos.';
                             return next(err);
                         }
-                        
+                        const mensaje = `El organizador ha modificado el evento con id ${id}`;
+                        const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
+                        notificarTodosLosParticipantes(connection, usuarios, mensaje, req.params.id, fecha, (err) => {
+                            connection.release();
+                            if (err) {
+                                return next(err);
+                            }
+                            res.status(200).json({ success: true });
+                        });
                     });
                 });
-                res.status(200).json({ success: true });
+               
             });
         });
     });

@@ -1,0 +1,74 @@
+<%- include("partials/header.ejs", { user: user }) %>
+<div class=" mt-5">
+    <h2 class="text-center text-black">Estadísticas de Uso</h2>
+    <div class="row justify-content-center">
+    <div class="col-9">
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered bg-white">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Usuario</th>
+                    <th>IP</th>
+                    <th>Fecha</th>
+                    <th>Navegador</th>
+                    <th>Sistema Operativo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% estadisticas.forEach(function(registro) { %>
+                    <tr>
+                        <td><%=  %></td>
+                        <td><%= registro.ip %></td>
+                        <td><%= new Date(registro.fecha).toLocaleString() %></td>
+                        <td><%= registro.navegador %></td>
+                        <td><%= registro.OS %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+    </div>
+</div>
+
+<style>
+  
+
+    .container-table {
+        background-color: #ffffff; /* Fondo blanco para el contenedor */
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .table {
+        margin-top: 20px;
+    }
+
+    .table thead {
+        background-color: #343a40; /* Fondo oscuro para el encabezado */
+        color: #ffffff; /* Texto blanco para el encabezado */
+    }
+
+    .table tbody tr:hover {
+        background-color: #f1f1f1; /* Fondo claro al pasar el ratón por encima */
+    }
+
+    .table-bordered {
+        border: 1px solid #dee2e6; /* Borde de la tabla */
+    }
+
+    .table-bordered th,
+    .table-bordered td {
+        border: 1px solid #dee2e6; /* Bordes de las celdas */
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-white {
+        color: #ffffff;
+    }
+</style>
+<%- include("partials/footer.ejs") %>
