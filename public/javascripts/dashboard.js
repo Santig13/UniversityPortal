@@ -144,7 +144,6 @@ let eventoId = null;
 
 // Funcion para guardar el id del evento a eliminar o editar
 function setEventoId(id) {
-    console.log(id);
     eventoId = id;
 }
 
@@ -396,7 +395,7 @@ function showParticipants(eventoId) {
             }
         },
         error: function (error) {
-            console.log(error);
+            showToast('Error al obtener la lista de participantes');
         }
     });
 }
@@ -440,7 +439,6 @@ function calificarEvento(Id) {
 
 
 function showRatings(eventoId) {
-    console.log(eventoId);
     $.ajax({
         url: `/eventos/${eventoId}/calificaciones`,
         method: 'GET',

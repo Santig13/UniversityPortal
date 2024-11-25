@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { validateEvent } = require('../schemas/event.js');
+const { validateEvent,validateFilter,validateCalification} = require('../schemas/event.js');
 const {añadirNotificacion} = require('./notifications.js');
 const moment = require('moment');
 
@@ -147,7 +147,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
     router.use(middlewareSession);
     
     // Ruta para obtener todos los eventos personales
-    router.get('/filter', (req, res, next) => {
+    router.get('/filter',validateFilter, (req, res, next) => {
         getEventos(req.query, pool, (err, eventos) => {
             if (err) {
                 err.message = 'Error al filtrar eventos.';
@@ -364,10 +364,9 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
         });
     });
     
-    router.post('/calificacion', (req, res, next) => {
+    router.post('/calificacion', validateCalification,(req, res, next) => {
         const { eventId, calificacion, comentario } = req.body;
         const sql = 'INSERT INTO calificaciones(usuario_id, evento_id, calificacion, comentario) VALUES(?, ?, ?, ?)';
-        
         pool.getConnection((err, connection) => {
             if (err) {
                 err.message = 'Error al obtener conexión de la base de datos para calificar evento.';

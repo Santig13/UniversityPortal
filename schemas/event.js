@@ -41,7 +41,30 @@ const validateEvent = [
         .isInt({ min: 1 }).withMessage('Capacidad máxima debe ser un número entero positivo')
         .custom(detectSQLInjection),
 ];
-
+const validateEventFilters = [
+    check('fecha')
+        .optional()
+        .matches(/^\d{4}-\d{2}-\d{2}$/).withMessage('Fecha debe estar en formato YYYY-MM-DD'),
+    check('ubicacion')
+        .optional()
+        .notEmpty().withMessage('Ubicación es requerida')
+        .isString().withMessage('Ubicación debe ser un texto')
+        .custom(detectSQLInjection),
+    check('capacidad_maxima')
+        .optional()
+        .isInt({ min: 1 }).withMessage('Capacidad máxima debe ser un número entero positivo')
+        .custom(detectSQLInjection),
+];
+const validateEventCalification = [
+    check('calificacion')
+        .notEmpty().withMessage('Calificación es requerida')
+        .isInt({ min: 1, max: 5 }).withMessage('Calificación debe ser un número entero entre 1 y 5')
+        .custom(detectSQLInjection),
+    check('comentario')
+        .optional()
+        .isString().withMessage('Comentario debe ser un texto')
+        .custom(detectSQLInjection),
+];
 // Middleware general para manejar resultados de validación
 const validate = (req, res, next) => {
     const errors = validationResult(req);
@@ -59,6 +82,9 @@ const validate = (req, res, next) => {
     next();
 };
 
+
 module.exports = {
-    validateEvent: [...validateEvent, validate]
+    validateEvent: [...validateEvent, validate],
+    validateFilter: [...validateEventFilters, validate],
+    validateCalification: [...validateEventCalification, validate]
 };

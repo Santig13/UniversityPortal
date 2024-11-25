@@ -165,7 +165,6 @@ app.get('/estadisticas', requireAuth, (req, res, next) => {
     `;
     pool.query(sql, (err, results) => {
         if (err) {
-            console.log(err);
             err.message = 'Error al recuperar las estadísticas de uso.';
             return next(err);
         }
