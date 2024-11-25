@@ -83,6 +83,8 @@ CREATE TABLE IF NOT EXISTS CALIFICACIONES (
     calificacion INT NOT NULL,
     comentario TEXT,
     fecha TIMESTAMP NOT NULL,
+    horaEntrada TIME NOT NULL,
+    horaSalida TIME,
     FOREIGN KEY (usuario_id) REFERENCES USUARIOS(id) ON DELETE CASCADE,
     FOREIGN KEY (evento_id) REFERENCES EVENTOS(id) ON DELETE CASCADE
 );

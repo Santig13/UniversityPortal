@@ -70,6 +70,11 @@
                                     </select>
                                 </div>
                             </li>
+                            <li>
+                                <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#shortConfigModal">
+                                    <i class="bi bi-plus-circle me-1"></i>Configurar opciones de teclado
+                                </button>
+                            </li>
                         </ul>
                     </li>
                 </ul>
@@ -128,7 +133,35 @@
         </div>
     </div>
 
-
+    <!-- shortConfigModal-->
+    <div class="modal fade" id="shortConfigModal" tabindex="-1" aria-labelledby="shortConfigModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shortConfigModalLabel">Configuración de accesibilidad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="shortcutForm">
+                        <div class="mb-3">
+                            <label for="shortcutPersonalArea" class="form-label">Área Personal</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="shortcutPersonalArea" value="Ctrl+P" readonly>
+                                <button type="button" class="btn btn-outline-secondary" onclick="registerShortcut('shortcutPersonalArea')">Cambiar</button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="shortcutInscribir" class="form-label">Inscribirse al Evento</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="shortcutInscribir" value="Ctrl+I" readonly>
+                                <button type="button" class="btn btn-outline-secondary" onclick="registerShortcut('shortcutInscribir')">Cambiar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div> 
+            </div> 
+        </div>
+    </div>        
 
     <!-- Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">

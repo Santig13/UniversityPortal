@@ -155,13 +155,18 @@ app.get('/estadisticas', requireAuth, (req, res, next) => {
             registro_uso.ip, 
             registro_uso.navegador, 
             registro_uso.fecha, 
-            registro_uso.OS 
+            registro_uso.OS,
+            registro_uso.horaEntrada,
+            registro_uso.horaSalida
         FROM 
             registro_uso 
         JOIN 
             usuarios 
         ON 
             registro_uso.usuario_id = usuarios.id
+        ORDER BY
+            registro_uso.fecha DESC,
+            registro_uso.horaEntrada DESC
     `;
     pool.query(sql, (err, results) => {
         if (err) {

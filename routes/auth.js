@@ -8,18 +8,19 @@ const { validateLogIn, validateUser } = require('../schemas/users');
 function registroUso(connection,req,callback) {
     const ip = req.ip;
     const fecha = new Date();
+    const hora = fecha.getHours() + ':' + fecha.getMinutes() + ':' + fecha.getSeconds();
     const user = req.session.user.id;
     const userAgent = req.headers['user-agent'];
     const parser = new UAParser(userAgent);
     const browser = parser.getBrowser(); // Detecta el navegador
     const os = parser.getOS(); // Detecta el sistema operativo
-    const sql = 'INSERT INTO registro_uso(ip, fecha, usuario_id,navegador,OS) VALUES(?,?,?,?,?)';
-    connection.query(sql, [ip, fecha, user,browser.name,os.name], (err) => {
+    const sql = 'INSERT INTO registro_uso(ip, fecha,horaEntrada, usuario_id,navegador,OS) VALUES(?,?,?,?,?,?)';
+    connection.query(sql, [ip, fecha,hora, user,browser.name,os.name], (err,result) => {
         if (err) {
             err.message = 'Error al registrar el uso de la aplicación.';
-            return callback(err);
+            return callback(err,null);
         }
-        return callback(null);
+        return callback(null,result);
     });
 }
 function createAuthRouter(pool, sessionMiddleware) {
@@ -64,11 +65,14 @@ function createAuthRouter(pool, sessionMiddleware) {
                                 accesibilidad: accesibilidad[0]
                             };
                             req.session.user = userWithAccesibilidad;
-                            registroUso(connection,req, (err)=>{
+                            registroUso(connection,req, (err,rows)=>{
                                 if (err) {
+                                    console.log(err);
                                     err.message = 'Error al registrar el uso de la aplicación.';
                                     return next(err);
                                 }
+                                console.log(rows.insertId);
+                                req.session.uso=rows.insertId;
                                 res.redirect('/dashboard');
                             });
                         } else {
@@ -86,6 +90,22 @@ function createAuthRouter(pool, sessionMiddleware) {
 
     // Ruta logout
     router.post('/logout', (req, res, next) => {
+        const uso=req.session.uso;
+        pool.getConnection((err, connection) => {
+            if (err) {
+                err.message = 'Error al obtener conexión de la base de datos para cerrar la sesión.';
+                return next(err);
+            }
+            const sql = 'UPDATE registro_uso SET horaSalida = ? WHERE id = ?';
+            const fecha = new Date();
+            const hora = fecha.getHours() + ':' + fecha.getMinutes() + ':' + fecha.getSeconds();
+            connection.query(sql, [hora,uso], (err,result) => {
+                if (err) {
+                    err.message = 'Error al cerrar la sesión.';
+                    return next(err);
+                }
+            });
+        });
         req.session.destroy(err => {
             if (err) {
                 err.message = 'Error al cerrar la sesión.';

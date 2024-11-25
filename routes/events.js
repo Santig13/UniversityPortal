@@ -150,6 +150,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
     router.get('/filter',validateFilter, (req, res, next) => {
         getEventos(req.query, pool, (err, eventos) => {
             if (err) {
+                
                 err.message = 'Error al filtrar eventos.';
                 err.status = 500;
                 return next(err);

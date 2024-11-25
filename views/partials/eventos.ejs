@@ -53,7 +53,7 @@
             <% eventos.forEach(evento => { %>
                 <div class="row mb-4">
                     <div class="col-12">
-                        <div class="card">
+                        <div class="card" tabindex="0">
                             <div class="card-header m-1">
                                 <h5 class="card-title"><%= evento.titulo %></h5>
                             </div>
@@ -97,7 +97,7 @@
                                             <button onclick= "abandonarListaEspera('<%= evento.id %>','<%= evento.organizador_id %>')" class="btn btn-outline-warning btn-event participante" >Abandonar</button>
                                             <div id="mensaje-<%= evento.id %>" class="mx-2 text-warning">En lista de espera</div>
                                         <% } else { %>
-                                            <button onclick="inscribirUsuario('<%= evento.id %>','<%= evento.organizador_id %>')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>
+                                            <button id="apuntarse" onclick="inscribirUsuario('<%= evento.id %>','<%= evento.organizador_id %>')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>
                                             <div id="mensaje-<%= evento.id %>"></div>
                                         <% } %>
                                     <% } %>
@@ -304,7 +304,7 @@
                     <input type="hidden" id="rateEventId" name="eventId">
                     <div class="modal-footer border-0">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button id="calificarEventoButton" type="submit"  class="btn btn-outline-primary">Enviar Calificación</button>
+                        <button id="calificarEventoButton" type="submit" data-bs-dismiss="modal" class="btn btn-outline-primary">Enviar Calificación</button>
                     </div>
                 </form>
             </div>
@@ -341,3 +341,6 @@
         </div>
     </div>
 </div>
+<style>
+    
+</style>

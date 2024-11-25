@@ -43,15 +43,15 @@ const validateEvent = [
 ];
 const validateEventFilters = [
     check('fecha')
-        .optional()
+        .optional({ checkFalsy: true })
         .matches(/^\d{4}-\d{2}-\d{2}$/).withMessage('Fecha debe estar en formato YYYY-MM-DD'),
     check('ubicacion')
-        .optional()
+        .optional({ checkFalsy: true })
         .notEmpty().withMessage('Ubicación es requerida')
         .isString().withMessage('Ubicación debe ser un texto')
         .custom(detectSQLInjection),
     check('capacidad_maxima')
-        .optional()
+        .optional({ checkFalsy: true })
         .isInt({ min: 1 }).withMessage('Capacidad máxima debe ser un número entero positivo')
         .custom(detectSQLInjection),
 ];
@@ -61,13 +61,13 @@ const validateEventCalification = [
         .isInt({ min: 1, max: 5 }).withMessage('Calificación debe ser un número entero entre 1 y 5')
         .custom(detectSQLInjection),
     check('comentario')
-        .optional()
         .isString().withMessage('Comentario debe ser un texto')
         .custom(detectSQLInjection),
 ];
 // Middleware general para manejar resultados de validación
 const validate = (req, res, next) => {
     const errors = validationResult(req);
+    console.log(errors);
     if (!errors.isEmpty()) {
         // Transformar los errores en una cadena más legible
         const errorMessages = errors.array().map(err => err.msg).join(', ');

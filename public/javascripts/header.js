@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
             url: '/notificaciones',
             method: 'GET',
             success: function (notificaciones, jqXHR) {
+                console.log("hola");
                 const notificacionesContainer = document.getElementById('notificacionesContainer');
                 notificacionesContainer.innerHTML = '';
                 let html = '';
@@ -48,6 +49,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+    document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && event.key === 'p') {
+            event.preventDefault();
+            window.location.href = `/usuarios/${usuario.id}`;
+        }
+    });
 
 function marcarComoLeido(notificacionId) {
     $.ajax({
@@ -69,6 +76,7 @@ function marcarComoLeido(notificacionId) {
         }
     });
 }
+
 
 document.addEventListener("DOMContentLoaded", function () {
     const darkModeSwitch = document.getElementById("darkModeSwitch");

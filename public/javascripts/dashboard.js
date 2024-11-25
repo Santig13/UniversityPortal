@@ -41,9 +41,9 @@ function renderEventos(eventos) {
         const eventoHTML = `
             <div class="row mb-4">
                 <div class="col-12">
-                    <div class="card">
+                    <div class="card" tabindex="-1">
                     <div class="card-header m-1">
-                                        <h5 class="card-title">${evento.titulo}</h5>
+                        <h5 class="card-title">${evento.titulo}</h5>
                     </div>
                         <div class="card-body">
                             <p class="card-text"><strong>Descripción:</strong> ${evento.descripcion}</p>
@@ -61,6 +61,9 @@ function renderEventos(eventos) {
                                 ${(userRole === 'participante' && evento.estadoInscripcion === 'inscrito') ? `
                                  <button class="btn btn-outline-primary btn-event participante ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#rateEventModal" onclick="setRateEventId('${evento.id}')">
                                         <i class="bi bi-star me-1"></i> Calificar Evento
+                                    </button>
+                                    <button class="btn btn-outline-info btn-event organizador ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#viewRatingsModal" onclick="showRatings('${evento.id}')">
+                                        <i class="bi bi-star me-1"></i> Ver Calificaciones
                                     </button>
                                 ` :`
                                     <button class="btn btn-outline-info btn-event organizador ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#viewRatingsModal" onclick="showRatings('${evento.id}')">
@@ -476,6 +479,39 @@ function showRatings(eventoId) {
     });
 }
 
+//Configuraciones de shortcuts
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', function(event) {
+            card.focus();
+        });
+    });
+});
+
+document.addEventListener('keydown', function(event) {
+    const cards = document.querySelectorAll('.card');
+    let currentIndex = Array.from(cards).findIndex(card => card === document.activeElement);
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+        event.preventDefault();
+        if (currentIndex < cards.length - 1) {
+            cards[currentIndex + 1].focus();
+        }
+    } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+        event.preventDefault();
+        if (currentIndex > 0) {
+            cards[currentIndex - 1].focus();
+        }
+    }
+    else if (event.ctrlKey && event.key === 'i') {
+        event.preventDefault();
+        const currentCard = cards[currentIndex];
+        const apuntarseButton = currentCard.querySelector('button[id^="apuntarse"]');
+        if (apuntarseButton) {
+            apuntarseButton.click();
+        }
+    }
+});
 // Funcion para mostrar un toast
 function showToast(message) {
     const toastElement = document.getElementById('myToast');

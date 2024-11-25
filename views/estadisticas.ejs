@@ -11,6 +11,8 @@
                             <th>Usuario</th>
                             <th>IP</th>
                             <th>Fecha</th>
+                            <th>Hora de entrada</th>
+                            <th>Hora de salida</th>
                             <th>Navegador</th>
                             <th>Sistema Operativo</th>
                         </tr>
@@ -20,7 +22,9 @@
                             <tr>
                                 <td><%= registro.user %></td>
                                 <td><%= registro.ip %></td>
-                                <td><%= new Date(registro.fecha).toLocaleString() %></td>
+                                <td><%= registro.fecha ? new Date(registro.fecha).toLocaleDateString() : 'N/A' %></td>
+                                <td><%= registro.horaEntrada ? registro.horaEntrada : 'N/A' %></td>
+                                <td><%= registro.horaSalida ? registro.horaSalida : 'Actualmente en uso' %></td>
                                 <td><%= registro.navegador %></td>
                                 <td><%= registro.OS %></td>
                             </tr>
