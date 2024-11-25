@@ -72,7 +72,8 @@ function getEventos(query, pool, callback) {
         sql += ' AND capacidad_maxima >= ?';
         params.push(capacidad);
     }
-
+    //ordeno por fecha y hora descendente
+    sql += ' ORDER BY fecha DESC, hora_ini DESC';
     pool.getConnection((err, connection) => {
         if (err) {
             err.message = 'Error al obtener conexión de la base de datos para filtrar eventos.';
@@ -84,6 +85,10 @@ function getEventos(query, pool, callback) {
                 err.message = 'Error al consultar eventos en la base de datos.';
                 return callback(err);
             }
+            rows = rows.map(row => {
+                row.terminado = moment().isAfter(row.fecha);
+                return row;
+            });
             callback(null, rows);
         });
     });
@@ -142,7 +147,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
     router.use(middlewareSession);
     
     // Ruta para obtener todos los eventos personales
-    router.get('/filter', requireAuth, (req, res, next) => {
+    router.get('/filter', (req, res, next) => {
         getEventos(req.query, pool, (err, eventos) => {
             if (err) {
                 err.message = 'Error al filtrar eventos.';
@@ -170,7 +175,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
     });
 
     // Ruta para crear un evento
-    router.post('/crear', requireAuth, validateEvent ,(req, res, next) => {
+    router.post('/crear', validateEvent ,(req, res, next) => {
         const { titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima} = req.body;
         const sql = 'INSERT INTO eventos(titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima, organizador_id) VALUES(?, ?, ?, ?,?, ?, ?, ?)';
         pool.getConnection((err, connection) => {
@@ -225,7 +230,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
     }
 
     // Ruta para borrar un evento
-    router.delete('/:id', requireAuth, (req, res, next) => {
+    router.delete('/:id', (req, res, next) => {
         const sql = 'DELETE FROM eventos WHERE id=?';
         pool.getConnection((err, connection) => {
             if (err) {
@@ -266,9 +271,10 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
     });
 
     // Ruta para editar un evento
-    router.put('/:id', requireAuth, validateEvent, (req, res, next) => {
+    router.put('/:id', validateEvent, (req, res, next) => {
         const { titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima} = req.body;
         const id = req.params.id;
+        console.log(hola);
         const sql = 'UPDATE eventos SET titulo=?, descripcion=?, fecha=?, hora_ini=?,hora_fin=?, ubicacion=?, capacidad_maxima=? WHERE id=?';
         pool.getConnection((err, connection) => {
             if (err) {
@@ -328,6 +334,54 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                     return next(err);
                 }
                 res.status(200).json({ participantes: rows });
+            });
+        });
+    });
+    
+    router.get('/:id/calificaciones', (req, res, next) => {
+        const { id } = req.params;
+        // Consulta para obtener los nombres y correos de los usuarios que han calificado el evento
+        const sql = `
+            SELECT usuarios.nombre, usuarios.email, calificaciones.calificacion, calificaciones.comentario
+            FROM calificaciones
+            JOIN usuarios ON calificaciones.usuario_id = usuarios.id
+            WHERE calificaciones.evento_id = ?
+        `;
+
+        pool.getConnection((err, connection) => {
+            if (err) {
+                err.message = 'Error al obtener conexión de la base de datos para obtener calificaciones.';
+                return next(err);
+            }
+            connection.query(sql, [id], (err, rows) => {
+                connection.release();
+                if (err) {
+                    err.message = 'Error al consultar calificaciones en la base de datos.';
+                    return next(err);
+                }
+                res.status(200).json({ calificaciones: rows });
+            });
+        });
+    });
+    
+    router.post('/calificacion', (req, res, next) => {
+        const { eventId, calificacion, comentario } = req.body;
+        const sql = 'INSERT INTO calificaciones(usuario_id, evento_id, calificacion, comentario) VALUES(?, ?, ?, ?)';
+        
+        pool.getConnection((err, connection) => {
+            if (err) {
+                err.message = 'Error al obtener conexión de la base de datos para calificar evento.';
+                return next(err);
+            }
+          
+            connection.query(sql, [req.session.user.id, eventId, calificacion, comentario], (err, result) => {
+                connection.release();
+                if (err) {
+                    console.log(err);
+                    err.message = 'Error al calificar evento en la base de datos.';
+                    return next(err);
+                }
+                res.status(200).json({ success: true, message: 'Evento calificado exitosamente' });
             });
         });
     });

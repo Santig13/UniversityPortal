@@ -57,16 +57,6 @@ CREATE TABLE IF NOT EXISTS LISTA_NEGRA_IPS (
     motivo VARCHAR(255) DEFAULT 'Intento de inyección SQL'
 );
 
--- Lista de espera para personas que intentaron registrarse en eventos con capacidad llena
-CREATE TABLE IF NOT EXISTS LISTA_ESPERA (
-    usuario_id INT NOT NULL,
-    evento_id INT NOT NULL,
-    fecha_registro DATE NOT NULL,
-    PRIMARY KEY (usuario_id, evento_id),
-    FOREIGN KEY (usuario_id) REFERENCES USUARIOS(id) ON DELETE CASCADE,
-    FOREIGN KEY (evento_id) REFERENCES EVENTOS(id) ON DELETE CASCADE
-);
-
 -- Tabla de notificaciones para cada usuario
 CREATE TABLE IF NOT EXISTS NOTIFICACIONES (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -84,6 +74,17 @@ CREATE TABLE IF NOT EXISTS registro_uso (
     navegador VARCHAR(100) NOT NULL,
     OS VARCHAR(100) NOT NULL,
     FOREIGN KEY (usuario_id) REFERENCES USUARIOS(id) ON DELETE CASCADE
+);
+/*Lista de calificaciones*/
+CREATE TABLE IF NOT EXISTS CALIFICACIONES (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    evento_id INT NOT NULL,
+    calificacion INT NOT NULL,
+    comentario TEXT,
+    fecha TIMESTAMP NOT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES USUARIOS(id) ON DELETE CASCADE,
+    FOREIGN KEY (evento_id) REFERENCES EVENTOS(id) ON DELETE CASCADE
 );
 /*
 INSERT INTO EVENTOS (titulo, descripcion, fecha, hora, ubicacion, capacidad_maxima, organizador_id)

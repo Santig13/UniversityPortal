@@ -144,9 +144,28 @@ app.get('/calendar', requireAuth, (req, res) => {
 
 app.get('/estadisticas', requireAuth, (req, res, next) => {
     // Obtener las estadísticas de uso desde el registro de uso
-    const sql = 'SELECT * FROM registro_uso';
+    if (req.session.user.rol !== 'organizador') {
+        const err = new Error('No tienes permisos para acceder a esta página.');
+        err.status = 401;
+        return next(err);
+    }
+    const sql = `
+        SELECT 
+            usuarios.nombre AS user, 
+            registro_uso.ip, 
+            registro_uso.navegador, 
+            registro_uso.fecha, 
+            registro_uso.OS 
+        FROM 
+            registro_uso 
+        JOIN 
+            usuarios 
+        ON 
+            registro_uso.usuario_id = usuarios.id
+    `;
     pool.query(sql, (err, results) => {
         if (err) {
+            console.log(err);
             err.message = 'Error al recuperar las estadísticas de uso.';
             return next(err);
         }

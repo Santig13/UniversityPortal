@@ -54,25 +54,45 @@ function renderEventos(eventos) {
                             <p class="card-text"><strong>Capacidad Máxima:</strong> ${evento.capacidad_maxima}</p>
                             <p class="card-text"><strong>Organizador ID:</strong> ${evento.organizador_id}</p>
                         </div>
-                        <div class="card-footer m-1 d-flex flex-wrap align-items-center justify-content-lg-start">
+                                                <div class="card-footer m-1 d-flex flex-wrap align-items-center justify-content-lg-start">
                             <small class="text-muted mx-2 mt-1">ID Evento: ${evento.id}</small>
-                            ${(userRole === 'organizador' && userId == evento.organizador_id) ? ` <button class="btn btn-outline-primary btn-event organizador mt-1" data-bs-toggle="modal" data-bs-target="#editEventModal" onclick="fillModal(${JSON.stringify(evento).replace(/"/g, '&quot;')})"><i class="bi bi-pencil-square me-1"></i> Editar</button>
-                                                             <button class="btn btn-outline-danger btn-event organizador ms-2 mt-1" data-bs-toggle= "modal" data-bs-target="#deleteEventModal" data-event-id="${evento.id}" onclick="setEventoId('${evento.id}')" style="display: inline-block;">
-                                                                    <i class="bi bi-trash me-1"></i> Eliminar
-                                                    </button><button class="btn btn-outline-info btn-event organizador ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#participantsModal" onclick="showParticipants('${evento.id}')">
-                                                    <i class="bi bi-people me-1"></i> Participantes
-                                                </button>` : ''}
-                           ${userRole === 'participante' ? 
-                            (evento.estadoInscripcion === 'inscrito' ? 
-                                `<button onclick="desinscribirUsuario('${evento.id}','${evento.organizador_id}')" class="btn btn-outline-danger btn-event participante">Desapuntarse</button>
-                                <div id="mensaje-${evento.id}" class="mx-2 text-success">Inscrito en el evento</div>` : 
-                            (evento.estadoInscripcion === 'lista de espera' ? 
-                                `<button onclick="abandonarListaEspera('${evento.id}','${evento.organizador_id}')" class="btn btn-outline-warning btn-event participante">Abandonar</button>
-                                <div id="mensaje-${evento.id}" class="mx-2 text-warning">En lista de espera</div>` : 
-                                `<button onclick="inscribirUsuario('${evento.id}','${evento.organizador_id}')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>
-                                <div id="mensaje-${evento.id}"></div>`)) : ''}
+                            ${evento.terminado ? `
+                                <div class="text-danger mx-2 mt-1">Este evento ha terminado</div>
+                                ${(userRole === 'participante' && evento.estadoInscripcion === 'inscrito') ? `
+                                 <button class="btn btn-outline-primary btn-event participante ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#rateEventModal" onclick="setRateEventId('${evento.id}')">
+                                        <i class="bi bi-star me-1"></i> Calificar Evento
+                                    </button>
+                                ` :`
+                                    <button class="btn btn-outline-info btn-event organizador ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#viewRatingsModal" onclick="showRatings('${evento.id}')">
+                                        <i class="bi bi-star me-1"></i> Ver Calificaciones
+                                    </button>
+                                ` }
+                            ` : `
+                                ${(userRole === 'organizador' && userId == evento.organizador_id) ? `
+                                    <button class="btn btn-outline-primary btn-event organizador mt-1" data-bs-toggle="modal" data-bs-target="#editEventModal" onclick="fillModal(${JSON.stringify(evento).replace(/"/g, '&quot;')})">
+                                        <i class="bi bi-pencil-square me-1"></i> Editar
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-event organizador ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#deleteEventModal" data-event-id="${evento.id}" onclick="setEventoId('${evento.id}')" style="display: inline-block;">
+                                        <i class="bi bi-trash me-1"></i> Eliminar
+                                    </button>
+                                    <button class="btn btn-outline-info btn-event organizador ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#participantsModal" onclick="showParticipants('${evento.id}')">
+                                        <i class="bi bi-people me-1"></i> Participantes
+                                    </button>
+                                ` : ''}
+                                ${userRole === 'participante' ? `
+                                    ${evento.estadoInscripcion === 'inscrito' ? `
+                                        <button onclick="desinscribirUsuario('${evento.id}','${evento.organizador_id}')" class="btn btn-outline-danger btn-event participante">Desapuntarse</button>
+                                        <div id="mensaje-${evento.id}" class="mx-2 text-success">Inscrito en el evento</div>
+                                    ` : evento.estadoInscripcion === 'lista de espera' ? `
+                                        <button onclick="abandonarListaEspera('${evento.id}','${evento.organizador_id}')" class="btn btn-outline-warning btn-event participante">Abandonar</button>
+                                        <div id="mensaje-${evento.id}" class="mx-2 text-warning">En lista de espera</div>
+                                    ` : `
+                                        <button onclick="inscribirUsuario('${evento.id}','${evento.organizador_id}')" class="btn btn-outline-primary btn-event participante">Apuntarse</button>
+                                        <div id="mensaje-${evento.id}"></div>
+                                    `}
+                                ` : ''}
+                            `}
                         </div>
-                    </div>
                 </div>
             </div>
         `;
@@ -124,6 +144,7 @@ let eventoId = null;
 
 // Funcion para guardar el id del evento a eliminar o editar
 function setEventoId(id) {
+    console.log(id);
     eventoId = id;
 }
 
@@ -379,6 +400,84 @@ function showParticipants(eventoId) {
         }
     });
 }
+
+// Funcion para el modal de calificar evento
+document.getElementById('calificarEventoButton').addEventListener('click',  async function(event) {
+    event.preventDefault();
+    calificarEvento(eventoId);
+    const modal = document.getElementById('rateEventModal');
+    const modalInstance = bootstrap.Modal.getInstance(modal);
+    if (modalInstance) {
+        modalInstance.hide();
+    }
+    eventoId = null;
+});
+
+
+function calificarEvento(Id) {
+    $.ajax({
+        url: `/eventos/calificacion`,
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            userId: userId,
+            eventId: Id,
+            calificacion: document.getElementById('rating').value,
+            comentario: document.getElementById('comments').value
+        }),
+        success: function(data) {
+            if (data.success) {
+                showToast(data.message);
+            } else {
+                showToast('Error al calificar el evento');
+            }
+        },
+        error: function() {
+            showToast('Error al calificar el evento');
+        }
+    });
+}
+
+
+function showRatings(eventoId) {
+    console.log(eventoId);
+    $.ajax({
+        url: `/eventos/${eventoId}/calificaciones`,
+        method: 'GET',
+        success: function(response) {
+            const ratingsContainer = document.getElementById('ratingsContainer');
+            ratingsContainer.innerHTML = '';
+            if (response.calificaciones.length === 0) {
+                ratingsContainer.innerHTML = '<h4 class="text-center">No hay calificaciones</h4>';
+            } else {
+                response.calificaciones.forEach(calificacion => {
+                    const calificacionHtml = `
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body d-flex align-items-center">
+                                    <div>
+                                        <h5 class="card-title">Calificación</h5>
+                                        <p class="card-text"><strong>Usuario:</strong> ${calificacion.nombre}</p>
+                                        <p class="card-text"><strong>Email:</strong> ${calificacion.email}</p>
+                                        <p class="card-text"><strong>Calificación:</strong> ${calificacion.calificacion}</p>
+                                        <p class="card-text"><strong>Comentario:</strong> ${calificacion.comentario}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                    ratingsContainer.insertAdjacentHTML('beforeend', calificacionHtml);
+                });
+            }
+        },
+        error: function() {
+            console.log(error);
+        }
+    });
+}
+
 // Funcion para mostrar un toast
 function showToast(message) {
     const toastElement = document.getElementById('myToast');

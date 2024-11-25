@@ -435,3 +435,47 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     border-radius: 50%;
     margin-left: auto;
 }
+/* Estilos para la tabla de estadísticas en modo claro */
+.table-responsive {
+    background-color: #ffffff; /* Fondo claro para el contenedor de la tabla */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table {
+    
+    background-color: #ffffff; /* Fondo claro para la tabla */
+    color: #2d3d44; /* Texto oscuro */
+}
+
+.table thead {
+    background-color: var(--primary-color); /* Fondo azul para el encabezado */
+    color: #ffffff; /* Texto blanco para el encabezado */
+}
+
+.table tbody tr:hover {
+    background-color: #f1f1f1; /* Fondo más claro al pasar el ratón por encima */
+}
+
+.table-bordered {
+    border: 1px solid #dee2e6; /* Borde gris claro */
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #dee2e6; /* Bordes de las celdas */
+}
+
+.table th,
+.table td {
+    padding: 15px; /* Espaciado interno para las celdas */
+    vertical-align: middle; /* Alineación vertical */
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-white {
+    color: #ffffff;
+}

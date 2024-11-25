@@ -14,11 +14,6 @@ function registroUso(connection,req,callback) {
     const browser = parser.getBrowser(); // Detecta el navegador
     const os = parser.getOS(); // Detecta el sistema operativo
     const sql = 'INSERT INTO registro_uso(ip, fecha, usuario_id,navegador,OS) VALUES(?,?,?,?,?)';
-    console.log(ip);
-    console.log(fecha);
-    console.log(user);
-    console.log(browser.name);
-    console.log(os.name);
     connection.query(sql, [ip, fecha, user,browser.name,os.name], (err) => {
         if (err) {
             err.message = 'Error al registrar el uso de la aplicación.';
