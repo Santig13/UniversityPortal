@@ -3,6 +3,7 @@ const { Router } = require('express');
 const { getEventosPersonales } = require('./events');
 const {añadirNotificacion} = require('./notifications');
 const {comprobarCapacidad} = require('./events');
+const bcrypt = require('bcrypt');
 const moment = require('moment');
 
 function createUsuariosRouter(pool, requireAuth, middlewareSession){
@@ -146,7 +147,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
     
 
     // Listar eventos en los que el usuario está inscrito
-    router.get('/:userId/eventos', (req, res, next) => {
+    router.get('/:userId/eventos', requireAuth, (req, res, next) => {
         const { userId } = req.params;
         const query = 'SELECT * FROM EVENTOS WHERE id IN (SELECT evento_id FROM Inscripciones WHERE usuario_id = ?)';
         pool.query(query, [userId], (error, results) => {
@@ -159,8 +160,24 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
         });
     });
 
+    router.put('/:userId/actualizar', requireAuth, async (req, res, next) => {
+        const {userId} = req.params;
+        const {nombre, telefonoCompleto, password } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const query = 'UPDATE usuarios SET nombre = ?, telefono = ?, password = ? WHERE id = ?';
+        pool.query(query, [nombre, telefonoCompleto, hashedPassword, userId], (error, results) => {
+            if (error) {
+                error.message = 'Error actualizando los datos del usuario';
+                error.status = 500;
+                return next(error);
+            }
+            res.status(200).send('ok');
+        });
+    });
+
     
-    // Navegación a la página de usuario personal
+    // Navegación a la página de usuario personal con sus eventos
     router.get('/:id', requireAuth, (req, res, next) => {
         getEventosPersonales(req.session.user, pool, (err, eventos) => {
             if (err) {
@@ -169,6 +186,19 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
                 return next(err);
             }
             res.render('usuario', { user: req.session.user, eventos });
+        });
+    });
+
+    // Ruta para obtener los datos del usuario
+    router.get('/:id/datos', requireAuth, (req, res, next) => {
+        const userId = req.params;
+       pool.query('SELECT * FROM usuarios WHERE id = ?', [userId], (error, results) => {
+            if (error) {
+                error.message = 'Error recuperando los datos del usuario';
+                error.status = 500;
+                return next(error);
+            }
+            res.status(200).json(results[0]);
         });
     });
 

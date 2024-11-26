@@ -71,6 +71,8 @@ CREATE TABLE IF NOT EXISTS registro_uso (
     usuario_id INT NOT NULL,
     ip VARCHAR(100) NOT NULL,
     fecha TIMESTAMP NOT NULL,
+    horaEntrada TIME NOT NULL,
+    horaSalida TIME,
     navegador VARCHAR(100) NOT NULL,
     OS VARCHAR(100) NOT NULL,
     FOREIGN KEY (usuario_id) REFERENCES USUARIOS(id) ON DELETE CASCADE

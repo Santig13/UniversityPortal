@@ -336,7 +336,9 @@ a:hover {
 
 .lista-eventos{
     overflow-y: auto;
-    max-height: 90vh;
+    max-height: 75vh;
+    scrollbar-color: #0DB8DE #1A2226;
+    scrollbar-width:thin;
 }
 .card {
     background-color: #1A2226;

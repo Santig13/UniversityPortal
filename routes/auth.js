@@ -71,7 +71,6 @@ function createAuthRouter(pool, sessionMiddleware) {
                                     err.message = 'Error al registrar el uso de la aplicación.';
                                     return next(err);
                                 }
-                                console.log(rows.insertId);
                                 req.session.uso=rows.insertId;
                                 res.redirect('/dashboard');
                             });
@@ -90,7 +89,7 @@ function createAuthRouter(pool, sessionMiddleware) {
 
     // Ruta logout
     router.post('/logout', (req, res, next) => {
-        const uso=req.session.uso;
+        const uso = req.session.uso;
         pool.getConnection((err, connection) => {
             if (err) {
                 err.message = 'Error al obtener conexión de la base de datos para cerrar la sesión.';
@@ -99,19 +98,20 @@ function createAuthRouter(pool, sessionMiddleware) {
             const sql = 'UPDATE registro_uso SET horaSalida = ? WHERE id = ?';
             const fecha = new Date();
             const hora = fecha.getHours() + ':' + fecha.getMinutes() + ':' + fecha.getSeconds();
-            connection.query(sql, [hora,uso], (err,result) => {
+            connection.query(sql, [hora, uso], (err, result) => {
+                connection.release();
                 if (err) {
                     err.message = 'Error al cerrar la sesión.';
                     return next(err);
                 }
+                req.session.destroy(err => {
+                    if (err) {
+                        err.message = 'Error al cerrar la sesión.';
+                        return next(err);
+                    }
+                    res.redirect('/');
+                });
             });
-        });
-        req.session.destroy(err => {
-            if (err) {
-                err.message = 'Error al cerrar la sesión.';
-                return next(err);
-            }
-            res.redirect('/');
         });
     });
 
