@@ -15,7 +15,6 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
         const { userId, eventId, organizador_id } = req.body;
         const fecha_inscripcion = moment().format('YYYY-MM-DD');
         const query = 'INSERT INTO inscripciones (usuario_id, evento_id, estado, fecha_inscripcion) VALUES (?, ?, ?, ?)';
-
         let message = 'Te has inscrito en el evento';
         let mensaje =`Te has inscrito en el evento con id ${eventId}`;
         let estado = "inscrito";

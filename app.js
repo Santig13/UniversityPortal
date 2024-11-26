@@ -191,6 +191,7 @@ app.use((err, req, res, next) => {
         400: '400 - Solicitud Incorrecta',
         401: '401 - No Autorizado',
         404: '404 - Página No Encontrada',
+        405: '405 - Método no permitido',
         500: '500 - Error Interno del Servidor'
     };
 

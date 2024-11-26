@@ -11,12 +11,13 @@ function getEventosPersonales(user, pool, callback) {
     }
 }
 function getEventosParticipante(user, pool, callback) {
-     const sql = `
+     let sql = `
         SELECT eventos.*, inscripciones.estado
         FROM eventos
         JOIN inscripciones ON eventos.id = inscripciones.evento_id
         WHERE inscripciones.usuario_id = ?
     `;
+    sql += ' ORDER BY fecha DESC, hora_ini DESC';
     pool.getConnection((err, connection) => {
         if (err) {
             err.message = 'Error al obtener conexión de la base de datos para obtener eventos del participante.';
@@ -28,13 +29,18 @@ function getEventosParticipante(user, pool, callback) {
                 err.message = 'Error al consultar eventos del participante en la base de datos.';
                 return callback(err);
             }
+            rows = rows.map(row => {
+                row.terminado = moment().isAfter(row.fecha);
+                return row;
+            });
             callback(null, rows);
         });
     });
 }
 
 function getEventosOrganizador(user, pool, callback) {
-    const sql = 'SELECT * FROM eventos WHERE organizador_id=?';
+    let sql = 'SELECT * FROM eventos WHERE organizador_id=?';
+    sql += ' ORDER BY fecha DESC, hora_ini DESC';
     pool.getConnection((err, connection) => {
         if (err) {
             err.message = 'Error al obtener conexión de la base de datos para obtener eventos del organizador.';
@@ -46,6 +52,10 @@ function getEventosOrganizador(user, pool, callback) {
                 err.message = 'Error al consultar eventos del organizador en la base de datos.';
                 return callback(err);
             }
+            rows = rows.map(row => {
+                row.terminado = moment().isAfter(row.fecha);
+                return row;
+            });
             callback(null, rows);
         });
     });

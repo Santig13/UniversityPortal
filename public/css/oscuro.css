@@ -154,7 +154,6 @@ div .fc-event-time {
 
 .btn-outline-primary:focus {
     outline: none;
-    box-shadow: none;
 }
 
 .btn-outline-secondary {
@@ -172,7 +171,6 @@ div .fc-event-time {
 
 .btn-outline-secondary:focus {
     outline: none;
-    box-shadow: none;
 }
 
 .btn-success {
@@ -189,7 +187,6 @@ div .fc-event-time {
 
 .btn-success:focus {
     outline: none;
-    box-shadow: none;
 }
 
 .btn-outline-danger {
@@ -207,7 +204,6 @@ div .fc-event-time {
 
 .btn-outline-danger:focus {
     outline: none;
-    box-shadow: none;
 }
 
 .btn-outline-warning {
@@ -337,6 +333,11 @@ a:hover {
 }
 
 /* Estilos para las tarjetas */
+
+.lista-eventos{
+    overflow-y: auto;
+    max-height: 90vh;
+}
 .card {
     background-color: #1A2226;
     border: 1px solid #0DB8DE;
@@ -501,3 +502,39 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .text-white {
     color: #ffffff;
 }
+
+/* Eliminar la línea blanca debajo de los botones */
+.nav-tabs {
+    border-bottom: none; /* Elimina el borde inferior de la lista */
+}
+
+/* Estilos para los botones de pestañas */
+.nav-tabs .nav-link {
+    background-color: #1A2226; /* Fondo inicial */
+    color: #0DB8DE; /* Color del texto */
+    border: 2px solid transparent; /* Sin bordes visibles inicialmente */
+    border-radius: 15px;
+    margin: 0 5px;
+    transition: all 0.3s ease;
+}
+
+/* Hover de los botones */
+.nav-tabs .nav-link:hover {
+    background-image: linear-gradient(160deg, #071014 0%, #0db8de 100%);
+    color: #ffffff;
+}
+
+/* Botón activo */
+.nav-tabs .nav-link.active {
+    background-color: #0db8de; /* Color activo */
+    color: #ffffff;
+    border: 2px solid #0db8de; /* Borde del color activo */
+}
+
+/* Mantener tamaño constante en todas las interacciones */
+.nav-tabs .nav-link,
+.nav-tabs .nav-link.active {
+    padding: 10px 20px; /* Asegura consistencia en el padding */
+    box-shadow: none; /* Elimina cualquier sombra adicional */
+}
+

@@ -28,7 +28,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <%- include("partials/footer.ejs") %>
 </body>
 </html>
@@ -40,16 +40,24 @@
             .then(response => response.json())
             .then(lista => {
 
-                const eventos = lista.map(row => ({
-                    id: row.id,
-                    title: row.titulo,
-                    description: row.descripcion,
-                    start: row.fecha, // Combina fecha y hora
-                    end: row.fecha ,// Si tienes una hora de finalización, puedes usarla aquí
-                    location: row.ubicacion,
-                    capacity: row.capacidad_maxima,
-                    organizer: row.organizador_id
-                }));
+               
+                const eventos = lista.map(row => {
+                    const fecha = moment(row.fecha).format('YYYY-MM-DD');
+                    const start = moment(`${fecha}T${row.hora_ini}`).toISOString();
+                    const end = moment(`${fecha}T${row.hora_fin}`).toISOString();
+
+                    return {
+                        id: row.id,
+                        title: row.titulo,
+                        description: row.descripcion,
+                        start: start,
+                        end: end,
+                        location: row.ubicacion,
+                        capacity: row.capacidad_maxima,
+                        organizer: row.organizador_id
+                    };
+                });
+
                 console.log(eventos);
                 const calendarEl = document.getElementById('calendar');
                 const calendar = new FullCalendar.Calendar(calendarEl, {

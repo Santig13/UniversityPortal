@@ -6,40 +6,97 @@
         <!-- Columna de Perfil -->
         <div class="col-md-3 py-2">
             <h2 class="mt-5">Actualizar Perfil</h2>
-            <form id="updateProfileForm" class="p-4 mt-3 rounded login-box shadow-sm">
-                <div class="mb-3">
-                    <label for="nombre" class="form-label">Nombre</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese su nombre">
-                </div>
-                <div class="mb-3">
-                    <label for="telefono" class="form-label">Teléfono</label>
-                    <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="Ingrese su nuevo teléfono">
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Ingrese su nueva contraseña">
-                </div>
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-outline-primary">
-                        <i class="bi bi-save"></i> 
-                        Guardar Cambios
+            
+            <!-- Pestañas -->
+            <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true">
+                        Información
                     </button>
-                    <button type="reset" class="btn btn-outline-secondary">
-                        <i class="bi bi-x-circle"></i> 
-                        Cancelar
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="accessibility-tab" data-bs-toggle="tab" data-bs-target="#accessibility" type="button" role="tab" aria-controls="accessibility" aria-selected="false">
+                        Accesibilidad
                     </button>
+                </li>
+            </ul>
+
+            <!-- Contenido de las pestañas -->
+            <div class="tab-content mt-3" id="profileTabsContent">
+                <!-- Pestaña de Información -->
+                <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+                    <form id="updateProfileForm" class="p-4 mt-3 rounded login-box shadow-sm">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese su nuevo nombre">
+                        </div>
+                        <div class="mb-3">
+                            <label for="telefono" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="Ingrese su nuevo teléfono">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" name="password" id="password" minlength="8" required placeholder="Ingrese su nueva contraseña"> 
+                        </div>
+    
+                        <div class="mb-3">
+                            <label for="passwordConfirm" class="form-label">Repetir Contraseña</label>
+                            <input type="password" class="form-control" name="passwordConfirm" id="passwordConfirm" minlength="8" required placeholder="Repita su nueva contraseña">
+                            <div id="passwordMessage" class=" mt-2 form-text"></div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="bi bi-save"></i> 
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+
+                <!-- Pestaña de Accesibilidad -->
+                <div class="tab-pane fade" id="accessibility" role="tabpanel" aria-labelledby="accessibility-tab">
+                    <form id="accessibilityForm" class="p-4 mt-3 rounded login-box shadow-sm">
+                        <div class="mb-3">
+                            <label for="theme" class="form-label">Tema</label>
+                            <select id="theme" name="theme" class="form-select" required>
+                                <option value="light">Claro</option>
+                                <option value="dark">Oscuro</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="navigation" class="form-label">Tipo de Navegación</label>
+                            <select id="navigation" name="navigation" class="form-select" required>
+                                <option value="keyboard">Teclado</option>
+                                <option value="mouse">Ratón</option>
+                                <option value="both">Ambos</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fontSize" class="form-label">Tamaño de Letra</label>
+                            <select id="fontSize" name="fontSize" class="form-select" required>
+                                <option value="small">Pequeño</option>
+                                <option value="normal">Normal</option>
+                                <option value="large">Grande</option>
+                            </select>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="bi bi-save"></i> 
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
-        
         <!-- Columna de Lista de Eventos -->
-
-            <%- include ("partials/eventos.ejs", { eventos: eventos, user: user, profile: true }) %>
-      
+        <%- include ("partials/eventos.ejs", { eventos: eventos, user: user, profile: true }) %>
     </div>
 </div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="/javascripts/dashboard.js"></script>
+<script src="/javascripts/perfil.js"></script>
 
 <%- include("partials/footer.ejs") %>
