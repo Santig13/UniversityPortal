@@ -13,7 +13,7 @@
     --fc-button-active-bg-color: #1a252f;
     --fc-button-active-border-color: #151e27;
     --fc-event-bg-color: #3788d8;
-    --fc-event-border-color: #3788d8;
+    --fc-event-border-color: #69a6e4;
     --fc-event-text-color: #fff;
     --fc-event-selected-overlay-color: rgba(0, 0, 0, 0.25);
     --fc-more-link-bg-color: #d0d0d0;
@@ -60,11 +60,24 @@ header, .footer-nuestro, .navbar {
     color: #0DB8DE;
 }
 
+.red-text {
+    /* color: red; */
+    color:#FF3D3D;
+}
+
+.green-text {
+    color: #0BD00B;
+}
+.dark-text {
+    color: var(--dark-color);
+}
 /* Estilos para el calendario */
 .fc-scrollgrid-sync-inner {
     background-color: #1A2226;
 }
-
+.fc-daygrid-day-number{
+    color: black;
+}
 .fc-daygrid-day-frame {
     background-color: white !important;
 }
@@ -160,7 +173,7 @@ div .fc-event-time {
     border-radius: 15px;
     cursor: pointer;
     border-color: #B0B0B0 !important;
-    color: #B0B0B0;
+    color: #ffffff;
     outline: none;
 }
 
@@ -192,8 +205,10 @@ div .fc-event-time {
 .btn-outline-danger {
     border-radius: 15px;
     cursor: pointer;
-    border-color: #dc3545 !important;
-    color: #dc3545;
+    border-color: #FF3D3D !important;
+    /* color: #dc3545; */
+    /* color:#ffffff; */
+    color:#FF3D3D;
     outline: none;
 }
 
@@ -388,7 +403,7 @@ a:hover {
 }
 
 .modal-header {
-    background-color: #0DB8DE;
+    background-color: #08809B;
     color: #ffffff;
     border-bottom: 1px solid #0DB8DE;
     border-top-left-radius: 15px;
@@ -539,4 +554,3 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     padding: 10px 20px; /* Asegura consistencia en el padding */
     box-shadow: none; /* Elimina cualquier sombra adicional */
 }
-

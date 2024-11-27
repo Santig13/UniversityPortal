@@ -9,7 +9,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="eventModalLabel">Detalles del Evento</h5>
+                    <="modal-title" id="eventModalLabel">Detalles del Evento</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -17,7 +17,7 @@
                     <p><strong>Descripción:</strong> <span id="modalDescription"></span></p>
                     <p><strong>Ubicación:</strong> <span id="modalLocation"></span></p>
                     <p><strong>Capacidad:</strong> <span id="modalCapacity"></span></p>
-                    <p><strong>Organizador ID:</strong> <span id="modalOrganizer"></span></p>
+                    <p><strong>Organizador:</strong> <span id="modalOrganizer"></span></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -27,12 +27,8 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <%- include("partials/footer.ejs") %>
-</body>
-</html>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -54,11 +50,9 @@
                         end: end,
                         location: row.ubicacion,
                         capacity: row.capacidad_maxima,
-                        organizer: row.organizador_id
+                        organizer: row.organizador_nombre
                     };
                 });
-
-                console.log(eventos);
                 const calendarEl = document.getElementById('calendar');
                 const calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',  // Vista mensual

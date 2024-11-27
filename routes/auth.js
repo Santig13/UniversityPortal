@@ -72,6 +72,7 @@ function createAuthRouter(pool, sessionMiddleware) {
                                     return next(err);
                                 }
                                 req.session.uso=rows.insertId;
+                                console.log(req.session.user);
                                 res.redirect('/dashboard');
                             });
                         } else {

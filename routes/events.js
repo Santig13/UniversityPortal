@@ -11,11 +11,21 @@ function getEventosPersonales(user, pool, callback) {
     }
 }
 function getEventosParticipante(user, pool, callback) {
-     let sql = `
-        SELECT eventos.*, inscripciones.estado
-        FROM eventos
-        JOIN inscripciones ON eventos.id = inscripciones.evento_id
-        WHERE inscripciones.usuario_id = ?
+        let sql = `
+        SELECT 
+            eventos.*, 
+            DATE_FORMAT(eventos.hora_ini, "%H:%i") as hora_ini, 
+            DATE_FORMAT(eventos.hora_fin, "%H:%i") as hora_fin, 
+            inscripciones.estado, 
+            usuarios.nombre as organizador_nombre
+        FROM 
+            eventos
+        JOIN 
+            inscripciones ON eventos.id = inscripciones.evento_id
+        JOIN 
+            usuarios ON eventos.organizador_id = usuarios.id
+        WHERE 
+            inscripciones.usuario_id = ?
     `;
     sql += ' ORDER BY fecha DESC, hora_ini DESC';
     pool.getConnection((err, connection) => {
@@ -30,6 +40,7 @@ function getEventosParticipante(user, pool, callback) {
                 return callback(err);
             }
             rows = rows.map(row => {
+                row.estadoInscripcion="inscrito";
                 row.terminado = moment().isAfter(row.fecha);
                 return row;
             });
@@ -39,7 +50,7 @@ function getEventosParticipante(user, pool, callback) {
 }
 
 function getEventosOrganizador(user, pool, callback) {
-    let sql = 'SELECT * FROM eventos WHERE organizador_id=?';
+    let sql = 'SELECT eventos.*,   DATE_FORMAT(eventos.hora_ini, "%H:%i") as hora_ini, DATE_FORMAT(eventos.hora_fin, "%H:%i") as hora_fin  FROM eventos WHERE organizador_id=?';
     sql += ' ORDER BY fecha DESC, hora_ini DESC';
     pool.getConnection((err, connection) => {
         if (err) {
@@ -53,6 +64,7 @@ function getEventosOrganizador(user, pool, callback) {
                 return callback(err);
             }
             rows = rows.map(row => {
+                row.organizador_nombre = user.nombre;
                 row.terminado = moment().isAfter(row.fecha);
                 return row;
             });
@@ -63,7 +75,21 @@ function getEventosOrganizador(user, pool, callback) {
 
 function getEventos(query, pool, callback) {
     const { fecha, tipo, ubicacion, capacidad } = query;
-    let sql = 'SELECT *, DATE_FORMAT(hora_ini, "%H:%i") as hora_ini, DATE_FORMAT(hora_fin, "%H:%i") as hora_fin FROM eventos WHERE 1=1';
+        let sql = `
+        SELECT 
+            eventos.*, 
+            DATE_FORMAT(eventos.hora_ini, "%H:%i") as hora_ini, 
+            DATE_FORMAT(eventos.hora_fin, "%H:%i") as hora_fin, 
+            usuarios.nombre as organizador_nombre 
+        FROM 
+            eventos 
+        JOIN 
+            usuarios 
+        ON 
+            eventos.organizador_id = usuarios.id 
+        WHERE 
+            1=1
+    `;
     const params = [];
 
     if (fecha) {
@@ -110,7 +136,6 @@ function solapan(connection,ubicacion,fecha,hora_ini,hora_fin, callback) {
         SELECT * FROM eventos
         WHERE ubicacion = ? AND fecha = ? AND  hora_fin >= ?
     `;  
-    console.log(ubicacion,fecha,hora_ini,hora_fin);
     connection.query(sql, [ubicacion, fecha, hora_ini], (err, result) => {
         if (err) {
             return callback(err);
@@ -184,7 +209,17 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
             });
         });
     });
-
+    //ruta para obtener los eventos personales 
+    router.get('/personales', (req, res, next) => {
+        getEventosPersonales(req.session.user, pool, (err, eventos) => {
+            if (err) {
+                err.message = 'Error al obtener eventos personales para el usuario.';
+                err.status = 500;
+                return next(err);
+            }
+            res.status(200).json(eventos);
+        });
+    });
     // Ruta para crear un evento
     router.post('/crear', validateEvent ,(req, res, next) => {
         const { titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima} = req.body;
@@ -194,7 +229,6 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                 err.message = 'Error al obtener conexión de la base de datos para crear evento.';
                 return next(err);
             }
-            //console.log(req.body);
 
             solapan(connection,ubicacion,fecha,hora_ini,hora_fin, (err, result) => {
                 if (err) {
@@ -285,7 +319,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
     router.put('/:id', validateEvent, (req, res, next) => {
         const { titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima} = req.body;
         const id = req.params.id;
-        console.log(hola);
+        
         const sql = 'UPDATE eventos SET titulo=?, descripcion=?, fecha=?, hora_ini=?,hora_fin=?, ubicacion=?, capacidad_maxima=? WHERE id=?';
         pool.getConnection((err, connection) => {
             if (err) {

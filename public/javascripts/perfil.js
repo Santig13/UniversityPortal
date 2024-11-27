@@ -37,8 +37,8 @@ $('#updateProfileForm').on('submit', function (e) {
                 }
             },
             error: function (jqXHR) {
-                console.log(jqXHR.responseText);
-                showToast('Error: ' + jqXHR.responseText);
+                
+                showToast('Error: ' + jqXHR.responseJSON.message);
             }
         });
     } else {
@@ -65,6 +65,7 @@ $(document).ready(function () {
             $(`.dropdown-menu a[data-prefix="${prefix}"]`).addClass('active');
         },
         error: function (jqXHR) {
+            console.log(jqXHR);
             console.error('Error al obtener datos:', jqXHR.responseText);
         }
     });
@@ -106,3 +107,5 @@ $('.dropdown-item').on('click', function(e) {
     const prefix = $(this).data('prefix');
     $('#dropdownMenuButton').text(prefix);
 });
+
+

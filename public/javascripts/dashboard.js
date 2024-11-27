@@ -1,36 +1,67 @@
 // Funcion para mostrar los botones de acuerdo al rol del usuari
 
 // Funcion para filtrar eventos
-document.getElementById('filterForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
-    filtrar();
-});
-
- function filtrar() {
-    const fecha = document.getElementById('fecha').value||"";
-    const tipo = document.getElementById('tipo').value || "";
-    const ubicacion = document.getElementById('ubicacion').value || "";
-    const capacidad = document.getElementById('capacidad').value || "";
-    const queryParams = new URLSearchParams({ fecha, tipo, ubicacion, capacidad }).toString();
-
-    $.ajax({
-        url: `/eventos/filter?${queryParams}`,
-        method: 'GET',
-        success: function(eventos) {
-            renderEventos(eventos);
-
-            // Reasignar los eventos de clic de los botones de eliminación después de refrescar la lista
-            document.querySelectorAll('.btn-outline-danger').forEach(button => {
-                button.addEventListener('click', function() {
-                    const eventId = button.getAttribute('data-event-id');
-                    setEventoId(eventId);
-                });
-            });
-        },
-        error: function() {
-            showToast('Error al filtrar los eventos');
-        }
+const filterForm = document.getElementById('filterForm');
+if (filterForm) {
+    filterForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        filtrar();
     });
+}
+ function filtrar() {
+         
+    
+    if (profile){
+        $.ajax({
+            url: `/eventos/personales`,
+            method: 'GET',
+            success: function(eventos) {
+                renderEventos(eventos);
+                // Reasignar los eventos de clic de los botones de eliminación después de refrescar la lista
+                document.querySelectorAll('.btn-outline-danger').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const eventId = button.getAttribute('data-event-id');
+                        setEventoId(eventId);
+                    });
+                });
+            },
+            error: function() {
+                showToast('Error al recuperar los  eventos personales');
+            }
+        });
+    }
+    else{
+        const fechaElement = document.getElementById('fecha');
+        const tipoElement = document.getElementById('tipo');
+        const ubicacionElement = document.getElementById('ubicacion');
+        const capacidadElement = document.getElementById('capacidad');
+
+        const fecha = fechaElement ? fechaElement.value : "";
+        const tipo = tipoElement ? tipoElement.value : "";
+        const ubicacion = ubicacionElement ? ubicacionElement.value : "";
+        const capacidad = capacidadElement ? capacidadElement.value : "";
+
+        const queryParams = new URLSearchParams({ fecha, tipo, ubicacion, capacidad }).toString();
+        $.ajax({
+            url: `/eventos/filter?${queryParams}`,
+            method: 'GET',
+            success: function(eventos) {
+                renderEventos(eventos);
+    
+                // Reasignar los eventos de clic de los botones de eliminación después de refrescar la lista
+                document.querySelectorAll('.btn-outline-danger').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const eventId = button.getAttribute('data-event-id');
+                        setEventoId(eventId);
+                    });
+                });
+            },
+            error: function() {
+                showToast('Error al filtrar los eventos');
+            }
+        });
+    }
+    
 }
 
 // Funcion para renderizar los eventos despues del filtro
@@ -43,7 +74,7 @@ function renderEventos(eventos) {
                 <div class="col-12">
                     <div class="card" tabindex="-1">
                     <div class="card-header m-1">
-                        <h5 class="card-title">${evento.titulo}</h5>
+                        <h4 class="card-title">${evento.titulo}</h4>
                     </div>
                         <div class="card-body">
                             <p class="card-text"><strong>Descripción:</strong> ${evento.descripcion}</p>
@@ -52,10 +83,10 @@ function renderEventos(eventos) {
                             <p class="card-text"><strong>Hora de fin:</strong> ${evento.hora_fin}</p>
                             <p class="card-text"><strong>Ubicación:</strong> ${evento.ubicacion}</p>
                             <p class="card-text"><strong>Capacidad Máxima:</strong> ${evento.capacidad_maxima}</p>
-                            <p class="card-text"><strong>Organizador ID:</strong> ${evento.organizador_id}</p>
+                            <p class="card-text"><strong>Organizador:</strong> ${evento.organizador_nombre}</p>
                         </div>
                                                 <div class="card-footer m-1 d-flex flex-wrap align-items-center justify-content-lg-start">
-                            <small class="text-muted mx-2 mt-1">ID Evento: ${evento.id}</small>
+                            <small class="mx-2 mt-1">ID Evento: ${evento.id}</small>
                             ${evento.terminado ? `
                                 <div class="text-danger mx-2 mt-1">Este evento ha terminado</div>
                                 ${(userRole === 'participante' && evento.estadoInscripcion === 'inscrito') ? `
@@ -247,14 +278,17 @@ function editarEvento() {
 }
 
 // Funcion para limpiar los campos del formulario de filtro
-document.getElementById('filterForm').addEventListener('reset', async function(event) {
-    event.preventDefault();
-    document.getElementById('fecha').value = '';
-    document.getElementById('tipo').value = '';
-    document.getElementById('ubicacion').value = '';
-    document.getElementById('capacidad').value = '';
-    filtrar();
-});
+if(filterForm){
+    filterForm.addEventListener('reset', async function(event) {
+        event.preventDefault();
+        document.getElementById('fecha').value = '';
+        document.getElementById('tipo').value = '';
+        document.getElementById('ubicacion').value = '';
+        document.getElementById('capacidad').value = '';
+        filtrar();
+    });
+}
+
 
 // Funcion para inscribir un usuario en un evento
 function inscribirUsuario(eventId, organizador_id) {
@@ -371,7 +405,7 @@ function showParticipants(eventoId) {
                             <div id="participante-${participante.id}" class="card">
                                 <div class="card-body d-flex align-items-center">
                                     <div>
-                                        <h5 class="card-title">Participante</h5>
+                                        <h4 class="card-title">Participante</h5>
                                         <p class="card-text"><strong>Nombre:</strong> ${participante.nombre}</p>
                                         <p class="card-text"><strong>Teléfono:</strong> ${participante.telefono}</p>
                                         <p class="card-text"><strong>Email:</strong> ${participante.email}</p>
@@ -458,7 +492,7 @@ function showRatings(eventoId) {
                             <div class="card">
                                 <div class="card-body d-flex align-items-center">
                                     <div>
-                                        <h5 class="card-title">Calificación</h5>
+                                        <h4 class="card-title">Calificación</h5>
                                         <p class="card-text"><strong>Usuario:</strong> ${calificacion.nombre}</p>
                                         <p class="card-text"><strong>Email:</strong> ${calificacion.email}</p>
                                         <p class="card-text"><strong>Calificación:</strong> ${calificacion.calificacion}</p>

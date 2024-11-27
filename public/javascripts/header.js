@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", function () {
             url: '/notificaciones',
             method: 'GET',
             success: function (notificaciones, jqXHR) {
-                console.log("hola");
                 const notificacionesContainer = document.getElementById('notificacionesContainer');
                 notificacionesContainer.innerHTML = '';
                 let html = '';
@@ -26,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 <div class="card-body d-flex align-items-center">
                                     ${!notificacion.leido ? `<div id="circulo-${notificacion.id}" class="circulo-azul me-3"></div>` : ''}
                                     <div>
-                                        <h5 class="card-title">Notificación</h5>
+                                        <h4 class="card-title">Notificación</h5>
                                         <p class="card-text"><strong>Mensaje:</strong> ${notificacion.mensaje}</p>
                                         <p class="card-text"><strong>Fecha de Creación:</strong> ${moment(notificacion.fecha_creacion).fromNow()}</p>
                                     </div>
@@ -77,20 +76,31 @@ function marcarComoLeido(notificacionId) {
     });
 }
 
+$(document).ready(function () {
+    const darkModeSwitch = $("#darkModeSwitch");
+    const themeStylesheet = $("#theme-stylesheet");
 
-document.addEventListener("DOMContentLoaded", function () {
-    const darkModeSwitch = document.getElementById("darkModeSwitch");
-    const themeStylesheet = document.getElementById("theme-stylesheet");
+    const currentTheme = themeStylesheet.attr("href").includes("oscuro") ? "oscura" : "clara";
+    darkModeSwitch.prop("checked", currentTheme === "oscura");
 
-    // Verificar si el tema actual es oscuro y configurar el estado inicial del switch
-    const currentTheme = themeStylesheet.getAttribute("href").includes("oscuro") ? "oscura" : "clara";
-    darkModeSwitch.checked = currentTheme === "oscura";
-
-    // Cambiar el tema al hacer clic en el switch
-    darkModeSwitch.addEventListener("change", function () {
+    darkModeSwitch.on("change", function () {
         const newTheme = this.checked ? "oscuro" : "claro";
-
-        // Cambiar dinámicamente el href de la hoja de estilos
-        themeStylesheet.href = `/css/${newTheme}.css`;
+       
+        themeStylesheet.attr("href", `/css/${newTheme}.css`);
+        // $.ajax({
+        //     url: '/usuarios/tema',
+        //     method: 'PATCH',
+        //     contentType: 'application/json',
+        //     data: JSON.stringify({ accesibilidad_id: accesibilidad_id, tema: newTheme }),
+        //     success: function (data) {
+        //         if (!data.success) {
+        //             showToast('Error al guardar el tema en la base de datos');
+        //         }
+        //     },
+        //     error: function (error) {
+        //         console.error('Error:', error);
+        //     }
+        // });
     });
+    
 });

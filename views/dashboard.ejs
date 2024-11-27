@@ -1,19 +1,17 @@
 <%- include("partials/header.ejs", { user: user }) %>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
 
 <div class="container mt-2 mb-2">
+   
     <div class="row">
-        <!-- Columna de Filtros -->
-       
     <%- include ("partials/eventos.ejs", { eventos: eventos, user: user, profile: false }) %>
-
+    </div>
     <%- include("partials/toast.ejs") %>
     
 </div>
 <script>
     const userRole = "<%= user.rol %>";  
-    const userId = "<%= user.id %>";  
     //paso el rol y el id del usuario al script de dashboard.js
+    const profile=false; 
 </script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

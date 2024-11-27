@@ -1,4 +1,8 @@
-<div class="col-md-3 py-2 <%= profile ? 'd-none': ''%>">
+
+<% if(!profile) { %>
+
+        <!-- Columna de Filtros -->
+    <div class="col-md-3 py-2 <%= profile ? 'd-none': ''%>">
     <h2 class="mb-2 mt-5">Filtrar Eventos</h2>
     <form id="filterForm" class="p-4 rounded login-box shadow-sm">
         <div class="mb-3">
@@ -27,7 +31,9 @@
             </button>
         </div>
     </form>
-</div>
+    </div>
+<% } %>
+
  <!-- Columna de Lista de Eventos -->
  <div class="col-md-9">
     <div class="container mt-5 lista-eventos">
@@ -35,12 +41,12 @@
 
             <% if(profile) { %>
                 <% if (user.rol === 'organizador') { %>
-                    <h1 class="mb-2">Lista de Eventos que has creado</h1>
+                    <h2 class="mb-2">Lista de Eventos que has creado</h1>
                 <% } else if (user.rol === 'participante') { %>
-                    <h1 class="mb-2">Eventos en los que estás inscrito </h1>
+                    <h2 class="mb-2">Eventos en los que estás inscrito </h1>
                 <% } %>
             <% } else { %>
-                <h1 class="mb-2">Lista de Eventos</h1>
+                <h2 class="mb-2">Lista de Eventos</h1>
             <% } %>
             <% if (user.rol === 'organizador') { %>
                 <button id="btn_modal_crear" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createEventModal">
@@ -55,7 +61,7 @@
                     <div class="col-12">
                         <div class="card" tabindex="0">
                             <div class="card-header m-1">
-                                <h5 class="card-title"><%= evento.titulo %></h5>
+                                <h4 class="card-title"><%= evento.titulo %></h4>
                             </div>
                             <div class="card-body">
                                 <p class="card-text"><strong>Descripción:</strong> <%= evento.descripcion %></p>
@@ -64,12 +70,12 @@
                                 <p class="card-text"><strong>Hora de fin:</strong> <%= evento.hora_fin %></p>
                                 <p class="card-text"><strong>Ubicación:</strong> <%= evento.ubicacion %></p>
                                 <p class="card-text"><strong>Capacidad Máxima:</strong> <%= evento.capacidad_maxima %></p>
-                                <p class="card-text"><strong>Organizador ID:</strong> <%= evento.organizador_id %></p>
+                                <p class="card-text"><strong>Organizador:</strong> <%= evento.organizador_nombre %></p>
                             </div>
                             <div class="card-footer m-1 d-flex flex-wrap align-items-center justify-content-lg-start">
-                                <small class="text-muted mx-2 mt-1">ID Evento: <%= evento.id %></small>
+                                <small class="mx-2 mt-1">ID Evento: <%= evento.id %></small>
                                 <% if (evento.terminado) { %>
-                                    <div class="text-danger mx-2 mt-1">Este evento ha terminado</div>
+                                    <div class="mx-2 mt-1 red-text"> <i class="bi bi-calendar-x red-text"></i> Este evento ha terminado </div>
                                     <% if (user.rol === 'participante' && evento.estadoInscripcion === 'inscrito') { %>
                                         <button class="btn btn-outline-primary btn-event participante ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#rateEventModal" onclick="setEventoId('<%= evento.id %>')">
                                             <i class="bi bi-star-fill me-1"></i> Calificar Evento
@@ -92,7 +98,7 @@
                                     <% } else if (user.rol === 'participante') { %>
                                         <% if (evento.estadoInscripcion==='inscrito') { %>
                                             <button onclick= "desinscribirUsuario('<%= evento.id %>','<%= evento.organizador_id %>')" class="btn btn-outline-danger btn-event participante" >Desapuntarse</button>
-                                            <div id="mensaje-<%= evento.id %>" class="mx-2 text-success">Inscrito en el evento</div>
+                                            <div id="mensaje-<%= evento.id %>" class="mx-2 green-text">Inscrito en el evento</div>
                                         <% } else if  (evento.estadoInscripcion==='lista de espera') { %>
                                             <button onclick= "abandonarListaEspera('<%= evento.id %>','<%= evento.organizador_id %>')" class="btn btn-outline-warning btn-event participante" >Abandonar</button>
                                             <div id="mensaje-<%= evento.id %>" class="mx-2 text-warning">En lista de espera</div>
@@ -110,7 +116,6 @@
         </div>
     </div>
 </div>
-</div>
 
 
 <!-- Modal para Crear Evento -->
@@ -118,7 +123,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="createEventModalLabel">Crear Nuevo Evento</h5>
+                <h3 class="modal-title" id="createEventModalLabel">Crear Nuevo Evento</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body m-1">
@@ -177,7 +182,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deleteEventModalLabel">¿Estás seguro de que deseas eliminar este evento?</h5>
+                <h3 class="modal-title" id="deleteEventModalLabel">¿Estás seguro de que deseas eliminar este evento?</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body m-1">
@@ -196,7 +201,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editEventModalLabel">Editar Evento</h5>
+                <h3 class="modal-title" id="editEventModalLabel">Editar Evento</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body m-1">
@@ -218,13 +223,13 @@
                     </div>
                     <!-- Hora del Evento -->
                     <div class="mb-3">
-                        <label for="editHora" class="form-label">Hora de inicio</label>
-                        <input type="time" class="form-control" id="editHora" name="hora_ini" required>
+                        <label for="editHoraIni" class="form-label">Hora de inicio</label>
+                        <input type="time" class="form-control" id="editHoraIni" name="hora_ini" required>
                     </div>
                      <!-- Hora del Evento -->
                      <div class="mb-3">
-                        <label for="editHora" class="form-label">Hora de fin</label>
-                        <input type="time" class="form-control" id="editHora" name="hora_fin" required>
+                        <label for="editHoraFin" class="form-label">Hora de fin</label>
+                        <input type="time" class="form-control" id="editHoraFin" name="hora_fin" required>
                     </div>
                     <!-- Ubicación del Evento -->
                     <div class="mb-3">
@@ -253,7 +258,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="viewRatingsModalLabel">Calificaciones del Evento</h5>
+                <h3 class="modal-title" id="viewRatingsModalLabel">Calificaciones del Evento</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
            
@@ -282,7 +287,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="rateEventModalLabel">Calificar Evento</h5>
+                <h3 class="modal-title" id="rateEventModalLabel">Calificar Evento</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -317,7 +322,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="notificationsModalLabel">Participantes</h5>
+                <h3 class="modal-title" id="notificationsModalLabel">Participantes</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -341,6 +346,3 @@
         </div>
     </div>
 </div>
-<style>
-    
-</style>

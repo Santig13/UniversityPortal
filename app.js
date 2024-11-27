@@ -7,6 +7,7 @@ const createAuthRouter = require('./routes/auth.js');
 const {createEventosRouter,getEventos,getEventosPersonales} = require('./routes/events.js');
 const createUsuariosRouter  = require('./routes/usuarios.js');
 const {createNotificationsRouter } = require('./routes/notifications.js');
+const cors = require('cors');
 const mysqlStore = mysqlSession(session);
 
 const sessionStore = new mysqlStore({
@@ -36,6 +37,8 @@ const pool=mysql.createPool({
     database: "AW_24"
 });
 
+
+
 const detectIPBloqueadas = (req, res, next) => {
     const ip = req.ip;
     pool.query('SELECT * FROM lista_negra_ips WHERE ip = ?', [ip], (err, results) => {
@@ -62,6 +65,8 @@ function requireAuth(req, res, next) {
         next(err); 
     }
 }
+//Middleware para cors
+app.use(cors());
 
 // Middleware para parsear datos de formularioy aceptar JSON
 app.use(express.json());
@@ -69,6 +74,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Middleware para que cargue todos los archivos estáticos y poder usar js y css en el html
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/node_modules', express.static(__dirname + '/node_modules'));
+
 
 app.use(middlewareSession);
 app.use(detectIPBloqueadas);

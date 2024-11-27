@@ -67,7 +67,6 @@ const validateEventCalification = [
 // Middleware general para manejar resultados de validación
 const validate = (req, res, next) => {
     const errors = validationResult(req);
-    console.log(errors);
     if (!errors.isEmpty()) {
         // Transformar los errores en una cadena más legible
         const errorMessages = errors.array().map(err => err.msg).join(', ');

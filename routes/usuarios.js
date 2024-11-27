@@ -5,6 +5,7 @@ const {añadirNotificacion} = require('./notifications');
 const {comprobarCapacidad} = require('./events');
 const bcrypt = require('bcrypt');
 const moment = require('moment');
+const { validateUserProfile,validateAccesibilidad} = require('../schemas/users');
 
 function createUsuariosRouter(pool, requireAuth, middlewareSession){
     const router = Router();
@@ -106,6 +107,48 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
             });
         });
     });
+
+    //Modifico los ajustes de accesibilidad del usuario
+    router.put('/:id/accesibilidad',validateAccesibilidad, (req, res, next) => {
+        const {fuente, tamaño, paleta} = req.body;
+        //si el usuario tiene la accesibilidad por defecto se le modifica la actual
+        if( req.session.user.accesibilidad_id!=1){
+            pool.query('UPDATE accesibilidades SET fuente = ?, tamaño = ?, paleta = ? WHERE id = ?', [fuente, tamaño, paleta, accesibilidad_id], (error, results) => {
+                if (error) {
+                    error.message = 'Error actualizando los ajustes de accesibilidad del usuario';
+                    error.status = 500;
+                    return next(error);
+                }
+                res.status(200).send('ok');
+            });
+        }
+        else{//creamos una configuracion de accesibilidad nueva
+            pool.query('INSERT INTO accesibilidades (fuente, tamaño, paleta) VALUES (?, ?, ?)', [fuente, tamaño, paleta], (error, results) => {
+                if (error) {
+                    error.message = 'Error creando la configuración de accesibilidad';
+                    error.status = 500;
+                    return next(error);
+                }
+                //actualizamos la sesion del usuario con la nueva configuracion
+                req.session.user.accesibilidad_id = results.insertId;
+                req.session.user.accesibilidad = {
+                    id: results.insertId,
+                    paleta: results.paleta,
+                    tamañoTexto: results.tamañoTexto,
+                    navegacion: results.navegacion
+                };
+                pool.query('UPDATE usuarios SET accesibilidad_id = ? WHERE id = ?', [results.insertId, req.params.id], (error, results) => {
+                    if (error) {
+                        error.message = 'Error actualizando los ajustes de accesibilidad del usuario';
+                        error.status = 500;
+                        return next(error);
+                    }
+                    res.status(200).send('ok');
+                });
+            });
+        }
+
+    });
     // Desinscribir usuario de un evento
     router.delete('/desinscribir', (req, res, next) => {
         const { userId, eventId,organizador_id } = req.body;
@@ -160,7 +203,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
         });
     });
 
-    router.put('/:userId/actualizar', requireAuth, async (req, res, next) => {
+    router.put('/:userId/actualizar', requireAuth, validateUserProfile, async (req, res, next) => {
         const {userId} = req.params;
         const {nombre, telefonoCompleto, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -191,7 +234,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
 
     // Ruta para obtener los datos del usuario
     router.get('/:id/datos', requireAuth, (req, res, next) => {
-        const userId = req.params;
+        const userId = req.params.id;
        pool.query('SELECT * FROM usuarios WHERE id = ?', [userId], (error, results) => {
             if (error) {
                 error.message = 'Error recuperando los datos del usuario';
@@ -201,6 +244,20 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
             res.status(200).json(results[0]);
         });
     });
+
+    //Ruta para modificar el modo oscuro/claro del usuario
+    // router.patch('/tema', requireAuth, (req, res, next) => {
+    //     const userId = req.params.id;
+    //     const {accesibilidad_id, modo} = req.body;
+    //     pool.query('UPDATE accesibilidades SET paleta = ? WHERE id = ?', [modo, accesibilidad_id], (error, results) => {
+    //         if (error) {
+    //             error.message = 'Error actualizando el modo del usuario';
+    //             error.status = 500;
+    //             return next(error);
+    //         }
+    //         res.status(200).send('ok');
+    //     });
+    // });
 
     return router;
 }

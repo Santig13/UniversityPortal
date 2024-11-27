@@ -42,6 +42,14 @@ header, .navbar {
     color: var(--primary-color);
 }
 
+.red-text {
+    color: #AD0000;
+}
+
+.green-text {
+    color: #0b6813fd
+}
+
 /* Estilos para el calendario */
 .fc-scrollgrid-sync-inner {
     background-color: var(--light-color);
@@ -173,7 +181,7 @@ div .fc-event-title {
 }
 
 .btn-outline-info:hover {
-    background-image: linear-gradient(160deg, #b0d4f1 0%, var(--info-color) 100%) !important;
+    background-image: linear-gradient(160deg, #679ac4 0%, var(--info-color) 100%) !important;
     color: #ffffff !important;
 }
 
