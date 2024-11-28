@@ -10,7 +10,7 @@ if (filterForm) {
 }
  function filtrar() {
          
-    
+
     if (profile){
         $.ajax({
             url: `/eventos/personales`,
@@ -47,7 +47,7 @@ if (filterForm) {
             method: 'GET',
             success: function(eventos) {
                 renderEventos(eventos);
-    
+
                 // Reasignar los eventos de clic de los botones de eliminación después de refrescar la lista
                 document.querySelectorAll('.btn-outline-danger').forEach(button => {
                     button.addEventListener('click', function() {
@@ -61,7 +61,7 @@ if (filterForm) {
             }
         });
     }
-    
+
 }
 
 // Funcion para renderizar los eventos despues del filtro
@@ -78,7 +78,7 @@ function renderEventos(eventos) {
                     </div>
                         <div class="card-body">
                             <p class="card-text"><strong>Descripción:</strong> ${evento.descripcion}</p>
-                            <p class="card-text"><strong>Fecha:</strong> ${new Date(evento.fecha).toLocaleDateString()}</p>
+                            <p class="card-text"><strong>Fecha:</strong> ${moment(evento.fecha).format('DD/MM/YYYY')}</p>
                             <p class="card-text"><strong>Hora de inicio:</strong> ${evento.hora_ini}</p>
                             <p class="card-text"><strong>Hora de fin:</strong> ${evento.hora_fin}</p>
                             <p class="card-text"><strong>Ubicación:</strong> ${evento.ubicacion}</p>
@@ -186,12 +186,12 @@ function fillModal(evento) {
     if (typeof evento === 'string') {
         evento = JSON.parse(evento);
     }
-
+    console.log(evento);
     const modal = document.getElementById('editEventModal');
     const form = document.getElementById('editEventForm');
-    form.titulo.value = evento.titulo || '';
+    form.titulo.value = evento.titulo || ''; 
     form.descripcion.value = evento.descripcion || '';
-    form.fecha.value = evento.fecha ? new Date(evento.fecha).toISOString().split('T')[0] : '';
+    form.fecha.value = evento.fecha ?  moment(evento.fecha).format('YYYY-MM-DD'): '';
     form.hora_ini.value = evento.hora_ini || '';
     form.hora_fin.value = evento.hora_fin || '';
     form.ubicacion.value = evento.ubicacion || '';
@@ -251,7 +251,7 @@ function editarEvento() {
     const form = document.getElementById('editEventForm');
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
-
+    console.log("hola");
     data.capacidad_maxima = parseInt(data.capacidad_maxima, 10);
     $.ajax({
         url: `/eventos/${eventoId}`,

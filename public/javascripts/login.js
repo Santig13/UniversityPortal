@@ -27,7 +27,41 @@ document.getElementById('togglePassword').addEventListener('click', function () 
     }
 });
 
-
+// hacer post a /auth/recover
+$('#recoverButton').click(function(event) {
+    event.preventDefault();
+    const email = $('#recoverEmail').val();
+    if (!email) {
+        showToast('Error en la recuperación de contraseña: Debe introducir un correo');
+        return;
+    }
+    $('#recoverPasswordModal').modal('hide');
+    showToast('Enviando correo de recuperación de contraseña...');
+    $.ajax({
+        url: '/auth/recuperar',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ email }),
+        success: function(jqXHR) {
+            if (jqXHR) {
+                
+                $('#recoverPasswordModal').modal('hide');
+                showToast(jqXHR.message);
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                showToast('Error en la recuperación de contraseña: ' + jqXHR.responseJSON.message);
+            } else {
+                document.body.innerHTML = jqXHR.responseText;
+                document.body.style.display = 'flex';
+                document.body.style.justifyContent = 'center';
+                document.body.style.alignItems = 'center';
+                document.body.style.height = '100vh';
+            }
+        }
+    });
+});
 
 //hacer post a /login
 document.getElementById('loginButton').addEventListener('click', function (event) {

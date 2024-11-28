@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const { validateEvent,validateFilter,validateCalification} = require('../schemas/event.js');
 const {añadirNotificacion} = require('./notifications.js');
+const cron = require('node-cron');
 const moment = require('moment');
 
 function getEventosPersonales(user, pool, callback) {
@@ -137,6 +138,7 @@ function solapan(connection,ubicacion,fecha,hora_ini,hora_fin, callback) {
         WHERE ubicacion = ? AND fecha = ? AND  hora_fin >= ?
     `;  
     connection.query(sql, [ubicacion, fecha, hora_ini], (err, result) => {
+   
         if (err) {
             return callback(err);
         }
@@ -229,23 +231,20 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                 err.message = 'Error al obtener conexión de la base de datos para crear evento.';
                 return next(err);
             }
-
+            console.log(ubicacion);
             solapan(connection,ubicacion,fecha,hora_ini,hora_fin, (err, result) => {
                 if (err) {
-                  
                   res.status(400).json({ success: false, message: err.message });
                 }
-                if(result.length > 0){
-                    connection.query(sql, [titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima, req.session.user.id], (err, result) => {
-                        connection.release();
-                        if (err) {
-                            err.message = 'Error al crear evento en la base de datos.';
-                            return next(err);
-                        }
-                        res.status(200).json({ id: result.insertId });
-                    });
 
-                }
+                connection.query(sql, [titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima, req.session.user.id], (err, result) => {
+                    connection.release();
+                    if (err) {
+                        err.message = 'Error al crear evento en la base de datos.';
+                        return next(err);
+                    }
+                    res.status(200).json({ id: result.insertId });
+                });
             });
         });
     });
@@ -272,6 +271,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                 }
             });
         });
+        return callback(null);
     }
 
     // Ruta para borrar un evento
@@ -336,13 +336,14 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                 const sql2 = 'SELECT * FROM eventos WHERE ubicacion = ? AND fecha = ? AND hora_fin => ? AND id != ?';
                 connection.query(sql2, [ubicacion, fecha, hora_ini, id], (err, result) => {
                     connection.query(sql, [titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima, id], (err, result) => {
-                        connection.release();
+                        
                         if (err) {
                             err.message = 'Error al actualizar evento en la base de datos.';
                             return next(err);
                         }
                         const mensaje = `El organizador ha modificado el evento con id ${id}`;
                         const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
+                        
                         notificarTodosLosParticipantes(connection, usuarios, mensaje, req.params.id, fecha, (err) => {
                             connection.release();
                             if (err) {
@@ -428,6 +429,52 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                 res.status(200).json({ success: true, message: 'Evento calificado exitosamente' });
             });
         });
+    });
+
+    function enviarNotificaciones() {
+        let hoy = new Date().toISOString().split('T')[0]; // Obtener la fecha de hoy en formato YYYY-MM-DD
+        const query = `
+            SELECT u.id
+            FROM usuarios u
+            JOIN inscripciones i ON u.id = i.usuario_id
+            JOIN eventos e ON i.evento_id = e.id
+            WHERE e.fecha = ?
+        `;
+        pool.getConnection((err, connection) => {
+            connection.query(query, [hoy], (err, results) => {
+                if (err) {
+                    console.error('Error al obtener los eventos del día:', err);
+                    return;
+                }
+                if (results.length === 0) {
+                    console.log('No hay usuarios inscritos en eventos programados para hoy.');
+                    return;
+                }
+                const usuarios = results.map(row => row.id);
+                connection.query('SELECT * FROM eventos WHERE fecha = ?', [hoy], (err, results) => {
+                    let mensaje = 'Hoy tienes los siguientes eventos programados: ';
+                    const eventos = results.map(row => row.titulo).join(', ');
+                    mensaje += eventos;
+                    mensaje += '.';
+                    hoy = moment().format('YYYY-MM-DD HH:mm:ss');
+                    usuarios.forEach(usuario_id => {
+                        añadirNotificacion(connection, usuario_id, mensaje, hoy, (err) => {
+                            connection.release();
+                            if (err) {
+                                err.message = 'Error al eliminar evento en la base de datos.';
+                                return callback(err);
+                            }
+                        });
+                    });
+                });
+                
+            });
+        });
+    }
+    
+    // Programar la tarea para que se ejecute todos los días a las 8:00 AM
+    cron.schedule('0 8 * * *', () => {
+        enviarNotificaciones();
     });
 
     return router;

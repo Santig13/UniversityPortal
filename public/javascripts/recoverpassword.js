@@ -45,8 +45,10 @@ document.getElementById('confirmButton').addEventListener('click', function(even
                 password: document.getElementById('password').value,  
             }),
             success: function() {
-                showToast('Contraseña actualizada exitosamente. Redirigiendo a la página de inicio de sesión...');
-                setTimeout(() => window.location.href = '/', 3000);
+                showToast('Contraseña actualizada exitosamente. Ya puedes cerrar la ventana.');
+                setTimeout(() => {
+                    window.close();
+                }, 5000);
             },
             error: function(jqXHR) {
                 

@@ -2,6 +2,7 @@ const { Router } = require('express');
 const bcrypt = require('bcrypt');
 const UAParser = require('ua-parser-js');
 const { validateLogIn, validateUser } = require('../schemas/users');
+const nodemailer = require('nodemailer');
 
 
 //Funcion para registrar ip negador fecha y user en una tabla 
@@ -168,28 +169,73 @@ function createAuthRouter(pool, sessionMiddleware) {
         });
     });
 
-    // Ruta recuperar contraseña 
-    router.post('/recover', (req, res, next) => {
+    router.get('/recover/:email', (req, res) => {
+        res.render('restorepassword' , {email: req.params.email});
+    });
+
+    router.post('/recuperar', async (req, res, next) => {
         const { email } = req.body;
         pool.getConnection((err, connection) => {
             if (err) {
                 err.message = 'Error al obtener conexión de la base de datos para la recuperación de contraseña.';
                 return next(err);
             }
-
-            connection.query('SELECT * FROM usuarios WHERE email = ?', [email], (err, rows) => {
+            connection.query('SELECT * FROM usuarios WHERE email = ?', [email], async (err, rows) => {
                 connection.release();
                 if (err) {
                     err.message = 'Error al consultar la base de datos para encontrar el usuario.';
                     return next(err);
                 }
 
-                if (rows.length > 0) {
-                    const user = rows[0];
-                    res.render('restorepassword', { email: email, user: user });
-                } else {
-                    res.redirect('/?fail=true&type=recover');
+                if (rows.length <= 0) {
+                   
+                    res.status(400).json({ success:false , message: 'El usuario introducido no existe' });
                 }
+                
+                const transport = nodemailer.createTransport({
+                    host: 'smtp.gmail.com',
+                    port: 465,
+                    secure: true,
+                    auth: {
+                        user: 'portal.gestionaw@gmail.com',
+                        pass: 'bwio wkpc qpmy izzw'
+
+                    }
+                });
+                
+                const resetLink = `http://localhost:3000/auth/recover/${email}`;
+                const mailOptions = {
+                    from: 'portal.gestionaw@gmail.com',
+                    to: email,
+                    subject: 'Recuperación de contraseña',
+                    html: `
+                        <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #1A2226; color: #0DB8DE;">
+                            <img src="cid:calendarioLogo" alt="Logo" style="width: 75px; margin-bottom: 20px;">
+                            <h2 style="color: #0DB8DE;">Recuperación de contraseña</h2>
+                            <p style="color: #ffffff;">Hola,</p>
+                            <p style="color: #ffffff;">Hemos recibido una solicitud para restablecer tu contraseña. Haz clic en el botón de abajo para continuar:</p>
+                            <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; margin: 20px 0; font-size: 16px; color: #fff; background-color: #0DB8DE; text-decoration: none; border-radius: 5px;">Restablecer contraseña</a>
+                            <p style="color: #ffffff;">Si no solicitaste este cambio, puedes ignorar este correo.</p>
+                            <p style="color: #ffffff;">Gracias,</p>
+                            <p style="color: #ffffff;">El equipo de Gestión AW</p>
+                        </div>
+                    `,
+                    attachments: [
+                        {
+                            filename: 'calendario_oscuro.png',
+                            path: 'public/images/calendario_oscuro.png', 
+                            cid: 'calendarioLogo' 
+                        }
+                    ]
+                };
+                
+                transport.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        console.log(error);
+                        return res.status(500).json({ success: false, message: 'Error al enviar el correo de recuperación.' });
+                    }
+                    res.status(200).json({ success: true, message: `Se ha enviado un correo a ${email} con instrucciones para restablecer la contraseña.` });
+                });
             });
         });
     });
