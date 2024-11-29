@@ -1,40 +1,35 @@
+"use strict";
+// Validar que las contraseñas coincidan
 function validatePasswords() {
-    var password = document.getElementById("password").value;
-    var confirmPassword = document.getElementById("confirmPassword").value;
+    var password = $('#password').val();
+    var confirmPassword = $('#confirmPassword').val();
     if (password !== confirmPassword) {
-        setTimeout(function() {
-            const toastBody = document.querySelector('.toast-body');
-            toastBody.textContent = 'Las contraseñas no coinciden';
-            const toast = new bootstrap.Toast(document.getElementById('myToast'));
-            toast.show(); 
-        }, 200);
-        setTimeout(() => toast.hide(), 5000);
+        showToast('Las contraseñas no coinciden');
         return false;
     }
     return true;
 }
 
-document.getElementById('confirmPassword').addEventListener('keyup', function () {
-    const password = document.querySelector('input[name="password"]').value;
-    const confirmPassword = this.value;
-    const message = document.getElementById('passwordMessage');
+// Validar que las contraseñas coincidan y mostrar mensaje
+$('#confirmPassword').on('keyup', function () {
+    var password = $('input[name="password"]').val();
+    var confirmPassword = $(this).val();
+    var message = $('#passwordMessage');
     
     if (confirmPassword === '') {
-        message.textContent = '';
+        message.text('');
     } else if (password === confirmPassword) {
-        message.textContent = 'Las contraseñas coinciden';
-        message.style.color = 'green';
+        message.text('Las contraseñas coinciden').css('color', 'green');
     } else {
-        message.textContent = 'Las contraseñas no coinciden';
-        message.style.color = 'red';
+        message.text('Las contraseñas no coinciden').css('color', 'red');
     }
 });
 
-
-document.getElementById('confirmButton').addEventListener('click', function(event) {
+// Hacer patch al servidor para actualizar la contraseña
+$('#confirmButton').on('click', function(event) {
     event.preventDefault(); 
 
-    var email = document.getElementById('titulo').getAttribute('data-email');
+    var email = $('#titulo').data('email');
     if (validatePasswords()) { 
         $.ajax({
             url: '/auth/updatepassword',  
@@ -42,7 +37,7 @@ document.getElementById('confirmButton').addEventListener('click', function(even
             contentType: 'application/json',  
             data: JSON.stringify({
                 email: email,
-                password: document.getElementById('password').value,  
+                password: $('#password').val(),  
             }),
             success: function() {
                 showToast('Contraseña actualizada exitosamente. Ya puedes cerrar la ventana.');
@@ -50,34 +45,27 @@ document.getElementById('confirmButton').addEventListener('click', function(even
                     window.close();
                 }, 5000);
             },
-            error: function(jqXHR) {
-                
-                const contentType = jqXHR.getResponseHeader('content-type');
-
-                if(contentType.includes('application/json')) {
-                    var errorMessage = jqXHR.status + ': ' + jqXHR.statusText;
-                    showToast('Error al actualizar la contraseña: ' + errorMessage);
+            error: function(jqXHR, statusText, errorThrown) {
+                if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                    showToast('Errores al actualizar la contraseña: ' + jqXHR.responseJSON.message);
+                } else {
+                    $('body').html(jqXHR.responseText).css({
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100vh'
+                    });
                 }
-                else{
-                    document.body.innerHTML = jqXHR.responseText;
-                    document.body.style.display = 'flex';
-                    document.body.style.justifyContent = 'center';
-                    document.body.style.alignItems = 'center';
-                    document.body.style.height = '100vh';
-                }
-
-               
             }
         });
     }
 });
 
 function showToast(message) {
-    const toastElement = document.getElementById('myToast');
-    const toastBody = toastElement.querySelector('.toast-body');
-    toastBody.textContent = message;
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
-    setTimeout(() => toast.hide(), 5000); // Ocultar toast después de 5 segundos
+    var toastElement = $('#myToast');
+    var toastBody = toastElement.find('.toast-body');
+    toastBody.text(message);
+    toastElement.fadeIn(400, function() {
+        setTimeout(() => toastElement.fadeOut(400), 5000); // Ocultar toast después de 5 segundos
+    });
 }
-

@@ -227,6 +227,7 @@ app.use((err, req, res, next) => {
         }
     }
     res.status(statusCode).render('error', {
+        user: req.session.user,
         titulo: title,
         mensaje: message,
         accesibilidad: accesibilidad

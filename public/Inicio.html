@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   
-    <title>Inicio de sesión</title>
+    <title>Portal Gestión Eventos Universitarios</title>
 </head>
   
 <body class="d-flex flex-column justify-content-center">
@@ -49,7 +49,7 @@
                     <form id="recoverPasswordForm" method="POST" action="/auth/recuperar">
                         <div class="mb-3">
                             <label for="recoverEmail" class="form-label">Correo Electrónico</label>
-                            <input type="email" class="form-control bg-white p-1" id="recoverEmail" name="email" required style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+                            <input type="email" class="form-control bg-white p-1" id="recoverEmail" name="email" required>
                         </div>
                         <button id="recoverButton" type="submit" class="btn btn-outline-primary">Enviar</button>
                     </form>
@@ -72,7 +72,7 @@
                         <label for="contrasena" class="form-label">Contraseña</label>
                         <div class="input-group">
                             <input type="password" class="form-control" id="contrasena" name="password" required>
-                            <button class="btn btn-sm btn-outline-primary ms-2 mb-3" alt="Boton ocultar contraseña" type="button" id="togglePassword">
+                            <button class="btn btn-sm btn-outline-primary ms-2 mb-3" alt="Boton ocultar contraseña" type="button" id="togglePassword" aria-label="Mostrar u ocultar contraseña">
                                 <i class="bi bi-eye"></i>
                             </button>
                         </div>
@@ -90,14 +90,33 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer-nuestro py-3 mt-auto">
-        <div class="container d-flex justify-content-between align-items-center">
-            <div class="blue-text">© 2024 Company, Inc</div>
-            <div>
-                <a href="/" class="text-decoration-none">Inicio</a> |
-                <a href="/privacy" class="text-decoration-none">Privacidad</a> |
-                <a href="/terms" class="text-decoration-none">Términos</a>
+    <footer class="footer-nuestro py-4 mt-auto blue-text">
+        <div class="container">
+            <!-- Primera fila: Nombre, correo y logos -->
+            <div class="row align-items-center mb-3">
+                <div class="col-md-4 text-md-start text-center">
+                    <h5 class="fw-bold mb-0">Portal Gestión Eventos Universitarios</h5>
+                </div>
+                <div class="col-md-4 text-md-center text-center my-3 my-lg-0">
+                    <a href="mailto:portal.gestionaw@gmail.com" class="text-decoration-none">
+                        <i class="bi bi-envelope-fill me-2"></i>portal.gestionaw@gmail.com
+                    </a>
+                </div>
+                <div class="col-md-4 text-md-end text-center">
+                    <a href="http://jigsaw.w3.org/css-validator/check/referer">
+                        <img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="¡CSS Válido!" />
+                    </a>
+                    <a href="http://jigsaw.w3.org/css-validator/check/referer">
+                        <img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss-blue" alt="¡CSS Válido!" />
+                    </a>
+                </div>
+            </div>
+    
+            <!-- Segunda fila: Enlaces y Derechos reservados -->
+            <div class="row text-center">
+                <div class="col-md-12">
+                    <small>© 2024 Portal Gestión Eventos Universitarios. Todos los derechos reservados.</small>
+                </div>
             </div>
         </div>
     </footer>

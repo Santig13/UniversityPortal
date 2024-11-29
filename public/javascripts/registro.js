@@ -1,76 +1,87 @@
-document.addEventListener('DOMContentLoaded', function(params) {
+"use strict";
+$(document).ready(function() {
     // cargar facultades
     $.ajax({
         url: '/facultades',
         method: 'GET',
-        success: function(data) {
-            const facultadSelect = document.getElementById('facultad');
+        success: function(data, statusText, jqXHR) {
+            const facultadSelect = $('#facultad');
             data.forEach(facultad => {
-                const option = document.createElement('option');
-                option.value = facultad.nombre;
-                option.textContent = facultad.nombre;
-                facultadSelect.appendChild(option);
+                const option = $('<option></option>').val(facultad.nombre).text(facultad.nombre);
+                facultadSelect.append(option);
             });
         },
-        error: function() {
-            showToast('Error al cargar las facultades');
-        }
-    });
-
-    // cambiar el prefijo del tlf
-    document.querySelectorAll('.dropdown-item').forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const prefix = this.getAttribute('data-prefix');
-            document.getElementById('dropdownMenuButton').textContent = prefix;
-        });
-    });
-
-    document.getElementById('passwordConfirm').addEventListener('keyup', function () {
-        const password = document.querySelector('input[name="password"]').value;
-        const passwordConfirm = this.value;
-        const message = document.getElementById('passwordMessage');
-        
-        if (passwordConfirm === '') {
-            message.textContent = '';
-        } else if (password === passwordConfirm) {
-            message.textContent = 'Las contraseñas coinciden';
-            message.style.color = 'green';
-        } else {
-            message.textContent = 'Las contraseñas no coinciden';
-            message.style.color = 'red';
-        }
-    });
-
-    document.getElementById('registerButton').addEventListener('click', function(event) {
-        var password = document.getElementById('password');
-        var passwordConfirm = document.getElementById('passwordConfirm');
-        var passwordMessage = document.getElementById('passwordMessage');
-    
-        if (password.value !== passwordConfirm.value) {
-            event.preventDefault();
-    
-            // Mostrar mensaje de error en el campo de confirmación
-            passwordConfirm.setCustomValidity('Las contraseñas no coinciden');
-            passwordConfirm.reportValidity();
-        } else {
-            passwordMessage.textContent = '';
-            passwordConfirm.setCustomValidity(''); // Restablecer validez si coinciden
+        error: function(jqXHR, statusText, errorThrown) {
+            if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                showToast('Error al cargar las facultades: ' + jqXHR.responseJSON.message);
+            }
+            else{
+                $('body').html(jqXHR.responseText).css({
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100vh'
+                });
+            }
         }
     });
 });
 
+// cambiar el prefijo del tlf
+$('.dropdown-item').on('click', function(e) {
+    e.preventDefault();
+    const prefix = $(this).data('prefix');
+    $('#dropdownMenuButton').text(prefix);
+});
+
+// Validar que las contraseñas coincidan
+$('#passwordConfirm').on('keyup', function() {
+    const password = $('input[name="password"]').val();
+    const passwordConfirm = $(this).val();
+    const message = $('#passwordMessage');
+    
+    if (passwordConfirm === '') {
+        message.text('');
+    } else if (password === passwordConfirm) {
+        message.text('Las contraseñas coinciden').css('color', 'green');
+    } else {
+        message.text('Las contraseñas no coinciden').css('color', 'red');
+    }
+});
+
+// Validar que las contraseñas coincidan al hacer click en el botón de registro
+$('#registerButton').on('click', function(event) {
+    const password = $('#password').val();
+    const passwordConfirm = $('#passwordConfirm').val();
+    const passwordMessage = $('#passwordMessage');
+
+    if (password !== passwordConfirm) {
+        event.preventDefault();
+
+        // Mostrar mensaje de error en el campo de confirmación
+        $('#passwordConfirm')[0].setCustomValidity('Las contraseñas no coinciden');
+        $('#passwordConfirm')[0].reportValidity();
+    } else {
+        passwordMessage.text('');
+        $('#passwordConfirm')[0].setCustomValidity(''); // Restablecer validez si coinciden
+    }
+});
+
+
 // Hacer post cuando se registre un usuario
-document.getElementById('registerButton').addEventListener('click', async function(event) {
-    const formCheck = document.querySelector('form');
-    const requiredFields = formCheck.querySelectorAll('input[required], select[required]');
+$('#registerButton').on('click', async function(event) {
+    const formCheck = $('form');
+    const requiredFields = formCheck.find('input[required], select[required]');
     let allFieldsFilled = true;
 
-    requiredFields.forEach(field => {
-        if (!field.value.trim()) {
-            allFieldsFilled = false;
-        } 
-    });
+    if (requiredFields.length > 0) {
+        requiredFields.each(function() {
+            const value = $(this).val();
+            if (value === null || !value.trim()) {
+                allFieldsFilled = false;
+            }
+        });
+    }
 
     // Solo continua si todos los campos están llenos
     if (!allFieldsFilled) {
@@ -80,8 +91,8 @@ document.getElementById('registerButton').addEventListener('click', async functi
     }
 
     // Verificación de la contraseña
-    const password = document.getElementById('password').value;
-    const passwordConfirm = document.getElementById('passwordConfirm').value;
+    const password = $('#password').val();
+    const passwordConfirm = $('#passwordConfirm').val();
     if (password !== passwordConfirm || password.length < 8) {
         showToast('Las contraseñas no coinciden o son demasiado cortas.');
         event.preventDefault();
@@ -89,48 +100,46 @@ document.getElementById('registerButton').addEventListener('click', async functi
     }
 
     event.preventDefault();
-    const form = document.querySelector('form');
-    const formData = new FormData(form);
-        // Añadir el prefijo al teléfono
-        const prefix = document.getElementById('dropdownMenuButton').textContent;
-
-    const data = Object.fromEntries(formData.entries());
-
-    data.telefonoCompleto = prefix + data.telefono;
-    
-    delete data.passwordConfirm; // No enviar la confirmación de la contraseña
-    delete data.telefono; // No enviar el teléfono sin prefijo
-
+    const data = {
+        nombre: $('input[name="nombre"]').val(),
+        apellido: $('input[name="apellido"]').val(),
+        email: $('input[name="email"]').val(),
+        password: password,
+        facultad: $('#facultad').val(),
+        telefonoCompleto: $('#dropdownMenuButton').text() + $('input[name="telefono"]').val()
+    };
 
     $.ajax({
         url: '/auth/register',
         method: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(data),
-        success: function(jqXHR) {
+        success: function() {
             showToast('Registro exitoso. Redirigiendo a la página de inicio de sesión...');
             setTimeout(() => {
                 window.location.href = '/';
-            }, 2000); 
+            }, 3000); 
         },
-        error: function(jqXHR, textStatus, errorThrown) {
+        error: function(jqXHR, statusText, errorThrown) {
             if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
-                showToast('Error en el registro: ' + jqXHR.responseJSON.message);
+                showToast('Errores en el registro: ' + jqXHR.responseJSON.message);
             } else {
-                document.body.innerHTML = jqXHR.responseText;
-                document.body.style.display = 'flex';
-                document.body.style.justifyContent = 'center';
-                document.body.style.alignItems = 'center';
-                document.body.style.height = '100vh';
+                $('body').html(jqXHR.responseText).css({
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100vh'
+                });
             }
         }
     });
 });
 
 function showToast(message) {
-    const toastElement = document.getElementById('myToast');
-    const toastBody = toastElement.querySelector('.toast-body');
-    toastBody.textContent = message;
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
+    const toastElement = $('#myToast');
+    const toastBody = toastElement.find('.toast-body');
+    toastBody.text(message);
+    toastElement.fadeIn(400, function() {
+        setTimeout(() => toastElement.fadeOut(400), 5000); // Ocultar toast después de 5 segundos
+    });
 }

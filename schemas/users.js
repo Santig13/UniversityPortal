@@ -84,6 +84,12 @@ const validaUserProfile = [
         .custom(detectSQLInjection)
 ];
 
+const validateRecover = [
+    check('password')
+        .isLength({ min: 8 }).withMessage('Contraseña debe tener al menos 8 caracteres')
+        .custom(detectSQLInjection)
+]
+
 // Middleware de validación para login
 const validateLogIn = [
     check('email')
@@ -117,5 +123,6 @@ module.exports = {
     validateLogIn: [...validateLogIn, validate],
     validateUser: [...validateUser, validate],
     validateUserProfile: [...validaUserProfile, validate],
-    validateAccesibilidad: [...validateAccesibilidad, validate]
+    validateAccesibilidad: [...validateAccesibilidad, validate],
+    validateRecover: [...validateRecover, validate]
 };

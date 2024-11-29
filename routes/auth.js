@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const bcrypt = require('bcrypt');
 const UAParser = require('ua-parser-js');
-const { validateLogIn, validateUser } = require('../schemas/users');
+const { validateLogIn, validateUser, validateRecover } = require('../schemas/users');
 const nodemailer = require('nodemailer');
 
 
@@ -73,7 +73,6 @@ function createAuthRouter(pool, sessionMiddleware) {
                                     return next(err);
                                 }
                                 req.session.uso=rows.insertId;
-                                console.log(req.session.user);
                                 res.redirect('/dashboard');
                             });
                         } else {
@@ -120,7 +119,7 @@ function createAuthRouter(pool, sessionMiddleware) {
     // Ruta registro
     router.post('/register', validateUser, async (req, res, next) => {
         const { nombre, email, telefonoCompleto, facultad, rol, password } = req.body; 
-        const hashedPassword = await bcrypt.hash(password, 10); // hash password 10 salt rounds
+        const hashedPassword = await bcrypt.hash(password, 10); // hasheamos la password para que no este visible desde la base de datos
 
         const consultaINSERTuser = 'INSERT INTO usuarios(nombre, email, telefono, facultad_id, rol, accesibilidad_id, password) VALUES(?,?,?,?,?,?,?)';
         const consultaSELECTfacultad = 'SELECT id FROM facultades WHERE nombre=?';
@@ -169,10 +168,12 @@ function createAuthRouter(pool, sessionMiddleware) {
         });
     });
 
+    // Ruta recuperar contraseña
     router.get('/recover/:email', (req, res) => {
         res.render('restorepassword' , {email: req.params.email});
     });
 
+    // Ruta enviar mail de recuperación
     router.post('/recuperar', async (req, res, next) => {
         const { email } = req.body;
         pool.getConnection((err, connection) => {
@@ -189,7 +190,7 @@ function createAuthRouter(pool, sessionMiddleware) {
 
                 if (rows.length <= 0) {
                    
-                    res.status(400).json({ success:false , message: 'El usuario introducido no existe' });
+                     return res.status(400).json({ success:false , message: 'El usuario introducido no existe' });
                 }
                 
                 const transport = nodemailer.createTransport({
@@ -241,7 +242,7 @@ function createAuthRouter(pool, sessionMiddleware) {
     });
 
     // Ruta cambiar contraseña
-    router.patch('/updatepassword', async (req, res, next) => {
+    router.patch('/updatepassword', validateRecover, async (req, res, next) => {
         const { email, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
 

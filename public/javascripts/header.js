@@ -104,3 +104,26 @@ $(document).ready(function () {
     });
     
 });
+
+$(document).ready(function () {
+    const fontSizeSelector = $('#fontSizeSelector'); // Selector de tamaño de fuente
+    const body = $('body'); // Referencia al <body>
+
+    // Aplicar tamaño de letra según el valor seleccionado
+    fontSizeSelector.on('change', function () {
+        const selectedSize = fontSizeSelector.val(); // Obtener el valor seleccionado
+
+        // Eliminar clases de tamaño de fuente existentes
+        body.removeClass('font-small font-normal font-large');
+
+        // Añadir la clase correspondiente
+        if (selectedSize === 'small') {
+            body.addClass('font-small');
+        } else if (selectedSize === 'large') {
+            body.addClass('font-large');
+        } else {
+            body.addClass('font-normal'); // Valor por defecto
+        }
+    });
+});
+

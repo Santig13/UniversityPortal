@@ -2,40 +2,40 @@
 <% if(!profile) { %>
 
         <!-- Columna de Filtros -->
-    <div class="col-md-3 py-2 <%= profile ? 'd-none': ''%>">
-    <h2 class="mb-2 mt-5">Filtrar Eventos</h2>
-    <form id="filterForm" class="p-4 rounded login-box shadow-sm">
-        <div class="mb-3">
-            <label for="fecha" class="form-label">Fecha</label>
-            <input type="date" class="form-control" id="fecha" name="fecha" placeholder="none">
-        </div>
-        
-        <div class="mb-3">
-            <label for="tipo" class="form-label">Tipo de evento</label>
-            <input type="text" class="form-control" id="tipo" name="tipo" placeholder="Ej: Conferencia, Taller">
-        </div>
-        <div class="mb-3">
-            <label for="ubicacion" class="form-label">Ubicación</label>
-            <input type="text" class="form-control" id="ubicacion" name="ubicacion" placeholder="Ej: Auditorio, Sala A">
-        </div>
-        <div class="mb-3">
-            <label for="capacidad" class="form-label">Capacidad máxima</label>
-            <input type="number" class="form-control" id="capacidad" name="capacidad" placeholder="Ej: 50">
-        </div>
-        <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-outline-primary">
-                <i class="bi bi-search me-1"></i> Filtrar
-            </button>
-            <button type="reset" class="btn btn-outline-secondary">
-                <i class="bi bi-x-circle me-1"></i> Limpiar
-            </button>
-        </div>
-    </form>
+    <div class="col-md-3 mb-4 <%= profile ? 'd-none': ''%>">
+        <h2 class="mb-2 mt-5 text-center text-md-start">Filtrar Eventos</h2>
+        <form id="filterForm" class="p-4 rounded login-box shadow-sm">
+            <div class="mb-3">
+                <label for="fecha" class="form-label">Fecha</label>
+                <input type="date" class="form-control" id="fecha" name="fecha" placeholder="none">
+            </div>
+            
+            <div class="mb-3">
+                <label for="tipo" class="form-label">Tipo de evento</label>
+                <input type="text" class="form-control" id="tipo" name="tipo" placeholder="Ej: Conferencia, Taller">
+            </div>
+            <div class="mb-3">
+                <label for="ubicacion" class="form-label">Ubicación</label>
+                <input type="text" class="form-control" id="ubicacion" name="ubicacion" placeholder="Ej: Auditorio, Sala A">
+            </div>
+            <div class="mb-3">
+                <label for="capacidad" class="form-label">Capacidad máxima</label>
+                <input type="number" class="form-control" id="capacidad" name="capacidad" placeholder="Ej: 50">
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-outline-primary">
+                    <i class="bi bi-search me-1"></i> Filtrar
+                </button>
+                <button type="reset" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle me-1"></i> Limpiar
+                </button>
+            </div>
+        </form>
     </div>
 <% } %>
 
  <!-- Columna de Lista de Eventos -->
- <div class="col-md-9">
+ <div class="col-md-9 mb-4">
     <div class="container mt-5 lista-eventos">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2">
 
