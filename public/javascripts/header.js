@@ -1,24 +1,22 @@
+"use strict";
 
-
-document.addEventListener("DOMContentLoaded", function () {
-    const notificationsLink = document.getElementById('link-notificaciones');
-   
-    notificationsLink.addEventListener('click', function () {
+// Para mostrar el contenido del modal de notificaciones
+$(document).ready(function () {
+    $('#link-notificaciones').on('click', function () {
         $.ajax({
             url: '/notificaciones',
             method: 'GET',
-            success: function (notificaciones, jqXHR) {
-                const notificacionesContainer = document.getElementById('notificacionesContainer');
-                notificacionesContainer.innerHTML = '';
+            success: function (data, jqXHR, statusText) {
+                const notificacionesContainer = $('#notificacionesContainer');
+                notificacionesContainer.empty();
                 let html = '';
-                if(notificaciones.length === 0){
-                    const tituloNotificaciones = document.getElementById('tituloNotificaciones');
-                    tituloNotificaciones.classList.add('d-none');
-                    notificacionesContainer.innerHTML = '<h4 class="text-center">No hay notificaciones</h4>';
+                if (data.length === 0) {
+                    $('#tituloNotificaciones').addClass('d-none');
+                    notificacionesContainer.html('<h4 class="text-center">No hay notificaciones</h4>');
                 }
-                notificaciones.forEach(notificacion => {
+                data.forEach(notificacion => {
                     moment.locale('es');
-                    html +=  `
+                    html += `
                     <div class="row mb-4">
                         <div class="col-12">
                             <div id="${notificacion.id}" class="card ${notificacion.leido ? '' : 'notificacion-no-leida'}">
@@ -31,37 +29,38 @@ document.addEventListener("DOMContentLoaded", function () {
                                     </div>
                                 </div>
                                 <div class="card-footer m-1 d-flex align-items-center">
-                                    <small class="text-muted mx-2">ID de la Notificación: ${notificacion.id}</small>
+                                    <small class="mx-2">ID Notificación: ${notificacion.id}</small>
                                     ${!notificacion.leido ? `<button id="btn-${notificacion.id}" class="btn btn-outline-primary btn-event ms-auto" onclick="marcarComoLeido(${notificacion.id})">Marcar como leído</button>` : ''}
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
-                
                 });
-                notificacionesContainer.insertAdjacentHTML('beforeend', html);
+                notificacionesContainer.append(html);
             },
             error: function (error) {
-                console.log(error);
+                alert('Error al recuperar las notificaciones');
             }
         });
     });
 });
-    document.addEventListener('keydown', function(event) {
-        if (event.ctrlKey && event.key === 'p') {
-            event.preventDefault();
-            window.location.href = `/usuarios/${userId}`;
-        }
-    });
+// Shortcut para ir a la página de usuario
+$(document).keydown(function(event) {
+    if (event.ctrlKey && event.key === 'p') {
+        event.preventDefault();
+        window.location.href = `/usuarios/${userId}`;
+    }
+});
 
+// Para marcar una notificación como leída
 function marcarComoLeido(notificacionId) {
     $.ajax({
         url: `/notificaciones/${notificacionId}/leido`,
         method: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({ leido: true }),
-        success: function (data) {
+        success: function (data, jqXHR, statusText) {
             if (data.success) {
                 document.getElementById(notificacionId).classList.remove('notificacion-no-leida');
                 document.getElementById(`circulo-${notificacionId}`).classList.add('d-none');
@@ -76,47 +75,57 @@ function marcarComoLeido(notificacionId) {
     });
 }
 
+// Para cambiar el tema oscuro o claro
 $(document).ready(function () {
     const darkModeSwitch = $("#darkModeSwitch");
     const themeStylesheet = $("#theme-stylesheet");
-
+    console.log($("#darkModeSwitch").length);
+    console.log("Listener activado");
     const currentTheme = themeStylesheet.attr("href").includes("oscuro") ? "oscura" : "clara";
     darkModeSwitch.prop("checked", currentTheme === "oscura");
 
-    darkModeSwitch.on("change", function () {
-        const newTheme = this.checked ? "oscuro" : "claro";
+    // darkModeSwitch.on("change", function () {
+    //     const newTheme = this.checked ? "oscuro" : "claro";
        
+    //     themeStylesheet.attr("href", `/css/${newTheme}.css`);
+    //     // $.ajax({
+    //     //     url: '/usuarios/tema',
+    //     //     method: 'PATCH',
+    //     //     contentType: 'application/json',
+    //     //     data: JSON.stringify({ accesibilidad_id: accesibilidad_id, tema: newTheme }),
+    //     //     success: function (data) {
+    //     //         if (!data.success) {
+    //     //             showToast('Error al guardar el tema en la base de datos');
+    //     //         }
+    //     //     },
+    //     //     error: function (error) {
+    //     //         console.error('Error:', error);
+    //     //     }
+    //     // });
+    // });
+
+    $("#darkModeSwitch").on("change", function () {
+        const newTheme = this.checked ? "oscuro" : "claro";
+        console.log("Cambiando tema a:", newTheme);
+    
+        const themeStylesheet = $("#theme-stylesheet");
         themeStylesheet.attr("href", `/css/${newTheme}.css`);
-        // $.ajax({
-        //     url: '/usuarios/tema',
-        //     method: 'PATCH',
-        //     contentType: 'application/json',
-        //     data: JSON.stringify({ accesibilidad_id: accesibilidad_id, tema: newTheme }),
-        //     success: function (data) {
-        //         if (!data.success) {
-        //             showToast('Error al guardar el tema en la base de datos');
-        //         }
-        //     },
-        //     error: function (error) {
-        //         console.error('Error:', error);
-        //     }
-        // });
+        console.log("Hoja de estilos cambiada a:", themeStylesheet.attr("href"));
     });
+
     
 });
 
+// Para cambiar el tamaño de la letra
 $(document).ready(function () {
-    const fontSizeSelector = $('#fontSizeSelector'); // Selector de tamaño de fuente
-    const body = $('body'); // Referencia al <body>
+    const fontSizeSelector = $('#fontSizeSelector'); 
+    const body = $('body'); 
 
-    // Aplicar tamaño de letra según el valor seleccionado
     fontSizeSelector.on('change', function () {
-        const selectedSize = fontSizeSelector.val(); // Obtener el valor seleccionado
+        const selectedSize = fontSizeSelector.val(); 
 
-        // Eliminar clases de tamaño de fuente existentes
         body.removeClass('font-small font-normal font-large');
 
-        // Añadir la clase correspondiente
         if (selectedSize === 'small') {
             body.addClass('font-small');
         } else if (selectedSize === 'large') {

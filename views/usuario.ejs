@@ -1,10 +1,11 @@
 <%- include("partials/header.ejs", { user: user }) %>
-<div class="container mt-2 mb-2">
+
+<div class="container mt-1 mb-2">
     
     <div class="row">
         
         <!-- Columna de Perfil -->
-        <div class="col-md-3 mb-4">
+        <div class="col-md-3 mb-4 p-lg-0">
             <h2 class="mt-5 text-center">Actualizar Perfil</h2>
             
             <!-- Pestañas -->
@@ -34,11 +35,11 @@
                     <div class="input-group mb-3">
                         <button class="btn btn-sm btn-outline-primary dropdown-toggle mb-0 me-2" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">+34</button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <li><a class="dropdown-item blue-text" href="#" data-prefix="+49">+49 (Alemania)</a></li>
-                            <li><a class="dropdown-item blue-text" href="#" data-prefix="+44">+44 (UK)</a></li>
-                            <li><a class="dropdown-item blue-text" href="#" data-prefix="+34">+34 (España)</a></li>
-                            <li><a class="dropdown-item blue-text" href="#" data-prefix="+33">+33 (Francia)</a></li>
-                        </ul>
+                            <li><a class="dropdown-item blue-text" href="#" id="prefix-de" data-prefix="+49">+49 (Alemania)</a></li>
+                            <li><a class="dropdown-item blue-text" href="#" id="prefix-uk" data-prefix="+44">+44 (UK)</a></li>
+                            <li><a class="dropdown-item blue-text" href="#" id="prefix-es" data-prefix="+34">+34 (España)</a></li>
+                            <li><a class="dropdown-item blue-text" href="#" id="prefix-fr" data-prefix="+33">+33 (Francia)</a></li>
+                        </ul>                        
                         <input type="hidden" name="telefonoCompleto" id="telefonoCompleto">
                         <input type="text" class="form-control mb-0" id="telefono" name="telefono" autocomplete="new-tel">
                     </div>
@@ -103,10 +104,12 @@
     </div>
 
 </div>
+
+
 <script>
     const userRole = "<%= user.rol %>";  
     const profile = true;
-    //paso el rol y el id del usuario al script de dashboard.js
+    //paso el rol y el perfil para que el script de dashboard.js sepa que es un perfil
 </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="/javascripts/dashboard.js"></script>

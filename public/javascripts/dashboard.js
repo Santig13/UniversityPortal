@@ -1,45 +1,38 @@
-// Funcion para mostrar los botones de acuerdo al rol del usuari
-
+"use strict";
 // Funcion para filtrar eventos
-const filterForm = document.getElementById('filterForm');
-if (filterForm) {
-    filterForm.addEventListener('submit', async function(event) {
+const filterForm = $('#filterForm');
+if (filterForm.length) {
+    filterForm.on('submit', function(event) {
         event.preventDefault();
         filtrar();
     });
 }
- function filtrar() {
-         
 
-    if (profile){
+// Funcion para filtrar eventos personales
+function filtrar() {
+    if (profile) {
         $.ajax({
             url: `/eventos/personales`,
             method: 'GET',
             success: function(eventos) {
                 renderEventos(eventos);
                 // Reasignar los eventos de clic de los botones de eliminación después de refrescar la lista
-                document.querySelectorAll('.btn-outline-danger').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const eventId = button.getAttribute('data-event-id');
+                $('.btn-outline-danger').each(function() {
+                    $(this).on('click', function() {
+                        const eventId = $(this).data('event-id');
                         setEventoId(eventId);
                     });
                 });
             },
             error: function() {
-                showToast('Error al recuperar los  eventos personales');
+                showToast('Error al recuperar los eventos personales');
             }
         });
-    }
-    else{
-        const fechaElement = document.getElementById('fecha');
-        const tipoElement = document.getElementById('tipo');
-        const ubicacionElement = document.getElementById('ubicacion');
-        const capacidadElement = document.getElementById('capacidad');
-
-        const fecha = fechaElement ? fechaElement.value : "";
-        const tipo = tipoElement ? tipoElement.value : "";
-        const ubicacion = ubicacionElement ? ubicacionElement.value : "";
-        const capacidad = capacidadElement ? capacidadElement.value : "";
+    } else {
+        const fecha = $('#fecha').val() || "";
+        const tipo = $('#tipo').val() || "";
+        const ubicacion = $('#ubicacion').val() || "";
+        const capacidad = $('#capacidad').val() || "";
 
         const queryParams = new URLSearchParams({ fecha, tipo, ubicacion, capacidad }).toString();
         $.ajax({
@@ -47,11 +40,10 @@ if (filterForm) {
             method: 'GET',
             success: function(eventos) {
                 renderEventos(eventos);
-
                 // Reasignar los eventos de clic de los botones de eliminación después de refrescar la lista
-                document.querySelectorAll('.btn-outline-danger').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const eventId = button.getAttribute('data-event-id');
+                $('.btn-outline-danger').each(function() {
+                    $(this).on('click', function() {
+                        const eventId = $(this).data('event-id');
                         setEventoId(eventId);
                     });
                 });
@@ -61,13 +53,12 @@ if (filterForm) {
             }
         });
     }
-
 }
 
 // Funcion para renderizar los eventos despues del filtro
 function renderEventos(eventos) {
-    const eventosContainer = document.getElementById('eventosContainer');
-    eventosContainer.innerHTML = ''; // Limpia la lista actual de eventos
+    const eventosContainer = $('#eventosContainer');
+    eventosContainer.empty(); // Limpia la lista actual de eventos
     eventos.forEach(evento => {
         const eventoHTML = `
             <div class="row mb-4">
@@ -78,27 +69,27 @@ function renderEventos(eventos) {
                     </div>
                         <div class="card-body">
                             <p class="card-text"><strong>Descripción:</strong> ${evento.descripcion}</p>
-                            <p class="card-text"><strong>Fecha:</strong> ${moment(evento.fecha).format('DD/MM/YYYY')}</p>
+                            <p class="card-text"><strong>Fecha:</strong> ${new Date(evento.fecha).toLocaleDateString('es-ES')}</p>
                             <p class="card-text"><strong>Hora de inicio:</strong> ${evento.hora_ini}</p>
                             <p class="card-text"><strong>Hora de fin:</strong> ${evento.hora_fin}</p>
                             <p class="card-text"><strong>Ubicación:</strong> ${evento.ubicacion}</p>
                             <p class="card-text"><strong>Capacidad Máxima:</strong> ${evento.capacidad_maxima}</p>
                             <p class="card-text"><strong>Organizador:</strong> ${evento.organizador_nombre}</p>
                         </div>
-                                                <div class="card-footer m-1 d-flex flex-wrap align-items-center justify-content-lg-start">
+                        <div class="card-footer m-1 d-flex flex-wrap align-items-center justify-content-lg-start">
                             <small class="mx-2 mt-1">ID Evento: ${evento.id}</small>
                             ${evento.terminado ? `
-                                <div class="text-danger mx-2 mt-1">Este evento ha terminado</div>
+                                <div class="mx-2 mt-1 red-text"> <i class="bi bi-calendar-x red-text"></i> Este evento ha terminado </div>
                                 ${(userRole === 'participante' && evento.estadoInscripcion === 'inscrito') ? `
                                  <button class="btn btn-outline-primary btn-event participante ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#rateEventModal" onclick="setRateEventId('${evento.id}')">
                                         <i class="bi bi-star me-1"></i> Calificar Evento
                                     </button>
                                     <button class="btn btn-outline-info btn-event organizador ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#viewRatingsModal" onclick="showRatings('${evento.id}')">
-                                        <i class="bi bi-star me-1"></i> Ver Calificaciones
+                                        <i class="bi bi-list-stars me-1"></i> Ver Calificaciones
                                     </button>
                                 ` :`
                                     <button class="btn btn-outline-info btn-event organizador ms-2 mt-1" data-bs-toggle="modal" data-bs-target="#viewRatingsModal" onclick="showRatings('${evento.id}')">
-                                        <i class="bi bi-star me-1"></i> Ver Calificaciones
+                                         <i class="bi bi-list-stars me-1"></i> Ver Calificaciones
                                     </button>
                                 ` }
                             ` : `
@@ -116,7 +107,7 @@ function renderEventos(eventos) {
                                 ${userRole === 'participante' ? `
                                     ${evento.estadoInscripcion === 'inscrito' ? `
                                         <button onclick="desinscribirUsuario('${evento.id}','${evento.organizador_id}')" class="btn btn-outline-danger btn-event participante">Desapuntarse</button>
-                                        <div id="mensaje-${evento.id}" class="mx-2 text-success">Inscrito en el evento</div>
+                                        <div id="mensaje-${evento.id}" class="mx-2 green-text">Inscrito en el evento</div>
                                     ` : evento.estadoInscripcion === 'lista de espera' ? `
                                         <button onclick="abandonarListaEspera('${evento.id}','${evento.organizador_id}')" class="btn btn-outline-warning btn-event participante">Abandonar</button>
                                         <div id="mensaje-${evento.id}" class="mx-2 text-warning">En lista de espera</div>
@@ -130,19 +121,23 @@ function renderEventos(eventos) {
                 </div>
             </div>
         `;
-        eventosContainer.insertAdjacentHTML('beforeend', eventoHTML);
+        eventosContainer.append(eventoHTML);
     });
 }
 // Funcion para crear eventos
-
-document.getElementById('createEventButton').addEventListener('click', async function(event) {
+$('#createEventButton').on('click', async function(event) {
     event.preventDefault();
-    const form = document.getElementById('createEventForm');
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-
-    data.capacidad_maxima = parseInt(data.capacidad_maxima, 10);
-    data.organizador_id = parseInt(data.organizador_id, 10);
+    const form = $('#createEventForm');
+    const data = {
+        titulo: form.find('[name="titulo"]').val(),
+        descripcion: form.find('[name="descripcion"]').val(),
+        fecha: form.find('[name="fecha"]').val(),
+        hora_ini: form.find('[name="hora_ini"]').val(),
+        hora_fin: form.find('[name="hora_fin"]').val(),
+        ubicacion: form.find('[name="ubicacion"]').val(),
+        capacidad_maxima: parseInt(form.find('[name="capacidad_maxima"]').val(), 10),
+        organizador_id: parseInt(form.find('[name="organizador_id"]').val(), 10)
+    };
 
     $.ajax({
         url: '/eventos/crear',
@@ -152,23 +147,26 @@ document.getElementById('createEventButton').addEventListener('click', async fun
         success: function(response) {
             showToast('Evento creado exitosamente');
             filtrar(); // Refrescar la lista después de crear
-            const modal = document.getElementById('createEventModal');
-            const modalInstance = bootstrap.Modal.getInstance(modal);
+            const modal = $('#createEventModal');
+            const modalInstance = bootstrap.Modal.getInstance(modal[0]);
             if (modalInstance) {
-                form.reset();
+                form[0].reset();
                 modalInstance.hide();
             }
         },
         error: function(jqXHR) {
-            if (jqXHR.getResponseHeader('content-type').includes('text/html')) {
-                document.body.innerHTML = jqXHR.responseText;
-                document.body.style.display = 'flex';
-                document.body.style.justifyContent = 'center';
-                document.body.style.alignItems = 'center';
-                document.body.style.height = '100vh';
-            } else {
-                const data = JSON.parse(jqXHR.responseText);
-                showToast('Errores en la creacion del evento: ' + data.message);
+
+            if(jqXHR.responseJSON){
+                showToast('Errores en la creacion del evento: ' + jqXHR.responseJSON.message);
+            }
+            else{
+                $('body').html(jqXHR.responseText)
+                    .css({
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100vh'
+                    });
             }
         }
     });
@@ -181,35 +179,12 @@ function setEventoId(id) {
     eventoId = id;
 }
 
-// Funcion para guardar el id del evento a eliminar o editar
-function fillModal(evento) {
-    if (typeof evento === 'string') {
-        evento = JSON.parse(evento);
-    }
-    console.log(evento);
-    const modal = document.getElementById('editEventModal');
-    const form = document.getElementById('editEventForm');
-    form.titulo.value = evento.titulo || ''; 
-    form.descripcion.value = evento.descripcion || '';
-    form.fecha.value = evento.fecha ?  moment(evento.fecha).format('YYYY-MM-DD'): '';
-    form.hora_ini.value = evento.hora_ini || '';
-    form.hora_fin.value = evento.hora_fin || '';
-    form.ubicacion.value = evento.ubicacion || '';
-    form.capacidad_maxima.value = evento.capacidad_maxima || '';
-    const modalInstance = bootstrap.Modal.getInstance(modal);
-    if (modalInstance) {
-        modalInstance.show();
-    }
-    eventoId = evento.id;
-}
-
-
 // Funcion para el modal de confirmación de eliminación
-document.getElementById('confirmDeleteEventButton').addEventListener('click', async function(event) {
+$('#confirmDeleteEventButton').on('click', async function(event) {
     event.preventDefault();
     eliminarEvento(eventoId);
-    const modal = document.getElementById('deleteEventModal');
-    const modalInstance = bootstrap.Modal.getInstance(modal);
+    const modal = $('#deleteEventModal');
+    const modalInstance = bootstrap.Modal.getInstance(modal[0]);
     if (modalInstance) {
         modalInstance.hide();
     }
@@ -235,24 +210,54 @@ function eliminarEvento(eventId) {
     });
 }
 
-// Funcion para el modal de confirmación de eliminación
-document.getElementById('confirmEditEventButton').addEventListener('click', async function(event) {
+// Funcion para el modal de confirmación de edición
+$('#confirmEditEventButton').on('click', async function(event) {
     event.preventDefault();
     editarEvento();
-    const modal = document.getElementById('editEventModal');
-    const modalInstance = bootstrap.Modal.getInstance(modal);
+    const modal = $('#editEventModal');
+    const modalInstance = bootstrap.Modal.getInstance(modal[0]);
     if (modalInstance) {
         modalInstance.hide();
     }
     eventoId = null;
 });
 
+
+// Funcion para rellenar el modal de edicion
+function fillModal(evento) {
+    if (typeof evento === 'string') {
+        evento = JSON.parse(evento);
+    }
+    console.log(evento);
+    const form = $('#editEventForm');
+    form.find('[name="titulo"]').val(evento.titulo || '');
+    form.find('[name="descripcion"]').val(evento.descripcion || '');
+    form.find('[name="fecha"]').val(evento.fecha ? moment(evento.fecha).format('YYYY-MM-DD') : '');
+    form.find('[name="hora_ini"]').val(evento.hora_ini || '');
+    form.find('[name="hora_fin"]').val(evento.hora_fin || '');
+    form.find('[name="ubicacion"]').val(evento.ubicacion || '');
+    form.find('[name="capacidad_maxima"]').val(evento.capacidad_maxima || '');
+    const modal = $('#editEventModal');
+    const modalInstance = bootstrap.Modal.getInstance(modal[0]);
+    if (modalInstance) {
+        modalInstance.show();
+    }
+    eventoId = evento.id;
+}
+
+// Funcion para editar eventos
 function editarEvento() {
-    const form = document.getElementById('editEventForm');
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-    console.log("hola");
-    data.capacidad_maxima = parseInt(data.capacidad_maxima, 10);
+    const form = $('#editEventForm');
+    const data = {
+        titulo: form.find('[name="titulo"]').val(),
+        descripcion: form.find('[name="descripcion"]').val(),
+        fecha: form.find('[name="fecha"]').val(),
+        hora_ini: form.find('[name="hora_ini"]').val(),
+        hora_fin: form.find('[name="hora_fin"]').val(),
+        ubicacion: form.find('[name="ubicacion"]').val(),
+        capacidad_maxima: parseInt(form.find('[name="capacidad_maxima"]').val(), 10)
+    };
+
     $.ajax({
         url: `/eventos/${eventoId}`,
         method: 'PUT',
@@ -263,28 +268,30 @@ function editarEvento() {
             filtrar(); // Refrescar la lista después de editar
         },
         error: function(jqXHR) {
-            if (jqXHR.getResponseHeader('content-type').includes('text/html')) {
-                document.body.innerHTML = jqXHR.responseText;
-                document.body.style.display = 'flex';
-                document.body.style.justifyContent = 'center';
-                document.body.style.alignItems = 'center';
-                document.body.style.height = '100vh';
-            } else {
-                const data = JSON.parse(jqXHR.responseText);
-                showToast('Errores en la edicion del evento: ' + data.message);
+            if(jqXHR.responseJSON){
+                showToast('Errores en la edicion del evento: ' + jqXHR.responseJSON.message);
+            }
+            else{
+                $('body').html(jqXHR.responseText)
+                    .css({
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100vh'
+                    });
             }
         }
     });
 }
 
 // Funcion para limpiar los campos del formulario de filtro
-if(filterForm){
-    filterForm.addEventListener('reset', async function(event) {
+if (filterForm.length) {
+    filterForm.on('reset', function(event) {
         event.preventDefault();
-        document.getElementById('fecha').value = '';
-        document.getElementById('tipo').value = '';
-        document.getElementById('ubicacion').value = '';
-        document.getElementById('capacidad').value = '';
+        $('#fecha').val('');
+        $('#tipo').val('');
+        $('#ubicacion').val('');
+        $('#capacidad').val('');
         filtrar();
     });
 }
@@ -302,19 +309,16 @@ function inscribirUsuario(eventId, organizador_id) {
             organizador_id: organizador_id,
         }),
         success: function(data) {
-            const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
+            const mensajeElemento = $(`#mensaje-${eventId}`);
             if (data.success) {
-                if(data.message == 'Se te ha añadido a la lista de espera'){
-                    mensajeElemento.innerText = 'En lista de espera';
-                    mensajeElemento.classList.add('text-warning');
-                    mensajeElemento.classList.add('mx-2');
-                }else{
-                    mensajeElemento.innerText = 'Inscrito en el evento';
-                    mensajeElemento.classList.add('text-success');
-                    mensajeElemento.classList.add('mx-2');
+                if (data.message === 'Se te ha añadido a la lista de espera') {
+                    mensajeElemento.text('En lista de espera')
+                        .addClass('text-warning mx-2');
+                } else {
+                    mensajeElemento.text('Inscrito en el evento')
+                        .addClass('text-success mx-2');
                 }
                 showToast(data.message);
-              
                 filtrar(); // Refrescar la lista después de inscribirse
             } else {
                 showToast('Error al inscribirse en el evento');
@@ -326,7 +330,8 @@ function inscribirUsuario(eventId, organizador_id) {
     });
 }
 
-function desinscribirUsuario(eventId,organizador_id){
+// Funcion para desinscribir un usuario de un evento
+function desinscribirUsuario(eventId, organizador_id) {
     $.ajax({
         url: '/usuarios/desinscribir',
         method: 'DELETE',
@@ -337,12 +342,10 @@ function desinscribirUsuario(eventId,organizador_id){
             organizador_id: organizador_id,
         }),
         success: function(data) {
-            const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
+            const mensajeElemento = $(`#mensaje-${eventId}`);
             if (data.success) {
-                mensajeElemento.innerText = '';
-                mensajeElemento.classList.remove('text-success');
-                mensajeElemento.classList.remove('mx-2');
-                
+                mensajeElemento.text('')
+                    .removeClass('text-success mx-2');
                 filtrar(); // Refrescar la lista después de desapuntarse
                 showToast(data.message);
             } else {
@@ -353,8 +356,10 @@ function desinscribirUsuario(eventId,organizador_id){
             showToast('Error al desapuntarse en el evento');
         }
     });
-} 
-function abandonarListaEspera(eventId,organizador_id){
+}
+
+// Funcion para hacer delete de la lista de espera
+function abandonarListaEspera(eventId, organizador_id) {
     $.ajax({
         url: '/usuarios/abandonar',
         method: 'DELETE',
@@ -365,11 +370,10 @@ function abandonarListaEspera(eventId,organizador_id){
             organizador_id: organizador_id,
         }),
         success: function(data) {
-            const mensajeElemento = document.getElementById(`mensaje-${eventId}`);
+            const mensajeElemento = $(`#mensaje-${eventId}`);
             if (data.success) {
-                mensajeElemento.innerText = '';
-                mensajeElemento.classList.remove('text-warning');
-                mensajeElemento.classList.remove('mx-2');
+                mensajeElemento.text('')
+                    .removeClass('text-warning mx-2');
                 filtrar(); // Refrescar la lista después de abandonar la lista de espera
                 showToast(data.message);
             } else {
@@ -379,24 +383,22 @@ function abandonarListaEspera(eventId,organizador_id){
         error: function() {
             showToast('Error al abandonar la lista de espera');
         }
-
     });
 }
 
+// Funcion para mostrar el contenido del modal de calificar evento haciendo get de los participantes
 function showParticipants(eventoId) {
-
     $.ajax({
         url: `/eventos/${eventoId}/participantes`,
         method: 'GET',
-        success: function (response) {
-            const participantesContainer = document.getElementById('participantesContainer');
-            participantesContainer.innerHTML = '';
+        success: function(response) {
+            const participantesContainer = $('#participantesContainer');
+            participantesContainer.empty();
             let inscritosHtml = '';
             let listaEsperaHtml = '';
 
             if (response.participantes.length === 0) {
-                const tituloNotificaciones = document.getElementById('tituloParticipantes');
-                participantesContainer.innerHTML = '<h4 class="text-center">No hay participantes</h4>';
+                participantesContainer.html('<h4 class="text-center">No hay participantes</h4>');
             } else {
                 response.participantes.forEach(participante => {
                     const participanteHtml = `
@@ -405,7 +407,7 @@ function showParticipants(eventoId) {
                             <div id="participante-${participante.id}" class="card">
                                 <div class="card-body d-flex align-items-center">
                                     <div>
-                                        <h4 class="card-title">Participante</h5>
+                                        <h5 class="card-title">Participante</h5>
                                         <p class="card-text"><strong>Nombre:</strong> ${participante.nombre}</p>
                                         <p class="card-text"><strong>Teléfono:</strong> ${participante.telefono}</p>
                                         <p class="card-text"><strong>Email:</strong> ${participante.email}</p>
@@ -424,32 +426,32 @@ function showParticipants(eventoId) {
                 });
 
                 if (inscritosHtml) {
-                    participantesContainer.insertAdjacentHTML('beforeend', `<h4 class="text-center">Lista de Participantes</h4>${inscritosHtml}`);
+                    participantesContainer.append(`<h4 class="text-center mb-3">Lista de Participantes</h4>${inscritosHtml}`);
                 }
                 if (listaEsperaHtml) {
-                    participantesContainer.insertAdjacentHTML('beforeend', `<h4 class="text-center">Lista de Espera</h4>${listaEsperaHtml}`);
+                    participantesContainer.append(`<h4 class="text-center mb-3">Lista de Espera</h4>${listaEsperaHtml}`);
                 }
             }
         },
-        error: function (error) {
+        error: function() {
             showToast('Error al obtener la lista de participantes');
         }
     });
 }
 
 // Funcion para el modal de calificar evento
-document.getElementById('calificarEventoButton').addEventListener('click',  async function(event) {
+$('#calificarEventoButton').on('click', async function(event) {
     event.preventDefault();
     calificarEvento(eventoId);
-    const modal = document.getElementById('rateEventModal');
-    const modalInstance = bootstrap.Modal.getInstance(modal);
+    const modal = $('#rateEventModal');
+    const modalInstance = bootstrap.Modal.getInstance(modal[0]);
     if (modalInstance) {
         modalInstance.hide();
     }
     eventoId = null;
 });
 
-
+// Funcion para hacer post de la calificacion del evento
 function calificarEvento(Id) {
     $.ajax({
         url: `/eventos/calificacion`,
@@ -458,12 +460,15 @@ function calificarEvento(Id) {
         data: JSON.stringify({
             userId: userId,
             eventId: Id,
-            calificacion: document.getElementById('rating').value,
-            comentario: document.getElementById('comments').value
+            calificacion: $('#rating').val(),
+            comentario: $('#comments').val()
         }),
         success: function(data) {
             if (data.success) {
                 showToast(data.message);
+                //borrar contenido del input de texto del modal
+                $('#rating').val('1'); 
+                $('#comments').val('');
             } else {
                 showToast('Error al calificar el evento');
             }
@@ -474,16 +479,16 @@ function calificarEvento(Id) {
     });
 }
 
-
+// Funcion para hacer get de las calificaciones y mostrarlas
 function showRatings(eventoId) {
     $.ajax({
         url: `/eventos/${eventoId}/calificaciones`,
         method: 'GET',
         success: function(response) {
-            const ratingsContainer = document.getElementById('ratingsContainer');
-            ratingsContainer.innerHTML = '';
+            const ratingsContainer = $('#ratingsContainer');
+            ratingsContainer.empty();
             if (response.calificaciones.length === 0) {
-                ratingsContainer.innerHTML = '<h4 class="text-center">No hay calificaciones</h4>';
+                ratingsContainer.html('<h4 class="text-center">No hay calificaciones</h4>');
             } else {
                 response.calificaciones.forEach(calificacion => {
                     const calificacionHtml = `
@@ -492,7 +497,7 @@ function showRatings(eventoId) {
                             <div class="card">
                                 <div class="card-body d-flex align-items-center">
                                     <div>
-                                        <h4 class="card-title">Calificación</h5>
+                                        <h4 class="card-title">Calificación</h4>
                                         <p class="card-text"><strong>Usuario:</strong> ${calificacion.nombre}</p>
                                         <p class="card-text"><strong>Email:</strong> ${calificacion.email}</p>
                                         <p class="card-text"><strong>Calificación:</strong> ${calificacion.calificacion}</p>
@@ -503,55 +508,75 @@ function showRatings(eventoId) {
                         </div>
                     </div>
                     `;
-                    ratingsContainer.insertAdjacentHTML('beforeend', calificacionHtml);
+                    ratingsContainer.append(calificacionHtml);
                 });
             }
         },
         error: function() {
-            console.log(error);
+            console.log('Error al obtener las calificaciones');
         }
     });
 }
 
 //Configuraciones de shortcuts
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.card').forEach(card => {
-        card.addEventListener('click', function(event) {
-            card.focus();
-        });
+$(document).ready(function() {
+    $('.card').on('click', function(event) {
+        $(this).focus();
     });
 });
 
-document.addEventListener('keydown', function(event) {
-    const cards = document.querySelectorAll('.card');
-    let currentIndex = Array.from(cards).findIndex(card => card === document.activeElement);
+// Configuración de accesos directos
+$(document).on('keydown', function(event) {
+    const cards = $('.card');
+    let currentIndex = cards.index(document.activeElement);
 
     if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
         event.preventDefault();
         if (currentIndex < cards.length - 1) {
-            cards[currentIndex + 1].focus();
+            cards.eq(currentIndex + 1).focus();
         }
     } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
         event.preventDefault();
         if (currentIndex > 0) {
-            cards[currentIndex - 1].focus();
+            cards.eq(currentIndex - 1).focus();
         }
-    }
-    else if (event.ctrlKey && event.key === 'i') {
+    } else if (event.ctrlKey && event.key === 'i') {
         event.preventDefault();
-        const currentCard = cards[currentIndex];
-        const apuntarseButton = currentCard.querySelector('button[id^="apuntarse"]');
-        if (apuntarseButton) {
+        const currentCard = cards.eq(currentIndex);
+        const apuntarseButton = currentCard.find('button:contains("Apuntarse")');
+        if (apuntarseButton.length) {
             apuntarseButton.click();
+        }
+    } else if (event.ctrlKey && event.key === 'd') {
+        event.preventDefault();
+        const currentCard = cards.eq(currentIndex);
+        const desapuntarseButton = currentCard.find('button:contains("Desapuntarse")');
+        if (desapuntarseButton.length) {
+            desapuntarseButton.click();
         }
     }
 });
-// Funcion para mostrar un toast
+
+let toastTimeout; 
+
 function showToast(message) {
-    const toastElement = document.getElementById('myToast');
-    const toastBody = toastElement.querySelector('.toast-body');
-    toastBody.textContent = message;
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
-    setTimeout(() => toast.hide(), 5000); // Ocultar toast después de 5 segundos
+    const toastElement = $('#myToast');
+    const toastBody = toastElement.find('.toast-body');
+    toastBody.text(message);
+
+    // Detén cualquier animación previa del toast y vuelve a mostrarlo
+    toastElement.stop(true, true).fadeIn(function () {
+        if (toastTimeout) {
+            clearTimeout(toastTimeout);
+        }
+
+        toastTimeout = setTimeout(() => {
+            toastElement.fadeOut();
+        }, 5000);
+    });
+
+    toastElement.find('.btn-close').off('click').on('click', function () {
+        toastElement.stop(true, true).fadeOut(); 
+        clearTimeout(toastTimeout); 
+    });
 }

@@ -1,5 +1,5 @@
 //Marcar como leido las notificaciones
-document.addEventListener("DOMContentLoaded", function () {
+$(document).ready(function () {
     $.ajax({
         url: `/notificaciones/leido`,
         method: 'post',

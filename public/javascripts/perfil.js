@@ -70,42 +70,26 @@ $(document).ready(function () {
         }
     });
 
-    // Manejar clics en las opciones del dropdown
     $('.dropdown-menu a').on('click', function (e) {
         e.preventDefault();
 
-        // Obtener el prefijo seleccionado
         const selectedPrefix = $(this).data('prefix');
-
-        // Actualizar el botón del dropdown con el prefijo seleccionado
         $('#dropdownMenuButton').text(selectedPrefix);
 
-        // Actualizar el campo oculto con el prefijo y número actual
         const currentNumber = $('#telefono').val();
         $('#telefonoCompleto').val(selectedPrefix + currentNumber);
 
-        // Cambiar la clase activa en el dropdown
         $('.dropdown-menu a').removeClass('active');
         $(this).addClass('active');
     });
 
 });
 
-
-// Mostrar mensajes
-function showToast(message) {
-    const toastElement = $('#myToast');
-    const toastBody = toastElement.find('.toast-body');
-    toastBody.text(message);
-    const toast = new bootstrap.Toast(toastElement[0]);
-    toast.show();
-}
-
-// cambiar el prefijo del tlf
-$('.dropdown-item').on('click', function(e) {
-    e.preventDefault();
-    const prefix = $(this).data('prefix');
-    $('#dropdownMenuButton').text(prefix);
+// Cambiar el prefijo del teléfono
+$('#prefix-de, #prefix-uk, #prefix-es, #prefix-fr').on('click', function(e) {
+    e.preventDefault(); 
+    const prefix = $(this).data('prefix'); 
+    $('#dropdownMenuButton').text(prefix); 
 });
 
 

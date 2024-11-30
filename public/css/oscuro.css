@@ -59,6 +59,22 @@ header, .footer-nuestro, .navbar {
 }
 
 
+::-webkit-scrollbar {
+    width: 13px;
+    height: 13px; 
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #0DB8DE; 
+    border-radius: 10px; 
+    border: 3px solid #1A2226; 
+}
+
+::-webkit-scrollbar-track {
+    background-color: #1A2226; 
+    border-radius: 10px; 
+}
+
 .blue-text {
     color: #0DB8DE;
 }
@@ -360,12 +376,12 @@ a:hover {
 
 /* Estilos para las tarjetas */
 
-.lista-eventos{
+
+.lista-estadisticas, .lista-eventos{
     overflow-y: auto;
     max-height: 65vh;
-    scrollbar-color: #0DB8DE #1A2226;
-    scrollbar-width:thin;
 }
+
 .card {
     background-color: #1A2226;
     border: 1px solid #0DB8DE;
@@ -612,7 +628,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .font-small button, .font-small a { font-size: 12px !important; }
 .font-small .btn { padding: 5px 10px !important; }
 
-.font-normal button, .font-normal a { font-size: 15px !important; }
+.font-normal button, .font-normal a { font-size: 15.5px !important; }
 .font-normal .btn { padding: 8px 15px !important; }
 
 .font-large button, .font-large a { font-size: 20px !important; }

@@ -1,5 +1,6 @@
 const { Router } = require('express');
 
+// Añadir una notificación a la base de datos
 function añadirNotificacion(connection, usuario_id, mensaje, fecha, callback) {
     const sql = 'INSERT INTO notificaciones (usuario_id, mensaje, fecha_creacion,leido) VALUES (?, ?, ?, ?)';
     connection.query(sql, [usuario_id, mensaje, fecha, 0], (err, result) => {
@@ -10,6 +11,7 @@ function añadirNotificacion(connection, usuario_id, mensaje, fecha, callback) {
     });
 }
 
+// Crear un router para las notificaciones
 function createNotificationsRouter(pool, requireAuth, middlewareSession) {
     const router = Router();
 
@@ -29,7 +31,7 @@ function createNotificationsRouter(pool, requireAuth, middlewareSession) {
             });
     });
 
-    // marcar una notificación específica como leída
+    // Marcar una notificación específica como leída
     router.post('/:notificacionId/leido', requireAuth, (req, res, next) => {
         const { notificacionId } = req.params;
         const sql = 'UPDATE notificaciones SET leido = 1 WHERE id = ?';

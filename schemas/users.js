@@ -9,7 +9,7 @@ const detectSQLInjection = (value) => {
     return true;
 };
 
-// Middleware de validación para usuario
+// Middleware de validación para usuario al registrarse
 const validateUser = [
     check('nombre')
         .notEmpty().withMessage('Nombre es requerido')
@@ -67,6 +67,7 @@ const validateAccesibilidad = [
         .custom(detectSQLInjection)
     
 ]
+// Middleware de validación para perfil de usuario
 const validaUserProfile = [ 
     check('nombre')
         .notEmpty().withMessage('Nombre es requerido')
@@ -84,6 +85,7 @@ const validaUserProfile = [
         .custom(detectSQLInjection)
 ];
 
+// Middleware de validación para recuperar contraseña
 const validateRecover = [
     check('password')
         .isLength({ min: 8 }).withMessage('Contraseña debe tener al menos 8 caracteres')

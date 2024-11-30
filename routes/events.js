@@ -42,7 +42,9 @@ function getEventosParticipante(user, pool, callback) {
             }
             rows = rows.map(row => {
                 row.estadoInscripcion="inscrito";
-                row.terminado = moment().isAfter(row.fecha);
+                const fecha = moment(row.fecha).format('YYYY-MM-DD'); 
+                const fechaHoraFin = moment(`${fecha} ${row.hora_fin}`, 'YYYY-MM-DD HH:mm');
+                row.terminado = moment().isAfter(fechaHoraFin);
                 return row;
             });
             callback(null, rows);
@@ -66,7 +68,9 @@ function getEventosOrganizador(user, pool, callback) {
             }
             rows = rows.map(row => {
                 row.organizador_nombre = user.nombre;
-                row.terminado = moment().isAfter(row.fecha);
+                const fecha = moment(row.fecha).format('YYYY-MM-DD'); 
+                const fechaHoraFin = moment(`${fecha} ${row.hora_fin}`, 'YYYY-MM-DD HH:mm');
+                row.terminado = moment().isAfter(fechaHoraFin);
                 return row;
             });
             callback(null, rows);
@@ -123,9 +127,12 @@ function getEventos(query, pool, callback) {
                 return callback(err);
             }
             rows = rows.map(row => {
-                row.terminado = moment().isAfter(row.fecha);
+                const fecha = moment(row.fecha).format('YYYY-MM-DD'); 
+                const fechaHoraFin = moment(`${fecha} ${row.hora_fin}`, 'YYYY-MM-DD HH:mm');
+                row.terminado = moment().isAfter(fechaHoraFin);
                 return row;
             });
+            
             callback(null, rows);
         });
     });
@@ -207,6 +214,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                     }
                     return evento;
                 });
+                
                 res.status(200).json(eventos);
             });
         });

@@ -41,6 +41,8 @@ const validateEvent = [
         .isInt({ min: 1 }).withMessage('Capacidad máxima debe ser un número entero positivo')
         .custom(detectSQLInjection),
 ];
+
+// Middleware de validación para filtros de eventos
 const validateEventFilters = [
     check('fecha')
         .optional({ checkFalsy: true })
@@ -55,6 +57,8 @@ const validateEventFilters = [
         .isInt({ min: 1 }).withMessage('Capacidad máxima debe ser un número entero positivo')
         .custom(detectSQLInjection),
 ];
+
+// Middleware de validación para calificación de evento
 const validateEventCalification = [
     check('calificacion')
         .notEmpty().withMessage('Calificación es requerida')
@@ -64,6 +68,7 @@ const validateEventCalification = [
         .isString().withMessage('Comentario debe ser un texto')
         .custom(detectSQLInjection),
 ];
+
 // Middleware general para manejar resultados de validación
 const validate = (req, res, next) => {
     const errors = validationResult(req);

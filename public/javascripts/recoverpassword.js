@@ -61,11 +61,27 @@ $('#confirmButton').on('click', function(event) {
     }
 });
 
+
+let toastTimeout; 
+
 function showToast(message) {
-    var toastElement = $('#myToast');
-    var toastBody = toastElement.find('.toast-body');
+    const toastElement = $('#myToast');
+    const toastBody = toastElement.find('.toast-body');
     toastBody.text(message);
-    toastElement.fadeIn(400, function() {
-        setTimeout(() => toastElement.fadeOut(400), 5000); // Ocultar toast después de 5 segundos
+
+    // Detén cualquier animación previa del toast y vuelve a mostrarlo
+    toastElement.stop(true, true).fadeIn(function () {
+        if (toastTimeout) {
+            clearTimeout(toastTimeout);
+        }
+
+        toastTimeout = setTimeout(() => {
+            toastElement.fadeOut();
+        }, 5000);
+    });
+
+    toastElement.find('.btn-close').off('click').on('click', function () {
+        toastElement.stop(true, true).fadeOut(); 
+        clearTimeout(toastTimeout); 
     });
 }
