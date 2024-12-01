@@ -41,7 +41,6 @@
     --font-family: 'Arial', sans-serif;
 }
 
-/* Estilos comunes para todas las páginas */
 body {
     background-color: #071014;
     background-image: linear-gradient(160deg, #071014 0%, #0db8de 100%);
@@ -80,7 +79,7 @@ header, .footer-nuestro, .navbar {
 }
 
 .red-text {
-    /* color: red; */
+
     color:#FF3D3D;
 }
 
@@ -90,7 +89,7 @@ header, .footer-nuestro, .navbar {
 .dark-text {
     color: var(--dark-color);
 }
-/* Estilos para el calendario */
+
 .fc-scrollgrid-sync-inner {
     background-color: #1A2226;
 }
@@ -115,7 +114,6 @@ div .fc-event-time {
     display: none;
 }
 
-/* Estilos para el login */
 .login-box {
     background: #1A2226;
     text-align: center;
@@ -162,7 +160,7 @@ div .fc-event-time {
     letter-spacing: 1px;
 }
 
-/* Estilo para el <select> */
+
 .form-select {
     background-color: #1A2226;
     border: none;
@@ -178,7 +176,7 @@ div .fc-event-time {
     color: #ECF0F5;
 }
 
-/* Estilos para botones */
+
 .btn-outline-primary {
     border-radius: 15px;
     cursor: pointer;
@@ -233,8 +231,6 @@ div .fc-event-time {
     border-radius: 15px;
     cursor: pointer;
     border-color: #FF3D3D !important;
-    /* color: #dc3545; */
-    /* color:#ffffff; */
     color:#FF3D3D;
     outline: none;
 }
@@ -270,7 +266,7 @@ div .fc-event-time {
     color: #ffffff !important;
 }
 
-/* Estilos para enlaces */
+
 a {
     color: #0DB8DE;
     text-decoration: none;
@@ -280,7 +276,7 @@ a:hover {
     color: #2d77c2;
 }
 
-/* Estilos personalizados para el toast */
+
 .custom-toast {
     background-color: #1A2226;
     color: #ECF0F5;
@@ -302,7 +298,7 @@ a:hover {
     border-radius: 0 0 20px 20px;
 }
 
-/* Estilos para nav-links */
+
 .nav-link {
     color: #0DB8DE;
     font-weight: bold;
@@ -314,13 +310,12 @@ a:hover {
     transform: scale(1.1);
 }
 
-/* Estilos para el span del navbar (texto) */
+
 #texto-navbar {
     color: #0DB8DE;
     font-weight: bold;
 }
 
-/* Estilos para los botones de perfil y notificaciones en la navbar */
 .navbar-buttons {
     margin-left: auto;
     display: flex;
@@ -347,7 +342,6 @@ a:hover {
     transform: scale(1.1);
 }
 
-/* Estilos personalizados para el botón toggler */
 .navbar-toggler {
     border: 2px solid #0DB8DE;
     border-radius: 5px;
@@ -373,8 +367,6 @@ a:hover {
     background-position: center;
     background-size: 20px 20px;
 }
-
-/* Estilos para las tarjetas */
 
 
 .lista-estadisticas, .lista-eventos{
@@ -420,7 +412,7 @@ a:hover {
     color: #6c757d !important;
 }
 
-/* Estilos personalizados para el modal */
+
 .modal-content {
     background-color: #1A2226;
     color: #ECF0F5;
@@ -454,7 +446,7 @@ a:hover {
     border-bottom-right-radius: 15px;
 }
 
-/* Estilo del botón de cerrar */
+
 .btn-close {
     background-color: transparent;
     color: #ECF0F5;
@@ -473,7 +465,7 @@ a:hover {
     box-shadow: none;
 }
 
-/* Ocultar el icono predeterminado y agregar un ícono personalizado */
+
 input[type="date"]::-webkit-calendar-picker-indicator {
     background-image: url('../images/schedule.png') !important;
     background-size: 20px 20px;
@@ -481,7 +473,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background-position: center;
 }
 
-/* Reemplazar el icono del reloj en el input de tipo time */
+
 input[type="time"]::-webkit-calendar-picker-indicator {
     background-image: url('../images/clock.png') !important;
     background-size: 20px 20px;
@@ -489,7 +481,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     background-position: center;
 }
 
-/* Estilos para notificaciones */
+
 .notificacion-no-leida {
     border: 2px solid blue;
 }
@@ -501,42 +493,42 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     border-radius: 50%;
     margin-left: auto;
 }
-/*Estilos para la tabla de estadisticas en modo oscuro*/
+
 
 .table-responsive {
-    background-color: #1A2226; /* Fondo oscuro para el contenedor de la tabla */
+    background-color: #1A2226; 
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .table {
    
-    background-color: #1A2226; /* Fondo oscuro para la tabla */
-    color: #ECF0F5; /* Texto claro */
+    background-color: #1A2226; 
+    color: #ECF0F5; 
 }
 
 .table thead {
-    background-color: #343a40; /* Fondo oscuro para el encabezado */
-    color: #ffffff; /* Texto blanco para el encabezado */
+    background-color: #343a40; 
+    color: #ffffff; 
 }
 
 .table tbody tr:hover {
-    background-color: #2d3d44; /* Fondo más claro al pasar el ratón por encima */
+    background-color: #2d3d44; 
 }
 
 .table-bordered {
-    border: 1px solid #0DB8DE; /* Borde azul */
+    border: 1px solid #0DB8DE; 
 }
 
 .table-bordered th,
 .table-bordered td {
-    border: 1px solid #0DB8DE; /* Bordes de las celdas */
+    border: 1px solid #0DB8DE; 
 }
 
 .table th,
 .table td {
-    padding: 15px; /* Espaciado interno para las celdas */
-    vertical-align: middle; /* Alineación vertical */
+    padding: 15px; 
+    vertical-align: middle; 
 }
 
 .text-center {
@@ -547,39 +539,37 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     color: #ffffff;
 }
 
-/* Eliminar la línea blanca debajo de los botones */
+
 .nav-tabs {
-    border-bottom: none; /* Elimina el borde inferior de la lista */
+    border-bottom: none; 
 }
 
-/* Estilos para los botones de pestañas */
+
 .nav-tabs .nav-link {
-    background-color: #1A2226; /* Fondo inicial */
-    color: #0DB8DE; /* Color del texto */
-    border: 2px solid transparent; /* Sin bordes visibles inicialmente */
+    background-color: #1A2226; 
+    color: #0DB8DE; 
+    border: 2px solid transparent; 
     border-radius: 15px;
     margin: 0 5px;
     transition: all 0.3s ease;
 }
 
-/* Hover de los botones */
+
 .nav-tabs .nav-link:hover {
     background-image: linear-gradient(160deg, #071014 0%, #0db8de 100%);
     color: #ffffff;
 }
 
-/* Botón activo */
 .nav-tabs .nav-link.active {
-    background-color: #0db8de; /* Color activo */
+    background-color: #0db8de; 
     color: #ffffff;
-    border: 2px solid #0db8de; /* Borde del color activo */
+    border: 2px solid #0db8de; 
 }
 
-/* Mantener tamaño constante en todas las interacciones */
 .nav-tabs .nav-link,
 .nav-tabs .nav-link.active {
-    padding: 10px 20px; /* Asegura consistencia en el padding */
-    box-shadow: none; /* Elimina cualquier sombra adicional */
+    padding: 10px 20px; 
+    box-shadow: none; 
 }
 
 /* Tamaños de letra generales para el cuerpo */
@@ -634,3 +624,12 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .font-large button, .font-large a { font-size: 20px !important; }
 .font-large .btn { padding: 10px 20px !important; }
 
+
+#spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+}
+     

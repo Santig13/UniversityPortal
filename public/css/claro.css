@@ -1,4 +1,4 @@
-/* Variables de colores y fuentes */
+
 :root {
     --primary-color: rgba(9, 85, 208, 1);
     --info-color: #004494;
@@ -14,7 +14,6 @@
     color: #574000 !important;
 }
 
-/* Estilos comunes para todas las páginas */
 body {
     background-color: #e0eaf1;
     background-image: linear-gradient(160deg, #e0eaf1 0%, #8bb8d6 100%);
@@ -52,7 +51,6 @@ header, .navbar {
     color: #0b6813fd
 }
 
-/* Estilos para el calendario */
 .fc-scrollgrid-sync-inner {
     background-color: var(--light-color);
 }
@@ -80,7 +78,7 @@ div .fc-event-title {
     color: #ffffff;
 }
 
-/* Estilos para el login */
+
 .login-box {
     background-color: #f0f8ff;
     text-align: center;
@@ -120,7 +118,7 @@ div .fc-event-title {
     letter-spacing: 1px;
 }
 
-/* Estilo para el <select> */
+
 .form-select {
     background-color: #f0f8ff;
     border: none;
@@ -140,7 +138,7 @@ div .fc-event-title {
     font-family: Arial, sans-serif; font-size: 16px; color: #333;
 }
 
-/* Estilos para botones */
+
 .btn-outline-primary,
 .btn-outline-secondary,
 .btn-outline-info,
@@ -225,7 +223,7 @@ div .fc-event-title {
     color: #ffffff !important;
 }
 
-/* Estilos para enlaces */
+
 a {
     color: var(--primary-color);
     text-decoration: none;
@@ -235,7 +233,7 @@ a:hover {
     color: #0056b3;
 }
 
-/* Estilos personalizados para el toast */
+
 .custom-toast {
     background-color: #f0f8ff;
     color: var(--dark-color);
@@ -257,7 +255,7 @@ a:hover {
     border-radius: 0 0 20px 20px;
 }
 
-/* Estilos para nav-links */
+
 .nav-link {
     color: var(--primary-color);
     font-weight: bold;
@@ -269,13 +267,13 @@ a:hover {
     transform: scale(1.1);
 }
 
-/* Estilos para el span del navbar (texto) */
+
 #texto-navbar {
     color: var(--primary-color);
     font-weight: bold;
 }
 
-/* Estilos para los botones de perfil y notificaciones en la navbar */
+
 .navbar-buttons {
     margin-left: auto;
     display: flex;
@@ -302,7 +300,7 @@ a:hover {
     transform: scale(1.1);
 }
 
-/* Estilos personalizados para el botón toggler */
+
 .navbar-toggler {
     border: 2px solid var(--primary-color);
     border-radius: 5px;
@@ -329,7 +327,7 @@ a:hover {
     background-size: 20px 20px;
 }
 
-/* Estilos para las tarjetas */
+
 .card {
     background-color: #f0f8ff;
     border: 1px solid var(--primary-color);
@@ -338,7 +336,7 @@ a:hover {
     cursor: pointer;
 }
 .card:focus {
-    box-shadow: 0 0 0 0.2rem rgba(0, 0, 139, 0.5); /* Dark blue shadow */
+    box-shadow: 0 0 0 0.2rem rgba(0, 0, 139, 0.5); 
 }
 
 ::-webkit-scrollbar {
@@ -390,7 +388,7 @@ a:hover {
     color: var(--secondary-color) !important;
 }
 
-/* Estilos personalizados para el modal */
+
 .modal-content {
     background-color: #f0f8ff;;
     color: var(--dark-color);
@@ -424,7 +422,7 @@ a:hover {
     border-bottom-right-radius: 15px;
 }
 
-/* Estilo del botón de cerrar */
+
 .btn-close {
     background-color: transparent;
     color: var(--dark-color);
@@ -443,7 +441,7 @@ a:hover {
     box-shadow: none;
 }
 
-/* Ocultar el icono predeterminado y agregar un ícono personalizado */
+
 input[type="date"]::-webkit-calendar-picker-indicator {
     background-image: url('../images/schedule.png') !important;
     background-size: 20px 20px;
@@ -451,7 +449,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background-position: center;
 }
 
-/* Reemplazar el icono del reloj en el input de tipo time */
+
 input[type="time"]::-webkit-calendar-picker-indicator {
     background-image: url('../images/clock.png') !important;
     background-size: 20px 20px;
@@ -459,7 +457,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     background-position: center;
 }
 
-/* Estilos para notificaciones */
+
 .notificacion-no-leida {
     border: 2px solid blue;
 }
@@ -471,41 +469,41 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     border-radius: 50%;
     margin-left: auto;
 }
-/* Estilos para la tabla de estadísticas en modo claro */
+
 .table-responsive {
-    background-color: #ffffff; /* Fondo claro para el contenedor de la tabla */
+    background-color: #ffffff; 
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .table {
     
-    background-color: #ffffff; /* Fondo claro para la tabla */
-    color: #2d3d44; /* Texto oscuro */
+    background-color: #ffffff; 
+    color: #2d3d44; 
 }
 
 .table thead {
-    background-color: var(--primary-color); /* Fondo azul para el encabezado */
-    color: #ffffff; /* Texto blanco para el encabezado */
+    background-color: var(--primary-color); 
+    color: #ffffff; 
 }
 
 .table tbody tr:hover {
-    background-color: #f1f1f1; /* Fondo más claro al pasar el ratón por encima */
+    background-color: #f1f1f1; 
 }
 
 .table-bordered {
-    border: 1px solid #dee2e6; /* Borde gris claro */
+    border: 1px solid #dee2e6; 
 }
 
 .table-bordered th,
 .table-bordered td {
-    border: 1px solid #dee2e6; /* Bordes de las celdas */
+    border: 1px solid #dee2e6; 
 }
 
 .table th,
 .table td {
-    padding: 15px; /* Espaciado interno para las celdas */
-    vertical-align: middle; /* Alineación vertical */
+    padding: 15px; 
+    vertical-align: middle; 
 }
 
 .text-center {
@@ -516,39 +514,34 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     color: #ffffff;
 }
 
-/* Eliminar la línea blanca debajo de los botones */
 .nav-tabs {
-    border-bottom: none; /* Elimina el borde inferior de la lista */
+    border-bottom: none; 
 }
 
-
 .nav-tabs .nav-link {
-    background-color: #f8f9fa; /* Fondo inicial en modo claro */
-    color: #007bff; /* Color del texto */
-    border: 2px solid transparent; /* Sin bordes visibles inicialmente */
+    background-color: #f8f9fa; 
+    color: #007bff; 
+    border: 2px solid transparent; 
     border-radius: 15px;
     margin: 0 5px;
     transition: all 0.3s ease;
 }
 
-/* Hover de los botones */
 .nav-tabs .nav-link:hover {
     background-image: linear-gradient(160deg, #bad8ec 0%, #007bff 100%);
     color: #ffffff;
 }
 
-/* Botón activo */
 .nav-tabs .nav-link.active {
-    background-color: #007bff; /* Color activo */
+    background-color: #007bff; 
     color: #ffffff;
-    border: 2px solid #007bff; /* Borde del color activo */
+    border: 2px solid #007bff; 
 }
 
-/* Mantener tamaño constante en todas las interacciones */
 .nav-tabs .nav-link,
 .nav-tabs .nav-link.active {
-    padding: 10px 20px; /* Asegura consistencia en el padding */
-    box-shadow: none; /* Elimina cualquier sombra adicional */
+    padding: 10px 20px; 
+    box-shadow: none; 
 }
 
 #profileTabs .nav-link {
@@ -608,3 +601,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .font-large button, .font-large a { font-size: 20px !important; }
 .font-large .btn { padding: 10px 20px !important; }
 
+#spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+}

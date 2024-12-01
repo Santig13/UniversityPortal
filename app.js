@@ -216,16 +216,17 @@ app.use((err, req, res, next) => {
     }
 
     let accesibilidad;
-    if(req.session.user){
+    //si req.session es undefined se pone accesibilidad por defecto si no se pone la accesibilidad del usuario
+    accesibilidad = {
+        paleta: 'oscura',
+        tamañoTexto: 'Normal',
+        navegacion: 'Ambos'
+    }
+
+    if(req && req.session!=undefined && req.session.user){
         accesibilidad = req.session.user.accesibilidad;
     }
-    else{
-        accesibilidad = {
-            paleta: 'oscura',
-            tamañoTexto: 'normal',
-            navegacion: 'teclado y raton'
-        }
-    }
+
     res.status(statusCode).render('error', {
         user: req.session.user,
         titulo: title,

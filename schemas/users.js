@@ -51,17 +51,17 @@ const validateUser = [
 
 //validacion para paleta,tamaño y navegacion
 const validateAccesibilidad = [
-    check('paleta')
+    check('theme')
         .notEmpty().withMessage('Paleta es requerido')
         .isString().withMessage('Paleta debe ser un texto')
         .custom(detectSQLInjection),
 
-    check('tamaño')
+    check('fontSize')
         .notEmpty().withMessage('Tamaño es requerido')
         .isString().withMessage('Tamaño debe ser un texto')
         .custom(detectSQLInjection),
 
-    check('navegacion')
+    check('navigation')
         .notEmpty().withMessage('Navegacion es requerido')
         .isString().withMessage('Navegacion debe ser un texto')
         .custom(detectSQLInjection)

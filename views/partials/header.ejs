@@ -12,18 +12,37 @@
         integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" 
         crossorigin="anonymous">
         
+    <link rel="preload" href="/css/claro.css" as="style">
+    <link rel="preload" href="/css/oscuro.css" as="style">
     <link id="theme-stylesheet" rel="stylesheet" href="/css/<%= user.accesibilidad.paleta === 'oscura' ? 'oscuro' : 'claro' %>.css">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales-all.min.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/interaction.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/daygrid.min.js"></script>     -->
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        // Ejecutar inmediatamente al cargar el script
+        (function() {
+            const savedTheme = Cookies.get('theme');
+            const savedFontSize = Cookies.get('fontSize');
+            console.log(savedFontSize);
+            console.log(savedTheme);
+            if (savedTheme) {
+                $('#theme-stylesheet').attr('href', `/css/${savedTheme}.css`);
+            }
+        })();
+    </script>
+   
 
 </head>
 <body class="d-flex flex-column">
-   
+    <div id="spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
     <nav class="navbar navbar-expand-lg px-2 py-2 mb-3">
         <div class="container-fluid">
             <a href="/">
@@ -71,9 +90,6 @@
                                 </div>
                             </li>
                             <li>
-                                <!-- <button class=" mx-2 my-1 btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#shortConfigModal">
-                                    <i class="bi bi-plus-circle me-1"></i>Configurar opciones de teclado
-                                </button> -->
                             </li>
                         </ul>
                     </li>
@@ -176,9 +192,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <form action="/auth/logout" method="POST" style="display: inline;">
-                        <button type="submit" class="btn btn-outline-danger">Cerrar Sesión</button>
-                    </form>
+                    <a href="#" id="logoutButton" class="btn btn-outline-danger">Cerrar Sesión</a>
                 </div>
             </div>
         </div>

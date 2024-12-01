@@ -109,33 +109,44 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
     });
 
     //Modifico los ajustes de accesibilidad del usuario
-    router.put('/:id/accesibilidad',validateAccesibilidad, (req, res, next) => {
-        const {fuente, tamaño, paleta} = req.body;
-        //si el usuario tiene la accesibilidad por defecto se le modifica la actual
-        if( req.session.user.accesibilidad_id!=1){
-            pool.query('UPDATE accesibilidades SET fuente = ?, tamaño = ?, paleta = ? WHERE id = ?', [fuente, tamaño, paleta, accesibilidad_id], (error, results) => {
+       router.put('/:id/accesibilidad', validateAccesibilidad, (req, res, next) => {
+        const { fontSize, navigation, theme } = req.body;
+        console.log(fontSize, navigation, theme);
+        console.log(req.session.user.accesibilidad_id);
+    
+        // Si el usuario tiene la accesibilidad por defecto se le modifica la actual
+        if (req.session.user.accesibilidad_id != 1) {
+            pool.query('UPDATE accesibilidades SET navegacion = ?, tamañoTexto = ?, paleta = ? WHERE id = ?', [ navigation,fontSize, theme, req.session.user.accesibilidad_id], (error, results) => {
                 if (error) {
                     error.message = 'Error actualizando los ajustes de accesibilidad del usuario';
                     error.status = 500;
                     return next(error);
                 }
+                // Actualizamos la sesión del usuario con la nueva configuración
+                req.session.user.accesibilidad = {
+                    id: req.session.user.accesibilidad_id,
+                    paleta: theme,
+                    tamañoTexto: fontSize,
+                    navegacion: navigation
+                };
                 res.status(200).send('ok');
             });
-        }
-        else{//creamos una configuracion de accesibilidad nueva
-            pool.query('INSERT INTO accesibilidades (fuente, tamaño, paleta) VALUES (?, ?, ?)', [fuente, tamaño, paleta], (error, results) => {
+        } else { // Creamos una configuración de accesibilidad nueva
+            pool.query('INSERT INTO accesibilidades (navegacion, tamañoTexto, paleta) VALUES (?, ?, ?)', [ navigation,fontSize, theme], (error, results) => {
                 if (error) {
+                    console.log(error);
                     error.message = 'Error creando la configuración de accesibilidad';
                     error.status = 500;
                     return next(error);
                 }
-                //actualizamos la sesion del usuario con la nueva configuracion
+                console.log(results);
+                // Actualizamos la sesión del usuario con la nueva configuración
                 req.session.user.accesibilidad_id = results.insertId;
                 req.session.user.accesibilidad = {
                     id: results.insertId,
-                    paleta: results.paleta,
-                    tamañoTexto: results.tamañoTexto,
-                    navegacion: results.navegacion
+                    paleta: theme,
+                    tamañoTexto: fontSize,
+                    navegacion: navigation
                 };
                 pool.query('UPDATE usuarios SET accesibilidad_id = ? WHERE id = ?', [results.insertId, req.params.id], (error, results) => {
                     if (error) {
@@ -147,7 +158,6 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
                 });
             });
         }
-
     });
     // Desinscribir usuario de un evento
     router.delete('/desinscribir', (req, res, next) => {

@@ -51,7 +51,32 @@ $(document).keydown(function(event) {
         event.preventDefault();
         window.location.href = `/usuarios/${userId}`;
     }
+    else if (event.ctrlKey && event.key === 'h') {
+        event.preventDefault();
+        window.location.href = '/dashboard';
+    }
+    else if(event.altKey && event.key === 'c'){
+        event.preventDefault();
+        window.location.href = '/calendar';
+    }
+    else if(event.ctrlKey && event.altKey && event.key === 'n'){
+        event.preventDefault();
+        event.stopPropagation(); // Bloquea propagación
+        $('#notificationsModal').modal('show'); // Mostrar el modal de notificaciones
+        console.log("Interceptado Ctrl + Alt + N");
+    }
 });
+
+$(document).keydown(function (event) {
+    console.log(`Key pressed: ${event.key}, Ctrl: ${event.ctrlKey}, Alt: ${event.altKey}`);
+    if (event.ctrlKey && event.altKey && event.key === 'c') {
+        event.preventDefault();
+        event.stopPropagation(); // Bloquea propagación
+        console.log("Interceptado Ctrl + Alt + C");
+        window.location.href = '/calendar';
+    }
+});
+
 
 // Para marcar una notificación como leída
 function marcarComoLeido(notificacionId) {
@@ -62,9 +87,9 @@ function marcarComoLeido(notificacionId) {
         data: JSON.stringify({ leido: true }),
         success: function (data, jqXHR, statusText) {
             if (data.success) {
-                document.getElementById(notificacionId).classList.remove('notificacion-no-leida');
-                document.getElementById(`circulo-${notificacionId}`).classList.add('d-none');
-                document.getElementById(`btn-${notificacionId}`).classList.add('d-none');
+                $(`#${notificacionId}`).removeClass('notificacion-no-leida');
+                $(`#circulo-${notificacionId}`).addClass('d-none');
+                $(`#btn-${notificacionId}`).addClass('d-none');
             } else {
                 alert('Error al marcar la notificación como leída');
             }
@@ -75,64 +100,58 @@ function marcarComoLeido(notificacionId) {
     });
 }
 
-// Para cambiar el tema oscuro o claro
 $(document).ready(function () {
     const darkModeSwitch = $("#darkModeSwitch");
     const themeStylesheet = $("#theme-stylesheet");
-    console.log($("#darkModeSwitch").length);
-    console.log("Listener activado");
-    const currentTheme = themeStylesheet.attr("href").includes("oscuro") ? "oscura" : "clara";
-    darkModeSwitch.prop("checked", currentTheme === "oscura");
 
-    // darkModeSwitch.on("change", function () {
-    //     const newTheme = this.checked ? "oscuro" : "claro";
-       
-    //     themeStylesheet.attr("href", `/css/${newTheme}.css`);
-    //     // $.ajax({
-    //     //     url: '/usuarios/tema',
-    //     //     method: 'PATCH',
-    //     //     contentType: 'application/json',
-    //     //     data: JSON.stringify({ accesibilidad_id: accesibilidad_id, tema: newTheme }),
-    //     //     success: function (data) {
-    //     //         if (!data.success) {
-    //     //             showToast('Error al guardar el tema en la base de datos');
-    //     //         }
-    //     //     },
-    //     //     error: function (error) {
-    //     //         console.error('Error:', error);
-    //     //     }
-    //     // });
-    // });
+    // Leer el tema de la cookie si existe
+    const savedTheme = Cookies.get('theme');
+    if (savedTheme) {
+        themeStylesheet.attr("href", `/css/${savedTheme}.css`);
+        darkModeSwitch.prop("checked", savedTheme === "oscuro");
+    } else {
+        const currentTheme = themeStylesheet.attr("href").includes("oscuro") ? "oscuro" : "claro";
+        darkModeSwitch.prop("checked", currentTheme === "oscuro");
+    }
 
-    $("#darkModeSwitch").on("change", function () {
+    // Cambiar el tema y almacenar en la cookie
+    darkModeSwitch.on("change", function () {
         const newTheme = this.checked ? "oscuro" : "claro";
-        console.log("Cambiando tema a:", newTheme);
-    
-        const themeStylesheet = $("#theme-stylesheet");
         themeStylesheet.attr("href", `/css/${newTheme}.css`);
-        console.log("Hoja de estilos cambiada a:", themeStylesheet.attr("href"));
+        Cookies.set('theme', newTheme, { expires: 1 }); // Almacenar el tema en una cookie por 1 dia
     });
 
-    
-});
+    // Leer el tamaño de letra de la cookie si existe
+    const savedFontSize = Cookies.get('fontSize');
+    const body = $('body');
+    if (savedFontSize) {
+        body.addClass(`font-${savedFontSize}`);
+        $('#fontSizeSelector').val(savedFontSize);
+    }
 
-// Para cambiar el tamaño de la letra
-$(document).ready(function () {
-    const fontSizeSelector = $('#fontSizeSelector'); 
-    const body = $('body'); 
-
-    fontSizeSelector.on('change', function () {
-        const selectedSize = fontSizeSelector.val(); 
-
+    // Cambiar el tamaño de letra y almacenar en la cookie
+    $('#fontSizeSelector').on('change', function () {
+        const selectedSize = $(this).val();
         body.removeClass('font-small font-normal font-large');
-
-        if (selectedSize === 'small') {
-            body.addClass('font-small');
-        } else if (selectedSize === 'large') {
-            body.addClass('font-large');
-        } else {
-            body.addClass('font-normal'); // Valor por defecto
-        }
+        body.addClass(`font-${selectedSize}`);
+        Cookies.set('fontSize', selectedSize, { expires: 1 }); // Almacenar el tamaño de letra en una cookie por 1 dia
     });
-});
+    
+    $('#logoutButton').on('click', function(event) {
+        event.preventDefault();
+        Cookies.remove('theme');
+        Cookies.remove('fontSize');
+        $.ajax({
+            url: '/auth/logout',
+            type: 'POST'
+        });
+    });
+    
 
+    // Ocultar el spinner y mostrar el contenido principal
+    $("#spinner").hide();
+    $("body").show();
+
+});
+    
+// 

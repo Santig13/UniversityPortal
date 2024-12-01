@@ -48,7 +48,6 @@ $('#updateProfileForm').on('submit', function (e) {
 
 // Poner los datos del usuario en el formulario
 $(document).ready(function () {
-
     $.ajax({
         url: `/usuarios/${userId}/datos`,
         method: 'GET',
@@ -85,6 +84,28 @@ $(document).ready(function () {
 
 });
 
+//Guardar preferencias de accesibilidad
+$('#accessibilityForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    $.ajax({
+        url: `/usuarios/${userId}/accesibilidad`,
+        method: 'PUT',
+        data: $(this).serialize(),
+        success: function(response) {
+            if (response === 'ok') {
+                showToast('Preferencias guardadas correctamente');
+                Cookies.remove('theme');
+                Cookies.remove('fontSize');
+            } else {
+                showToast('Error al guardar las preferencias');
+            }
+        },
+        error: function(jqXHR) {
+            console.error('Error al guardar las preferencias:', jqXHR.responseText);
+        }
+    });
+});
 // Cambiar el prefijo del teléfono
 $('#prefix-de, #prefix-uk, #prefix-es, #prefix-fr').on('click', function(e) {
     e.preventDefault(); 
