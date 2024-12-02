@@ -15,7 +15,8 @@ $('#passwordConfirm').on('keyup', function () {
 });
 
 $('#updateProfileForm').on('keydown', function(e) {
-    if (e.key === 'Enter') {
+    // Si se pulsa enter y se está haciendo focus en el botón
+    if (e.key === 'Enter' && $(document.activeElement).is('#btnActualizarPerfil')) {	
         e.preventDefault();
         $(this).submit();
     }
@@ -107,7 +108,7 @@ $(document).ready(function () {
 });
 
 $('#accessibilityForm').on('keydown', function(e) {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && $(document.activeElement).is('#btnActualizarAccesibilidad')) {
         e.preventDefault();
         $(this).submit();
     }

@@ -142,6 +142,38 @@ function renderEventos(eventos) {
     });
     }
 }
+//boton que carga las facultades
+$('#btn_modal_crear').on('click', async function(event) {
+    event.preventDefault();
+    $.ajax({
+        url: '/facultades',
+        method: 'GET',
+        success: function(facultades) {
+            
+            const select = $('#facultad');
+            select.empty();
+            facultades.forEach(facultad => {
+                select.append(`<option value="${facultad.nombre}">${facultad.nombre}</option>`);
+            });
+            //miro si esta createEventModal y lo abro
+            const modal = $('#createEventModal');
+            const modalInstance = bootstrap.Modal.getInstance(modal[0]);
+            if (modalInstance) {
+                modalInstance.show();
+            }
+            
+        },
+        error: function() {
+            const modal = $('#createEventModal');
+            const modalInstance = bootstrap.Modal.getInstance(modal[0]);
+            if (modalInstance) {
+                form[0].reset();
+                modalInstance.hide();
+            }
+            showToast('Error al obtener las facultades');
+        }
+    });
+});
 // Funcion para crear eventos
 $('#createEventButton').on('click', async function(event) {
     event.preventDefault();
@@ -152,7 +184,7 @@ $('#createEventButton').on('click', async function(event) {
         fecha: form.find('[name="fecha"]').val(),
         hora_ini: form.find('[name="hora_ini"]').val(),
         hora_fin: form.find('[name="hora_fin"]').val(),
-        ubicacion: form.find('[name="ubicacion"]').val(),
+        ubicacion: form.find('[name="facultad"]').val() + ", " + form.find('[name="ubicacion"]').val(),
         capacidad_maxima: parseInt(form.find('[name="capacidad_maxima"]').val(), 10),
         organizador_id: parseInt(form.find('[name="organizador_id"]').val(), 10)
     };

@@ -133,44 +133,7 @@ $(document).ready(function () {
         });
     });
     
-    function setNavigationMode(mode) {
-        // Limpia todos los eventos previos
-        $(document).off('keydown', handleKeyboardNavigation);
-        $(document).off('keydown', preventKeyboardNavigation);
-        $(document).off('click', preventMouseNavigation);
-
-        // Limpia desactivaciones específicas de inputs y hovers
-        $('*').off('mouseenter mouseleave');
-        $('input, textarea, select, button').off('focus blur');
-
-        //limpio body por si tiene la clase no-hover
-        $("body").removeClass("no-hover");
-        //limpio cards
-        $('.card').off('click');
-
-
-        if (mode === 'teclado') {
-            // Habilitar navegación con teclado, deshabilitar ratón
-            $(document).on('keydown', handleKeyboardNavigation);
-            $(document).on('click', preventMouseNavigation);
-            $("body").addClass("no-hover");
-            disableHover();
-            disableInputInteractions();
-        } else if (mode === 'ratón') {
-            console.log("Modo ratón");
-            // Habilitar navegación con ratón, deshabilitar teclado
-            $(document).on('keydown', preventKeyboardNavigation);
-            $(document).on('click', handleMouseNavigation);
-            disableHover();
-            disableInputInteractions();
-        } else if (mode === 'ambos') {
-            // Habilitar ambos modos
-            console.log("Modo ambos");
-            $(document).on('keydown', handleKeyboardNavigation);
-            $(document).on('click', handleMouseNavigation);
-        }
-    }
-
+    
     // Evitar navegación con el ratón
     function preventMouseNavigation(event) {
         event.preventDefault();
@@ -201,14 +164,13 @@ $(document).ready(function () {
         let currentIndex = cards.index(document.activeElement);
         //hago que el enter haga clic en los nav-links
         if (event.key === 'Enter') {
-            if(document.activeElement.classList.contains('nav-link')){
-                console.log("click en nav-link");
-                document.activeElement.click();
-
-                if(document.activeElement.classList.contains('dropdown-toggle')){
-                   $(document.activeElement).dropdown('toggle');
-                }
+            document.activeElement.click();
+            if(document.activeElement.classList.contains('dropdown-toggle')){
+                $(document.activeElement).dropdown('toggle');
             }
+            else if(document.activeElement.href){
+                window.location.href = document.activeElement.href;
+            }  
         }   
         else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
             event.preventDefault();
@@ -255,6 +217,45 @@ $(document).ready(function () {
 
       
     }
+
+    function setNavigationMode(mode) {
+        // Limpia todos los eventos previos
+        $(document).off('keydown', handleKeyboardNavigation);
+        $(document).off('keydown', preventKeyboardNavigation);
+        $(document).off('click', preventMouseNavigation);
+
+        // Limpia desactivaciones específicas de inputs y hovers
+        $('*').off('mouseenter mouseleave');
+        $('input, textarea, select, button').off('focus blur');
+
+        //limpio body por si tiene la clase no-hover
+        $("body").removeClass("no-hover");
+        //limpio cards
+        $('.card').off('click');
+
+
+        if (mode === 'teclado') {
+            // Habilitar navegación con teclado, deshabilitar ratón
+            $(document).on('keydown', handleKeyboardNavigation);
+            $(document).on('click', preventMouseNavigation);
+            $("body").addClass("no-hover");
+            disableHover();
+            disableInputInteractions();
+        } else if (mode === 'ratón') {
+            console.log("Modo ratón");
+            // Habilitar navegación con ratón, deshabilitar teclado
+            $(document).on('keydown', preventKeyboardNavigation);
+            $(document).on('click', handleMouseNavigation);
+            disableHover();
+            disableInputInteractions();
+        } else if (mode === 'ambos') {
+            // Habilitar ambos modos
+            console.log("Modo ambos");
+            $(document).on('keydown', handleKeyboardNavigation);
+            $(document).on('click', handleMouseNavigation);
+        }
+    }
+
 
     // Deshabilitar efectos hover
     function disableHover() {
