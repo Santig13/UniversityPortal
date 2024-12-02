@@ -1,3 +1,4 @@
+"use strict";
 // Mensaje contraseñas
 $('#passwordConfirm').on('keyup', function () {
     const password = $('input[name="password"]').val();
@@ -13,7 +14,12 @@ $('#passwordConfirm').on('keyup', function () {
     }
 });
 
-
+$('#updateProfileForm').on('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        $(this).submit();
+    }
+});
 // Actualizar perfil
 $('#updateProfileForm').on('submit', function (e) {
     e.preventDefault();
@@ -90,11 +96,8 @@ $(document).ready(function () {
         url: `/usuarios/${userId}/accesibilidad`,
         method: 'GET',
         success: function (response) {
-            console.log(response);
             $('#theme').val(response.paleta); 
-            
             $('#navigation').val(response.navegacion); 
-            
             $('#fontSize').val(response.tamañoTexto); 
         },
         error: function (jqXHR) {
@@ -103,6 +106,12 @@ $(document).ready(function () {
     });
 });
 
+$('#accessibilityForm').on('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        $(this).submit();
+    }
+});
 //Guardar preferencias de accesibilidad
 $('#accessibilityForm').on('submit', function(e) {
     e.preventDefault();

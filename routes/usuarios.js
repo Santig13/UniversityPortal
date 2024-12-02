@@ -270,20 +270,6 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
         });
     });
 
-    //Ruta para modificar el modo oscuro/claro del usuario
-    router.patch('/tema', requireAuth, (req, res, next) => {
-        const userId = req.params.id;
-        const {accesibilidad_id, modo} = req.body;
-        pool.query('UPDATE accesibilidades SET paleta = ? WHERE id = ?', [modo, accesibilidad_id], (error, results) => {
-            if (error) {
-                error.message = 'Error actualizando el modo del usuario';
-                error.status = 500;
-                return next(error);
-            }
-            res.status(200).send('ok');
-        });
-    });
-
     return router;
 }
 

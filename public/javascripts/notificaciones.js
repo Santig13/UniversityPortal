@@ -1,3 +1,4 @@
+"use strict";
 //Marcar como leido las notificaciones
 $(document).ready(function () {
     $.ajax({

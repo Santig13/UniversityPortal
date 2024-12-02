@@ -1,6 +1,13 @@
 "use strict";
 // Funcion para filtrar eventos
+
 const filterForm = $('#filterForm');
+$("#filterForm").on("keydown", function(event) { 
+    if (event.key === "Enter") {
+        event.preventDefault();
+        filtrar();
+    }
+});
 if (filterForm.length) {
     filterForm.on('submit', function(event) {
         event.preventDefault();
@@ -166,7 +173,12 @@ $('#createEventButton').on('click', async function(event) {
             }
         },
         error: function(jqXHR) {
-
+            const modal = $('#createEventModal');
+            const modalInstance = bootstrap.Modal.getInstance(modal[0]);
+            if (modalInstance) {
+                form[0].reset();
+                modalInstance.hide();
+            }
             if(jqXHR.responseJSON){
                 showToast('Errores en la creacion del evento: ' + jqXHR.responseJSON.message);
             }
@@ -180,6 +192,7 @@ $('#createEventButton').on('click', async function(event) {
                     });
             }
         }
+        
     });
 });
 

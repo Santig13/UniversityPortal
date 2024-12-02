@@ -317,8 +317,8 @@ a:hover {
 }
 
 .navbar-toggler:focus {
-    outline: none;
-    box-shadow: none;
+    outline: 2px solid black;
+    box-shadow: 0 0 0 2px black;
 }
 
 .navbar-toggler-icon {

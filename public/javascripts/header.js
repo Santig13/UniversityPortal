@@ -85,6 +85,15 @@ $(document).ready(function () {
     }
 
     // Cambiar el tema y almacenar en la cookie
+    darkModeSwitch.on("keydown", function (event) {
+        if (event.key === 'Enter') {
+           //cambio el estado actual del switch
+            darkModeSwitch.prop("checked", !darkModeSwitch.prop("checked"));
+            const newTheme = this.checked ? "oscuro" : "claro";
+            themeStylesheet.attr("href", `/css/${newTheme}.css`);
+            Cookies.set('theme', newTheme, { expires: 1 }); // Almacenar el tema en una cookie por 1 dia
+        }
+    });
     darkModeSwitch.on("change", function () {
         const newTheme = this.checked ? "oscuro" : "claro";
         themeStylesheet.attr("href", `/css/${newTheme}.css`);
@@ -124,59 +133,61 @@ $(document).ready(function () {
         });
     });
     
-function setNavigationMode(mode) {
-    // Limpia todos los eventos previos
-    $(document).off('keydown', handleKeyboardNavigation);
-    $(document).off('keydown', preventKeyboardNavigation);
-    $(document).off('click', preventMouseNavigation);
+    function setNavigationMode(mode) {
+        // Limpia todos los eventos previos
+        $(document).off('keydown', handleKeyboardNavigation);
+        $(document).off('keydown', preventKeyboardNavigation);
+        $(document).off('click', preventMouseNavigation);
 
-    // Limpia desactivaciones específicas de inputs y hovers
-    $('*').off('mouseenter mouseleave');
-    $('input, textarea, select, button').off('focus blur');
+        // Limpia desactivaciones específicas de inputs y hovers
+        $('*').off('mouseenter mouseleave');
+        $('input, textarea, select, button').off('focus blur');
 
-    //limpio body por si tiene la clase no-hover
-    $("body").removeClass("no-hover");
-    //limpio cards
-    $('.card').off('click');
+        //limpio body por si tiene la clase no-hover
+        $("body").removeClass("no-hover");
+        //limpio cards
+        $('.card').off('click');
 
 
-    if (mode === 'teclado') {
-        // Habilitar navegación con teclado, deshabilitar ratón
-        $(document).on('keydown', handleKeyboardNavigation);
-        $(document).on('click', preventMouseNavigation);
-        $("body").addClass("no-hover ");
-        disableHover();
-        disableInputInteractions();
-    } else if (mode === 'ratón') {
-        console.log("Modo ratón");
-        // Habilitar navegación con ratón, deshabilitar teclado
-        $(document).on('keydown', preventKeyboardNavigation);
-        $(document).on('click', handleMouseNavigation);
-        disableHover();
-        disableInputInteractions();
-    } else if (mode === 'ambos') {
-        // Habilitar ambos modos
-        $(document).on('keydown', handleKeyboardNavigation);
-        $(document).on('click', handleMouseNavigation);
+        if (mode === 'teclado') {
+            // Habilitar navegación con teclado, deshabilitar ratón
+            $(document).on('keydown', handleKeyboardNavigation);
+            $(document).on('click', preventMouseNavigation);
+            $("body").addClass("no-hover");
+            disableHover();
+            disableInputInteractions();
+        } else if (mode === 'ratón') {
+            console.log("Modo ratón");
+            // Habilitar navegación con ratón, deshabilitar teclado
+            $(document).on('keydown', preventKeyboardNavigation);
+            $(document).on('click', handleMouseNavigation);
+            disableHover();
+            disableInputInteractions();
+        } else if (mode === 'ambos') {
+            // Habilitar ambos modos
+            console.log("Modo ambos");
+            $(document).on('keydown', handleKeyboardNavigation);
+            $(document).on('click', handleMouseNavigation);
+        }
     }
-}
 
-// Evitar navegación con el ratón
-function preventMouseNavigation(event) {
-    event.preventDefault();
-    event.stopImmediatePropagation(); // Evita que otros oyentes se ejecuten
-   
-}
-
-// Evitar navegación con el teclado
-function preventKeyboardNavigation(event) {
-    event.preventDefault();
-    event.stopImmediatePropagation(); // Evita que otros oyentes se ejecuten
-    if (event.key === 'Tab') {
+    // Evitar navegación con el ratón
+    function preventMouseNavigation(event) {
         event.preventDefault();
+        event.stopImmediatePropagation(); // Evita que otros oyentes se ejecuten
+    
     }
-   
-}
+
+    // Evitar navegación con el teclado
+    function preventKeyboardNavigation(event) {
+        event.preventDefault();
+        event.stopImmediatePropagation(); // Evita que otros oyentes se ejecuten
+        if (event.key === 'Tab') {
+            event.preventDefault();
+        }
+    
+    }
+
     // Funcion de manejo de raton
     function handleMouseNavigation(event) {
         $('.card').on('click', function(event) {
@@ -188,8 +199,18 @@ function preventKeyboardNavigation(event) {
     function handleKeyboardNavigation(event) {
         const cards = $('.card');
         let currentIndex = cards.index(document.activeElement);
-        //hago que los enters cuenten como clicks
-        if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+        //hago que el enter haga clic en los nav-links
+        if (event.key === 'Enter') {
+            if(document.activeElement.classList.contains('nav-link')){
+                console.log("click en nav-link");
+                document.activeElement.click();
+
+                if(document.activeElement.classList.contains('dropdown-toggle')){
+                   $(document.activeElement).dropdown('toggle');
+                }
+            }
+        }   
+        else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
             event.preventDefault();
             if (currentIndex < cards.length - 1) {
                 cards.eq(currentIndex + 1).focus();
@@ -231,6 +252,8 @@ function preventKeyboardNavigation(event) {
                 }
             }
         }
+
+      
     }
 
     // Deshabilitar efectos hover
@@ -248,7 +271,7 @@ function preventKeyboardNavigation(event) {
         });
        
     }
-
+    console.log(navegacion);
     setNavigationMode(navegacion);
     // Ocultar el spinner y mostrar el contenido principal
     $("#spinner").hide();
