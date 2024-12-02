@@ -102,12 +102,14 @@ $('#registerButton').on('click', async function(event) {
     event.preventDefault();
     const data = {
         nombre: $('input[name="nombre"]').val(),
-        apellido: $('input[name="apellido"]').val(),
         email: $('input[name="email"]').val(),
+        rol: $('input[name="rol"]').val(),
         password: password,
         facultad: $('#facultad').val(),
         telefonoCompleto: $('#dropdownMenuButton').text() + $('input[name="telefono"]').val()
     };
+
+    console.log(data);
 
     $.ajax({
         url: '/auth/register',

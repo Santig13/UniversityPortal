@@ -84,6 +84,25 @@ $(document).ready(function () {
 
 });
 
+// hacer un get a accesibilidad para obtener las preferencias del usuario y mostrarlas en el form
+$(document).ready(function () {
+    $.ajax({
+        url: `/usuarios/${userId}/accesibilidad`,
+        method: 'GET',
+        success: function (response) {
+            console.log(response);
+            $('#theme').val(response.paleta); 
+            
+            $('#navigation').val(response.navegacion); 
+            
+            $('#fontSize').val(response.tamañoTexto); 
+        },
+        error: function (jqXHR) {
+            console.error('Error al obtener las preferencias de accesibilidad:', jqXHR.responseText);
+        }
+    });
+});
+
 //Guardar preferencias de accesibilidad
 $('#accessibilityForm').on('submit', function(e) {
     e.preventDefault();
@@ -94,7 +113,7 @@ $('#accessibilityForm').on('submit', function(e) {
         data: $(this).serialize(),
         success: function(response) {
             if (response === 'ok') {
-                showToast('Preferencias guardadas correctamente');
+                showToast('Preferencias guardadas correctamente, recarga la página para aplicar los cambios');
                 Cookies.remove('theme');
                 Cookies.remove('fontSize');
             } else {

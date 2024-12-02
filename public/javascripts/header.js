@@ -19,7 +19,7 @@ $(document).ready(function () {
                     html += `
                     <div class="row mb-4">
                         <div class="col-12">
-                            <div id="${notificacion.id}" class="card ${notificacion.leido ? '' : 'notificacion-no-leida'}">
+                            <div id="${notificacion.id}" class="card ${notificacion.leido ? '' : 'notificacion-no-leida'}" tabindex="0">
                                 <div class="card-body d-flex align-items-center">
                                     ${!notificacion.leido ? `<div id="circulo-${notificacion.id}" class="circulo-azul me-3"></div>` : ''}
                                     <div>
@@ -98,6 +98,7 @@ $(document).ready(function () {
         $('#fontSizeSelector').val(savedFontSize);
     }
     else{
+        
         body.addClass(`font-${tamañoTexto}`);
         $('#fontSizeSelector').val(tamañoTexto);
     }
@@ -105,7 +106,7 @@ $(document).ready(function () {
     // Cambiar el tamaño de letra y almacenar en la cookie
     $('#fontSizeSelector').on('change', function () {
         const selectedSize = $(this).val();
-        body.removeClass('font-small font-normal font-large');
+        body.removeClass('font-Pequña font-Normal font-Grande');
         body.addClass(`font-${selectedSize}`);
         Cookies.set('fontSize', selectedSize, { expires: 1 }); // Almacenar el tamaño de letra en una cookie por 1 dia
     });
@@ -120,7 +121,6 @@ $(document).ready(function () {
         });
     });
     
-   // Función para establecer el modo de navegación
 function setNavigationMode(mode) {
     // Limpia todos los eventos previos
     $(document).off('keydown', handleKeyboardNavigation);
@@ -133,6 +133,9 @@ function setNavigationMode(mode) {
 
     //limpio body por si tiene la clase no-hover
     $("body").removeClass("no-hover");
+    //limpio cards
+    $('.card').off('click');
+
 
     if (mode === 'teclado') {
         // Habilitar navegación con teclado, deshabilitar ratón
@@ -142,14 +145,16 @@ function setNavigationMode(mode) {
         disableHover();
         disableInputInteractions();
     } else if (mode === 'ratón') {
+        console.log("Modo ratón");
         // Habilitar navegación con ratón, deshabilitar teclado
         $(document).on('keydown', preventKeyboardNavigation);
-        $(document).on('click', preventMouseNavigation);
+        $(document).on('click', handleMouseNavigation);
         disableHover();
         disableInputInteractions();
     } else if (mode === 'ambos') {
         // Habilitar ambos modos
         $(document).on('keydown', handleKeyboardNavigation);
+        $(document).on('click', handleMouseNavigation);
     }
 }
 
@@ -169,10 +174,31 @@ function preventKeyboardNavigation(event) {
     }
    
 }
-
+    // Funcion de manejo de raton
+    function handleMouseNavigation(event) {
+        $('.card').on('click', function(event) {
+            $(this).focus();
+        });
+    }
+    
     // Funciones de manejo de navegación
     function handleKeyboardNavigation(event) {
-        if (event.ctrlKey && event.key === 'p') {
+        const cards = $('.card');
+        let currentIndex = cards.index(document.activeElement);
+        //hago que los enters cuenten como clicks
+        console.log(event.key);
+        if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+            event.preventDefault();
+            if (currentIndex < cards.length - 1) {
+                cards.eq(currentIndex + 1).focus();
+            }
+        } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+            event.preventDefault();
+            if (currentIndex > 0) {
+                cards.eq(currentIndex - 1).focus();
+            }
+        } 
+        else if (event.ctrlKey && event.key === 'p') {
             event.preventDefault();
             window.location.href = `/usuarios/${userId}`;
         } else if (event.ctrlKey && event.key === 'h') {
@@ -183,14 +209,26 @@ function preventKeyboardNavigation(event) {
             window.location.href = '/calendar';
         } else if (event.ctrlKey && event.altKey && event.key === 'n') {
             event.preventDefault();
-            event.stopPropagation(); // Bloquea propagación
             $('#notificationsModal').modal('show'); // Mostrar el modal de notificaciones
-            console.log("Interceptado Ctrl + Alt + N");
-        } else if (event.ctrlKey && event.altKey && event.key === 'c') {
-            event.preventDefault();
-            event.stopPropagation(); // Bloquea propagación
-            console.log("Interceptado Ctrl + Alt + C");
-            window.location.href = '/calendar';
+            $('#link-notificaciones').click();
+        } 
+
+        if(userRol === 'participante'){
+             if (event.ctrlKey && event.key === 'i') {
+                event.preventDefault();
+                const currentCard = cards.eq(currentIndex);
+                const apuntarseButton = currentCard.find('button:contains("Apuntarse")');
+                if (apuntarseButton.length) {
+                    apuntarseButton.click();
+                }
+            } else if (event.ctrlKey && event.key === 'd') {
+                event.preventDefault();
+                const currentCard = cards.eq(currentIndex);
+                const desapuntarseButton = currentCard.find('button:contains("Desapuntarse")');
+                if (desapuntarseButton.length) {
+                    desapuntarseButton.click();
+                }
+            }
         }
     }
 
@@ -211,10 +249,6 @@ function preventKeyboardNavigation(event) {
     }
 
     setNavigationMode(navegacion);
-
-
-
-
     // Ocultar el spinner y mostrar el contenido principal
     $("#spinner").hide();
     $("body").show();

@@ -1,7 +1,7 @@
 <%- include("partials/header.ejs", { user: user }) %>
 
     <div class="container my-5">
-        <h1 class="mb-4">Calendario de Eventos</h1>
+        <h1 class="mb-4 text-center text-md-start">Calendario de Eventos</h1>
         <div id="calendar"></div>
     </div>
     <!-- Modal -->
@@ -29,6 +29,20 @@
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <%- include("partials/footer.ejs") %>
+
+<style>
+    @media (max-width: 768px) {
+        .fc-toolbar {
+            flex-wrap: wrap; 
+            justify-content: space-between;
+        }
+        .fc-toolbar .fc-toolbar-chunk {
+            flex: 1 1 auto; 
+            text-align: center;
+            margin-bottom: 5px; 
+        }
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -72,9 +86,11 @@
                         document.getElementById('modalOrganizer').textContent = info.event.extendedProps.organizer;
                         var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
                         eventModal.show();
-                    }   
+                    } 
                 });
                 calendar.render();
+
+                
             })
             .catch(error => console.error('Error fetching events:', error));
     });

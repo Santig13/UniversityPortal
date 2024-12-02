@@ -27,10 +27,14 @@
         (function() {
             const savedTheme = Cookies.get('theme');
             const savedFontSize = Cookies.get('fontSize');
-            console.log(savedFontSize);
-            console.log(savedTheme);
             if (savedTheme) {
                 $('#theme-stylesheet').attr('href', `/css/${savedTheme}.css`);
+            }
+            if (savedFontSize) {
+                $('html').css('font-size', savedFontSize);
+            } else {
+                userFontSize = '<%= user.accesibilidad.tamañoTexto %>';
+                $('html').css('font-size', userFontSize);
             }
         })();
     </script>
@@ -83,9 +87,9 @@
                                 <div class="d-flex flex-column">
                                     <label for="fontSizeSelector" class=" mb-2 dark-text">Tamaño de letra</label>
                                     <select id="fontSizeSelector" class="form-select">
-                                        <option value="small">Pequeña</option>
-                                        <option value="normal" selected>Normal</option>
-                                        <option value="large">Grande</option>
+                                        <option value="Pequeña">Pequeña</option>
+                                        <option value="Normal" selected>Normal</option>
+                                        <option value="Grande">Grande</option>
                                     </select>
                                 </div>
                             </li>
@@ -201,6 +205,7 @@
     <script>
         // Pasar datos del usuario a header.js
           const userId = "<%= user.id %>";  
+          const userRol = "<%= user.rol %>";
           const accesibilidad_id = "<%= user.accesibilidad_id %>";
           const paleta= "<%= user.accesibilidad.paleta %>";
           const tamañoTexto = "<%= user.accesibilidad.tamañoTexto %>";

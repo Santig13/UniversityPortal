@@ -36,7 +36,7 @@ const validateUser = [
 
     check('rol')
         .notEmpty().withMessage('Rol es requerido')
-        .isIn(['participante', 'organizador']).withMessage('Rol debe ser participante u organizador')
+        .isIn(['Participante', 'Organizador']).withMessage('Rol debe ser participante u organizador')
         .custom(detectSQLInjection),
 
     check('facultad')

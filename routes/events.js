@@ -102,7 +102,7 @@ function getEventos(query, pool, callback) {
         params.push(fecha);
     }
     if (tipo) {
-        sql += ' AND tipo LIKE ?';
+        sql += ' AND titulo LIKE ?';
         params.push(`%${tipo}%`);
     }
     if (ubicacion) {

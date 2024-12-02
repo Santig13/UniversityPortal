@@ -108,6 +108,20 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
         });
     });
 
+    //Ruta para obtener los ajustes de accesibilidad del usuario
+    router.get('/:id/accesibilidad', (req, res, next) => {
+        const userId = req.params.id;
+        pool.query('SELECT * FROM accesibilidades WHERE id = (SELECT accesibilidad_id FROM usuarios WHERE id = ?)', [userId], (error, results) => {
+            if (error) {
+                error.message = 'Error recuperando los ajustes de accesibilidad del usuario';
+                error.status = 500;
+                return next(error);
+            }
+            res.status(200).json(results[0]);
+        });
+    });
+    
+
     //Modifico los ajustes de accesibilidad del usuario
        router.put('/:id/accesibilidad', validateAccesibilidad, (req, res, next) => {
         const { fontSize, navigation, theme } = req.body;
@@ -238,6 +252,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
                 err.status = 500;
                 return next(err);
             }
+            console.log(req.session.user);
             res.render('usuario', { user: req.session.user, eventos });
         });
     });

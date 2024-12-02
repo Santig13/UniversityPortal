@@ -18,9 +18,11 @@ function filtrar() {
                 renderEventos(eventos);
                 // Reasignar los eventos de clic de los botones de eliminación después de refrescar la lista
                 $('.btn-outline-danger').each(function() {
-                    $(this).on('click', function() {
-                        const eventId = $(this).data('event-id');
-                        setEventoId(eventId);
+                    $(this).on('click keydown', function(event) {
+                        if (event.type === 'click' || (event.type === 'keydown' && event.key === 'Enter')) {
+                            const eventId = $(this).data('event-id');
+                            setEventoId(eventId);
+                        }
                     });
                 });
             },
@@ -42,9 +44,11 @@ function filtrar() {
                 renderEventos(eventos);
                 // Reasignar los eventos de clic de los botones de eliminación después de refrescar la lista
                 $('.btn-outline-danger').each(function() {
-                    $(this).on('click', function() {
-                        const eventId = $(this).data('event-id');
-                        setEventoId(eventId);
+                    $(this).on('click keydown', function(event) {
+                        if (event.type === 'click' || (event.type === 'keydown' && event.key === 'Enter')) {
+                            const eventId = $(this).data('event-id');
+                            setEventoId(eventId);
+                        }
                     });
                 });
             },
@@ -59,7 +63,12 @@ function filtrar() {
 function renderEventos(eventos) {
     const eventosContainer = $('#eventosContainer');
     eventosContainer.empty(); // Limpia la lista actual de eventos
-    eventos.forEach(evento => {
+    //si no hay eventos, mostrar mensaje
+    if (eventos.length === 0) {
+        eventosContainer.html('<h4 class="text-center">No hay eventos</h4>');
+    }
+    else{
+        eventos.forEach(evento => {
         const eventoHTML = `
             <div class="row mb-4">
                 <div class="col-12">
@@ -121,8 +130,10 @@ function renderEventos(eventos) {
                 </div>
             </div>
         `;
+        
         eventosContainer.append(eventoHTML);
     });
+    }
 }
 // Funcion para crear eventos
 $('#createEventButton').on('click', async function(event) {
@@ -494,7 +505,7 @@ function showRatings(eventoId) {
                     const calificacionHtml = `
                     <div class="row mb-4">
                         <div class="col-12">
-                            <div class="card">
+                            <div class="card" tabindex="0">
                                 <div class="card-body d-flex align-items-center">
                                     <div>
                                         <h4 class="card-title">Calificación</h4>
@@ -517,45 +528,6 @@ function showRatings(eventoId) {
         }
     });
 }
-
-//Configuraciones de shortcuts
-$(document).ready(function() {
-    $('.card').on('click', function(event) {
-        $(this).focus();
-    });
-});
-
-// Configuración de accesos directos
-$(document).on('keydown', function(event) {
-    const cards = $('.card');
-    let currentIndex = cards.index(document.activeElement);
-
-    if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
-        event.preventDefault();
-        if (currentIndex < cards.length - 1) {
-            cards.eq(currentIndex + 1).focus();
-        }
-    } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
-        event.preventDefault();
-        if (currentIndex > 0) {
-            cards.eq(currentIndex - 1).focus();
-        }
-    } else if (event.ctrlKey && event.key === 'i') {
-        event.preventDefault();
-        const currentCard = cards.eq(currentIndex);
-        const apuntarseButton = currentCard.find('button:contains("Apuntarse")');
-        if (apuntarseButton.length) {
-            apuntarseButton.click();
-        }
-    } else if (event.ctrlKey && event.key === 'd') {
-        event.preventDefault();
-        const currentCard = cards.eq(currentIndex);
-        const desapuntarseButton = currentCard.find('button:contains("Desapuntarse")');
-        if (desapuntarseButton.length) {
-            desapuntarseButton.click();
-        }
-    }
-});
 
 let toastTimeout; 
 

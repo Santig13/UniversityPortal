@@ -95,7 +95,6 @@ div .fc-event-title {
     font-weight: bold;
     color: var(--primary-color);
 }
-
 .form-control {
     background-color: #f0f8ff;
     border: none;
@@ -104,12 +103,15 @@ div .fc-event-title {
     padding-left: 0;
     color: var(--dark-color);
     margin-bottom: 20px;
+    transition: border-color 0.3s, box-shadow 0.3s; /* Añadir transición para un efecto suave */
 }
 
 .form-control:focus {
-    box-shadow: none;
     background-color: #f0f8ff;
     color: var(--dark-color);
+    border-bottom: 2px solid var(--primary-color);
+    box-shadow: 0 0 5px var(--primary-color); /* Añadir sombra para resaltar */
+    outline: none; /* Eliminar el borde predeterminado del navegador */
 }
 
 .form-label {
@@ -126,12 +128,12 @@ div .fc-event-title {
     color: var(--dark-color);
     padding: 0.5em;
 }
-
 .form-select:focus {
-    box-shadow: none;
-    border-color: var(--primary-color);
     background-color: #f0f8ff;
     color: var(--dark-color);
+    border-bottom: 2px solid var(--primary-color);
+    box-shadow: 0 0 5px var(--primary-color); 
+    outline: none; 
 }
 
 #recoverEmail {
@@ -167,7 +169,6 @@ div .fc-event-title {
 .btn-outline-danger:focus,
 .btn-success:focus {
     outline: none;
-    box-shadow: none;
 }
 
 .btn-outline-secondary {
@@ -550,56 +551,56 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 
 /* Tamaños de letra generales para el cuerpo */
-.font-small {
+.font-Pequeña {
     font-size: 12px !important;
 }
 
-.font-normal {
+.font-Normal {
     font-size: 16px !important; /* Tamaño de texto normal para el body */
 }
 
-.font-large {
+.font-Grande {
     font-size: 20px !important;
 }
 
 /* Tamaños de texto para los encabezados */
-.font-small h1 { font-size: 22px !important; }
-.font-small h2 { font-size: 20px !important; }
-.font-small h3 { font-size: 18px !important; }
-.font-small h4 { font-size: 16px !important; }
-.font-small h5 { font-size: 14px !important; }
+.font-Pequeña h1 { font-size: 22px !important; }
+.font-Pequeña h2 { font-size: 20px !important; }
+.font-Pequeña h3 { font-size: 18px !important; }
+.font-Pequeña h4 { font-size: 16px !important; }
+.font-Pequeña h5 { font-size: 14px !important; }
 
-.font-normal h1 { font-size: 2.5rem !important; }  /* 40px */
-.font-normal h2 { font-size: 2rem !important; }    /* 32px */
-.font-normal h3 { font-size: 1.75rem !important; } /* 28px */
-.font-normal h4 { font-size: 1.5rem !important; }  /* 24px */
-.font-normal h5 { font-size: 1.25rem !important; } /* 20px */
+.font-Normal h1 { font-size: 2.5rem !important; }  /* 40px */
+.font-Normal h2 { font-size: 2rem !important; }    /* 32px */
+.font-Normal h3 { font-size: 1.75rem !important; } /* 28px */
+.font-Normal h4 { font-size: 1.5rem !important; }  /* 24px */
+.font-Normal h5 { font-size: 1.25rem !important; } /* 20px */
 
-.font-large h1 { font-size: 3rem !important; }      /* 48px */
-.font-large h2 { font-size: 2.5rem !important; }    /* 40px */
-.font-large h3 { font-size: 2.25rem !important; }   /* 36px */
-.font-large h4 { font-size: 2rem !important; }      /* 32px */
-.font-large h5 { font-size: 1.75rem !important; }   /* 28px */
+.font-Grande h1 { font-size: 3rem !important; }      /* 48px */
+.font-Grande h2 { font-size: 2.5rem !important; }    /* 40px */
+.font-Grande h3 { font-size: 2.25rem !important; }   /* 36px */
+.font-Grande h4 { font-size: 2rem !important; }      /* 32px */
+.font-Grande h5 { font-size: 1.75rem !important; }   /* 28px */
 
 /* Tamaños de form-label, input, select, textarea */
-.font-small .form-label { font-size: 10px !important; }
-.font-small input, .font-small select, .font-small textarea { font-size: 12px !important; }
+.font-Pequeña .form-label { font-size: 10px !important; }
+.font-Pequeña input, .font-Pequeña select, .font-Pequeña textarea { font-size: 12px !important; }
 
-.font-normal .form-label { font-size: 14px !important; }
-.font-normal input, .font-normal select, .font-normal textarea { font-size: 16px !important; }
+.font-Normal .form-label { font-size: 14px !important; }
+.font-Normal input, .font-Normal select, .font-Normal textarea { font-size: 16px !important; }
 
-.font-large .form-label { font-size: 18px !important; }
-.font-large input, .font-large select, .font-large textarea { font-size: 20px !important; }
+.font-Grande .form-label { font-size: 18px !important; }
+.font-Grande input, .font-Grande select, .font-Grande textarea { font-size: 20px !important; }
 
 /* Tamaños para botones y enlaces */
-.font-small button, .font-small a { font-size: 12px !important; }
-.font-small .btn { padding: 5px 10px !important; }
+.font-Pequeña button, .font-Pequeña a { font-size: 12px !important; }
+.font-Pequeña .btn { padding: 5px 10px !important; }
 
-.font-normal button, .font-normal a { font-size: 15.5px !important; }
-.font-normal .btn { padding: 8px 15px !important; }
+.font-Normal button, .font-Normal a { font-size: 15.5px !important; }
+.font-Normal .btn { padding: 8px 15px !important; }
 
-.font-large button, .font-large a { font-size: 20px !important; }
-.font-large .btn { padding: 10px 20px !important; }
+.font-Grande button, .font-Grande a { font-size: 20px !important; }
+.font-Grande .btn { padding: 10px 20px !important; }
 
 #spinner {
     position: fixed;
