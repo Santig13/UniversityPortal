@@ -45,37 +45,7 @@ $(document).ready(function () {
         });
     });
 });
-// Shortcut para ir a la página de usuario
-$(document).keydown(function(event) {
-    if (event.ctrlKey && event.key === 'p') {
-        event.preventDefault();
-        window.location.href = `/usuarios/${userId}`;
-    }
-    else if (event.ctrlKey && event.key === 'h') {
-        event.preventDefault();
-        window.location.href = '/dashboard';
-    }
-    else if(event.altKey && event.key === 'c'){
-        event.preventDefault();
-        window.location.href = '/calendar';
-    }
-    else if(event.ctrlKey && event.altKey && event.key === 'n'){
-        event.preventDefault();
-        event.stopPropagation(); // Bloquea propagación
-        $('#notificationsModal').modal('show'); // Mostrar el modal de notificaciones
-        console.log("Interceptado Ctrl + Alt + N");
-    }
-});
 
-$(document).keydown(function (event) {
-    console.log(`Key pressed: ${event.key}, Ctrl: ${event.ctrlKey}, Alt: ${event.altKey}`);
-    if (event.ctrlKey && event.altKey && event.key === 'c') {
-        event.preventDefault();
-        event.stopPropagation(); // Bloquea propagación
-        console.log("Interceptado Ctrl + Alt + C");
-        window.location.href = '/calendar';
-    }
-});
 
 
 // Para marcar una notificación como leída
@@ -121,12 +91,15 @@ $(document).ready(function () {
         Cookies.set('theme', newTheme, { expires: 1 }); // Almacenar el tema en una cookie por 1 dia
     });
 
-    // Leer el tamaño de letra de la cookie si existe
     const savedFontSize = Cookies.get('fontSize');
     const body = $('body');
     if (savedFontSize) {
         body.addClass(`font-${savedFontSize}`);
         $('#fontSizeSelector').val(savedFontSize);
+    }
+    else{
+        body.addClass(`font-${tamañoTexto}`);
+        $('#fontSizeSelector').val(tamañoTexto);
     }
 
     // Cambiar el tamaño de letra y almacenar en la cookie
@@ -147,6 +120,100 @@ $(document).ready(function () {
         });
     });
     
+   // Función para establecer el modo de navegación
+function setNavigationMode(mode) {
+    // Limpia todos los eventos previos
+    $(document).off('keydown', handleKeyboardNavigation);
+    $(document).off('keydown', preventKeyboardNavigation);
+    $(document).off('click', preventMouseNavigation);
+
+    // Limpia desactivaciones específicas de inputs y hovers
+    $('*').off('mouseenter mouseleave');
+    $('input, textarea, select, button').off('focus blur');
+
+    //limpio body por si tiene la clase no-hover
+    $("body").removeClass("no-hover");
+
+    if (mode === 'teclado') {
+        // Habilitar navegación con teclado, deshabilitar ratón
+        $(document).on('keydown', handleKeyboardNavigation);
+        $(document).on('click', preventMouseNavigation);
+        $("body").addClass("no-hover ");
+        disableHover();
+        disableInputInteractions();
+    } else if (mode === 'ratón') {
+        // Habilitar navegación con ratón, deshabilitar teclado
+        $(document).on('keydown', preventKeyboardNavigation);
+        $(document).on('click', preventMouseNavigation);
+        disableHover();
+        disableInputInteractions();
+    } else if (mode === 'ambos') {
+        // Habilitar ambos modos
+        $(document).on('keydown', handleKeyboardNavigation);
+    }
+}
+
+// Evitar navegación con el ratón
+function preventMouseNavigation(event) {
+    event.preventDefault();
+    event.stopImmediatePropagation(); // Evita que otros oyentes se ejecuten
+   
+}
+
+// Evitar navegación con el teclado
+function preventKeyboardNavigation(event) {
+    event.preventDefault();
+    event.stopImmediatePropagation(); // Evita que otros oyentes se ejecuten
+    if (event.key === 'Tab') {
+        event.preventDefault();
+    }
+   
+}
+
+    // Funciones de manejo de navegación
+    function handleKeyboardNavigation(event) {
+        if (event.ctrlKey && event.key === 'p') {
+            event.preventDefault();
+            window.location.href = `/usuarios/${userId}`;
+        } else if (event.ctrlKey && event.key === 'h') {
+            event.preventDefault();
+            window.location.href = '/dashboard';
+        } else if (event.altKey && event.key === 'c') {
+            event.preventDefault();
+            window.location.href = '/calendar';
+        } else if (event.ctrlKey && event.altKey && event.key === 'n') {
+            event.preventDefault();
+            event.stopPropagation(); // Bloquea propagación
+            $('#notificationsModal').modal('show'); // Mostrar el modal de notificaciones
+            console.log("Interceptado Ctrl + Alt + N");
+        } else if (event.ctrlKey && event.altKey && event.key === 'c') {
+            event.preventDefault();
+            event.stopPropagation(); // Bloquea propagación
+            console.log("Interceptado Ctrl + Alt + C");
+            window.location.href = '/calendar';
+        }
+    }
+
+    // Deshabilitar efectos hover
+    function disableHover() {
+        $('*').on('mouseenter mouseleave', function (event) {
+            event.stopImmediatePropagation(); // Bloquea eventos hover
+        });
+    }
+
+    // Deshabilitar interacciones con inputs
+    function disableInputInteractions() {
+        $('input, textarea, select, button').on('focus blur', function (event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        });
+       
+    }
+
+    setNavigationMode(navegacion);
+
+
+
 
     // Ocultar el spinner y mostrar el contenido principal
     $("#spinner").hide();

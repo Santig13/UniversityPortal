@@ -139,7 +139,7 @@ app.get('/dashboard', requireAuth, (req, res, next) => {
                 }
                 return evento;
             });
-           
+           console.log(req.session.user);
             res.render('dashboard', { user: req.session.user, eventos });
         });
     });

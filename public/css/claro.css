@@ -608,3 +608,6 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     transform: translate(-50%, -50%);
     z-index: 9999;
 }
+.no-hover * {
+    pointer-events: none;
+}
