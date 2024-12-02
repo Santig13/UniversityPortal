@@ -117,7 +117,10 @@ $(document).ready(function () {
         Cookies.remove('fontSize');
         $.ajax({
             url: '/auth/logout',
-            type: 'POST'
+            type: 'POST',
+            success: function() {
+                window.location.href = '/';
+            }
         });
     });
     
@@ -186,7 +189,6 @@ function preventKeyboardNavigation(event) {
         const cards = $('.card');
         let currentIndex = cards.index(document.activeElement);
         //hago que los enters cuenten como clicks
-        console.log(event.key);
         if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
             event.preventDefault();
             if (currentIndex < cards.length - 1) {
@@ -212,7 +214,6 @@ function preventKeyboardNavigation(event) {
             $('#notificationsModal').modal('show'); // Mostrar el modal de notificaciones
             $('#link-notificaciones').click();
         } 
-
         if(userRol === 'participante'){
              if (event.ctrlKey && event.key === 'i') {
                 event.preventDefault();

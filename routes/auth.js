@@ -47,7 +47,6 @@ function createAuthRouter(pool, sessionMiddleware) {
                 
                 if (rows.length > 0) {
                     const sql2 = 'SELECT * FROM accesibilidades WHERE id = ?';
-                    console.log(rows[0].accesibilidad_id);
                     connection.query(sql2, [rows[0].accesibilidad_id], async (err, accesibilidad) => {
                         connection.release();
                         if (err) {
@@ -55,7 +54,6 @@ function createAuthRouter(pool, sessionMiddleware) {
                             return next(err);
                         }
                       
-                        console.log(accesibilidad);
                         const user = rows[0];
                         const isMatch = await bcrypt.compare(password, user.password);
                         const { password: _, ...userWithoutPassword } = user;
@@ -111,7 +109,7 @@ function createAuthRouter(pool, sessionMiddleware) {
                         err.message = 'Error al cerrar la sesión.';
                         return next(err);
                     }
-                    res.redirect('/');
+                    res.status(200).json({ success: true, message: 'Sesión cerrada correctamente' });
                 });
             });
         });
