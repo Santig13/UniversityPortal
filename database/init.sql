@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS EVENTOS (
     ubicacion VARCHAR(255) NOT NULL,
     capacidad_maxima INT NOT NULL,
     organizador_id INT,
+    activo BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (organizador_id) REFERENCES USUARIOS(id) ON DELETE CASCADE
 );
 -- tabla intermedia N-M para participantes
@@ -104,3 +105,7 @@ VALUES
 ('Curso de Desarrollo Web', 'Aprende a construir sitios web interactivos desde cero.', '2024-11-18', '15:00:00', 'Laboratorio 1', 35, 5),
 ('Charla sobre Economía Circular', 'Discusión sobre sostenibilidad y economía circular.', '2024-12-03', '13:00:00', 'Auditorio Pequeño', 60, 5);
     */
+
+    -- INSERT INTO FACULTADES (nombre) VALUES ('Informatica'), ('Derecho'), ('Economia'), ('Ingenieria'), ('Medicina'), ('Arquitectura'), ('Humanidades'), ('Artes'), ('ucm'), ('gmail');
+
+    -- INSERT INTO ACCESIBILIDADES (paleta, tamañoTexto, navegacion) VALUES ('oscura', 'Normal', 'ambos');

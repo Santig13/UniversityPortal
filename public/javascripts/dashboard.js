@@ -151,7 +151,7 @@ $('#btn_modal_crear').on('click', async function(event) {
         success: function(facultades) {
             
             const select = $('#facultad');
-            select.empty();
+            // select.empty();
             facultades.forEach(facultad => {
                 select.append(`<option value="${facultad.nombre}">${facultad.nombre}</option>`);
             });
@@ -221,7 +221,7 @@ $('#createEventButton').on('click', async function(event) {
                         justifyContent: 'center',
                         alignItems: 'center',
                         height: '100vh'
-                    });
+                });
             }
         }
         
@@ -279,27 +279,67 @@ $('#confirmEditEventButton').on('click', async function(event) {
 });
 
 
-// Funcion para rellenar el modal de edicion
+// Función para rellenar el modal de edición
 function fillModal(evento) {
     if (typeof evento === 'string') {
         evento = JSON.parse(evento);
     }
     console.log(evento);
+
     const form = $('#editEventForm');
+
+    // Parse ubicacion into facultad and lugar
+    const [facultad, lugar] = (evento.ubicacion || '').split(',');
+
     form.find('[name="titulo"]').val(evento.titulo || '');
     form.find('[name="descripcion"]').val(evento.descripcion || '');
     form.find('[name="fecha"]').val(evento.fecha ? moment(evento.fecha).format('YYYY-MM-DD') : '');
     form.find('[name="hora_ini"]').val(evento.hora_ini || '');
     form.find('[name="hora_fin"]').val(evento.hora_fin || '');
-    form.find('[name="ubicacion"]').val(evento.ubicacion || '');
+    form.find('[name="ubicacion"]').val(lugar?.trim() || '');
     form.find('[name="capacidad_maxima"]').val(evento.capacidad_maxima || '');
+
     const modal = $('#editEventModal');
-    const modalInstance = bootstrap.Modal.getInstance(modal[0]);
-    if (modalInstance) {
-        modalInstance.show();
-    }
+    const modalInstance = bootstrap.Modal.getInstance(modal[0]) || new bootstrap.Modal(modal[0]);
+
+    modal.on('shown.bs.modal', function () {
+        const facultadSelect = form.find('[name="facultad"]');
+        facultadSelect.empty(); // Limpia opciones previas
+
+        // Realiza la llamada AJAX para obtener las facultades
+        $.ajax({
+            url: '/facultades',
+            method: 'GET',
+            success: function (data) {
+                data.forEach(fac => {
+                    const option = $('<option></option>')
+                        .val(fac.nombre)
+                        .text(fac.nombre)
+                        .prop('selected', fac.nombre.trim() === facultad?.trim());
+                    facultadSelect.append(option);
+                });
+                console.log('Facultades cargadas:', data);
+            },
+            error: function (jqXHR) {
+                console.error('Error al cargar las facultades:', jqXHR);
+                if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                    showToast('Error al cargar las facultades: ' + jqXHR.responseJSON.message);
+                } else {
+                    $('body').html(jqXHR.responseText || 'Error inesperado').css({
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100vh'
+                    });
+                }
+            }
+        });
+    });
+
+    modalInstance.show();
     eventoId = evento.id;
 }
+
 
 // Funcion para editar eventos
 function editarEvento() {
@@ -310,7 +350,7 @@ function editarEvento() {
         fecha: form.find('[name="fecha"]').val(),
         hora_ini: form.find('[name="hora_ini"]').val(),
         hora_fin: form.find('[name="hora_fin"]').val(),
-        ubicacion: form.find('[name="ubicacion"]').val(),
+        ubicacion: form.find('[name="facultad"]').val() + ", " + form.find('[name="ubicacion"]').val(),
         capacidad_maxima: parseInt(form.find('[name="capacidad_maxima"]').val(), 10)
     };
 

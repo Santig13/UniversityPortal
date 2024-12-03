@@ -112,6 +112,17 @@ $(document).ready(function () {
         $('#fontSizeSelector').val(tamañoTexto);
     }
 
+    const savedNavigationMode = Cookies.get('navigationMode');
+    if(savedNavigationMode){
+        console.log("Modo de navegación guardado: ", savedNavigationMode);
+        setNavigationMode(savedNavigationMode);   
+        $('#navigationModeSelector').val(savedNavigationMode);
+    }
+    else{
+        setNavigationMode(navegacion);
+        $('#navigationModeSelector').val(navegacion);
+    }
+
     // Cambiar el tamaño de letra y almacenar en la cookie
     $('#fontSizeSelector').on('change', function () {
         const selectedSize = $(this).val();
@@ -119,11 +130,20 @@ $(document).ready(function () {
         body.addClass(`font-${selectedSize}`);
         Cookies.set('fontSize', selectedSize, { expires: 1 }); // Almacenar el tamaño de letra en una cookie por 1 dia
     });
+
+    $('#navigationModeSelector').on('change', function () {
+        const selectedMode = $(this).val().toLowerCase();
+        console.log("Modo de navegación seleccionado: ", selectedMode);
+        setNavigationMode(selectedMode);
+        // Almacenar el modo de navegación en una cookie por 1 dia
+        Cookies.set('navigationMode', selectedMode, { expires: 1 });
+    });
     
     $('#logoutButton').on('click', function(event) {
         event.preventDefault();
         Cookies.remove('theme');
         Cookies.remove('fontSize');
+        Cookies.remove('navigationMode');
         $.ajax({
             url: '/auth/logout',
             type: 'POST',
@@ -250,7 +270,6 @@ $(document).ready(function () {
             disableInputInteractions();
         } else if (mode === 'ambos') {
             // Habilitar ambos modos
-            console.log("Modo ambos");
             $(document).on('keydown', handleKeyboardNavigation);
             $(document).on('click', handleMouseNavigation);
         }
@@ -272,8 +291,6 @@ $(document).ready(function () {
         });
        
     }
-    console.log(navegacion);
-    setNavigationMode(navegacion);
     // Ocultar el spinner y mostrar el contenido principal
     $("#spinner").hide();
     $("body").show();

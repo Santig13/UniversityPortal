@@ -67,7 +67,6 @@ function createAuthRouter(pool, sessionMiddleware) {
                             req.session.user = userWithAccesibilidad;
                             registroUso(connection,req, (err,rows)=>{
                                 if (err) {
-                                    console.log(err);
                                     err.message = 'Error al registrar el uso de la aplicación.';
                                     return next(err);
                                 }
@@ -231,7 +230,6 @@ function createAuthRouter(pool, sessionMiddleware) {
                 
                 transport.sendMail(mailOptions, (error, info) => {
                     if (error) {
-                        console.log(error);
                         return res.status(500).json({ success: false, message: 'Error al enviar el correo de recuperación.' });
                     }
                     res.status(200).json({ success: true, message: `Se ha enviado un correo a ${email} con instrucciones para restablecer la contraseña.` });

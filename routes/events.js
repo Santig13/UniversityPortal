@@ -239,10 +239,9 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                 err.message = 'Error al obtener conexión de la base de datos para crear evento.';
                 return next(err);
             }
-            console.log(ubicacion);
             solapan(connection,ubicacion,fecha,hora_ini,hora_fin, (err, result) => {
                 if (err) {
-                  res.status(400).json({ success: false, message: err.message });
+                  return res.status(400).json({ success: false, message: err.message });
                 }
 
                 connection.query(sql, [titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima, req.session.user.id], (err, result) => {
@@ -430,7 +429,6 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
             connection.query(sql, [req.session.user.id, eventId, calificacion, comentario], (err, result) => {
                 connection.release();
                 if (err) {
-                    console.log(err);
                     err.message = 'Error al calificar evento en la base de datos.';
                     return next(err);
                 }
@@ -455,7 +453,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                     return;
                 }
                 if (results.length === 0) {
-                    console.log('No hay usuarios inscritos en eventos programados para hoy.');
+                   // no hay usuarios inscritos en eventos de hoy
                     return;
                 }
                 const usuarios = results.map(row => row.id);

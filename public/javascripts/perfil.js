@@ -126,6 +126,7 @@ $('#accessibilityForm').on('submit', function(e) {
                 showToast('Preferencias guardadas correctamente, recarga la página para aplicar los cambios');
                 Cookies.remove('theme');
                 Cookies.remove('fontSize');
+                Cookies.remove('navigationMode');
             } else {
                 showToast('Error al guardar las preferencias');
             }

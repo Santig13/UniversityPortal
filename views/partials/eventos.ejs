@@ -163,7 +163,7 @@
                     <!-- Ubicación del Evento -->
                     <div class="mb-3">
                         <label for="ubicacion" class="form-label">Ubicación</label>
-                        <input type="text" class="form-control" id="ubicacion" name="ubicacion" required>
+                        <input type="text" class="form-control" id="ubicacion" name="ubicacion" required placeholder="Sala o Lugar dentro de la Facultad">
                     </div>
                     <!-- Capacidad Máxima -->
                     <div class="mb-3">
@@ -237,6 +237,13 @@
                      <div class="mb-3">
                         <label for="editHoraFin" class="form-label">Hora de fin</label>
                         <input type="time" class="form-control" id="editHoraFin" name="hora_fin" required>
+                    </div>
+                     <!-- Facultad -->
+                     <div class="mb-3">
+                        <label for="facultad" id="facultadLabel" class="form-label">Facultad</label>
+                        <select id="facultad" name="facultad" class="form-select" aria-labelledby="facultadLabel" required aria-label="Selecciona tu facultad">
+                            <option value="" disabled selected>Seleccione una facultad</option>
+                        </select>
                     </div>
                     <!-- Ubicación del Evento -->
                     <div class="mb-3">

@@ -125,8 +125,6 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
     //Modifico los ajustes de accesibilidad del usuario
        router.put('/:id/accesibilidad', validateAccesibilidad, (req, res, next) => {
         const { fontSize, navigation, theme } = req.body;
-        console.log(fontSize, navigation, theme);
-        console.log(req.session.user.accesibilidad_id);
     
         // Si el usuario tiene la accesibilidad por defecto se le modifica la actual
         if (req.session.user.accesibilidad_id != 1) {
@@ -148,12 +146,10 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
         } else { // Creamos una configuración de accesibilidad nueva
             pool.query('INSERT INTO accesibilidades (navegacion, tamañoTexto, paleta) VALUES (?, ?, ?)', [ navigation,fontSize, theme], (error, results) => {
                 if (error) {
-                    console.log(error);
                     error.message = 'Error creando la configuración de accesibilidad';
                     error.status = 500;
                     return next(error);
                 }
-                console.log(results);
                 // Actualizamos la sesión del usuario con la nueva configuración
                 req.session.user.accesibilidad_id = results.insertId;
                 req.session.user.accesibilidad = {
@@ -252,7 +248,6 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
                 err.status = 500;
                 return next(err);
             }
-            console.log(req.session.user);
             res.render('usuario', { user: req.session.user, eventos });
         });
     });
