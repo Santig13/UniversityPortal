@@ -206,13 +206,11 @@ app.use((err, req, res, next) => {
     const title = titles[statusCode] || 'Error';
     const message = err.message || defaultMessages[statusCode];
     if(message ==="Error de validación: posible intento de inyección SQL"){
-
         pool.query('INSERT INTO lista_negra_ips (ip) VALUES (?)', [req.ip], (err) => {
             if (err) {
                 console.error('Error al insertar la IP en la lista negra.', err);
             }
         });
-        
     }
 
     let accesibilidad;
@@ -228,7 +226,6 @@ app.use((err, req, res, next) => {
     }
 
     res.status(statusCode).render('error', {
-        user: req.session.user,
         titulo: title,
         mensaje: message,
         accesibilidad: accesibilidad
