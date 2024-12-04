@@ -162,7 +162,7 @@ function comprobarCapacidad(connection, evento_id, callback) {
         SELECT COUNT(inscripciones.usuario_id) AS inscritos, eventos.capacidad_maxima 
         FROM Inscripciones 
         JOIN EVENTOS ON Inscripciones.evento_id = EVENTOS.id 
-        WHERE EVENTOS.id = ? 
+        WHERE EVENTOS.id = ? AND Inscripciones.estado = 'inscrito' AND Inscripciones.activo = 1
         GROUP BY eventos.capacidad_maxima
     `;
     
