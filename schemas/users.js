@@ -19,9 +19,8 @@ const validateUser = [
     check('email')
         .notEmpty().withMessage('Email es requerido')
         .isEmail().withMessage('Email no tiene el formato correcto')
-        .custom((value, { req }) => {
-            const facultad = req.body.facultad ? req.body.facultad.toLowerCase() : '';
-            const emailRegex = new RegExp(`.*@${facultad}\\.(com|es)$`);
+        .custom((value) => {
+            const emailRegex = new RegExp(`.*@ucm\\.(com|es)$`);
             if (!emailRegex.test(value.toLowerCase())) {
                 throw new Error('Email no tiene el formato correcto para la facultad');
             }

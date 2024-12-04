@@ -7,14 +7,14 @@ const bcrypt = require('bcrypt');
 const moment = require('moment');
 const { validateUserProfile,validateAccesibilidad} = require('../schemas/users');
 
-function createUsuariosRouter(pool, requireAuth, middlewareSession){
+function createUsuariosRouter(pool, requireAuth, middlewareSession,requireParticipante, requireOrganizador) {
     const router = Router();
     router.use(requireAuth);
     router.use(middlewareSession);
 
    
     // Inscribir usuario en un evento
-    router.post('/inscribir', (req, res, next) => {
+    router.post('/inscribir', requireParticipante, (req, res, next) => {
         const { userId, eventId, organizador_id } = req.body;
         const fecha_inscripcion = moment().format('YYYY-MM-DD');
         const queryInsert = 'INSERT INTO inscripciones (usuario_id, evento_id, estado, fecha_inscripcion, activo) VALUES (?, ?, ?, ?, ?)';
@@ -23,21 +23,24 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
         const queryConflict = `
             SELECT * FROM inscripciones i
             JOIN eventos e ON i.evento_id = e.id
-            WHERE i.usuario_id = ? AND i.activo = TRUE AND e.hora_fin >= (SELECT hora_ini FROM eventos WHERE id = ?)
+            WHERE i.usuario_id = ? AND i.activo = TRUE 
+            AND e.hora_fin >= (SELECT hora_ini FROM eventos WHERE id = ?) 
+            AND e.hora_ini <= (SELECT hora_fin FROM eventos WHERE id = ?)
         `;
+        
         let message = 'Te has inscrito en el evento';
         let mensaje = `Te has inscrito en el evento con id ${eventId}`;
         let estado = "inscrito";
         let mensaje2 = `El usuario con id ${userId} se ha inscrito a su evento con id ${eventId}`;
-    
+        
         pool.getConnection((err, connection) => {
             if (err) {
                 err.message = 'Error al obtener conexión de la base de datos para inscribir usuario en evento';
                 return next(err);
             }
-    
+        
             // Verificar conflictos de horario
-            connection.query(queryConflict, [userId, eventId], (error, results) => {
+            connection.query(queryConflict, [userId, eventId, eventId], (error, results) => {
                 if (error) {
                     connection.release();
                     error.message = 'Error verificando conflictos de horario';
@@ -47,7 +50,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
     
                 if (results.length > 0) {
                     connection.release();
-                    return res.status(400).send({ success: false, message: 'Ya estás inscrito en otro evento que se solapa con este.' });
+                    return res.status(200).send({ success: false, message: 'Ya estás inscrito en otro evento que se solapa con este.' });
                 }
     
                 comprobarCapacidad(connection, eventId, (err, resultado) => {
@@ -129,7 +132,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
         });
     });
        // Desinscribir usuario de la lista de espera de un evento
-    router.delete('/abandonar', (req, res, next) => {
+    router.patch('/abandonar',requireParticipante, (req, res, next) => {
         const { userId, eventId, organizador_id } = req.body;
         const queryUpdate = 'UPDATE inscripciones SET estado = ?, fecha_inscripcion = ?, activo = ? WHERE usuario_id = ? AND evento_id = ?';
         
@@ -226,7 +229,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
         }
     });
     // Desinscribir usuario de un evento
-       router.delete('/desinscribir', (req, res, next) => {
+       router.patch('/desinscribir', requireParticipante, (req, res, next) => {
         const { userId, eventId, organizador_id } = req.body;
         const queryUpdate = 'UPDATE inscripciones SET estado = ?, fecha_inscripcion = ?, activo = ? WHERE usuario_id = ? AND evento_id = ?';
         const queryWaitlist = 'SELECT * FROM inscripciones WHERE evento_id = ? AND estado = ? ORDER BY fecha_inscripcion ASC LIMIT 1';
@@ -298,7 +301,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
     });
 
     // Listar eventos en los que el usuario está inscrito
-    router.get('/:userId/eventos', requireAuth, (req, res, next) => {
+    router.get('/:userId/eventos',requireParticipante, (req, res, next) => {
         const { userId } = req.params;
         const query = 'SELECT * FROM EVENTOS WHERE id IN (SELECT evento_id FROM Inscripciones WHERE usuario_id = ?)';
         pool.query(query, [userId], (error, results) => {
@@ -311,7 +314,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
         });
     });
 
-    router.put('/:userId/actualizar', requireAuth, validateUserProfile, async (req, res, next) => {
+    router.put('/:userId/actualizar', validateUserProfile, async (req, res, next) => {
         const {userId} = req.params;
         const {nombre, telefonoCompleto, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -329,7 +332,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
 
     
     // Navegación a la página de usuario personal con sus eventos
-    router.get('/:id', requireAuth, (req, res, next) => {
+    router.get('/:id', (req, res, next) => {
         getEventosPersonales(req.session.user, pool, (err, eventos) => {
             if (err) {
                 err.message = 'Error al recuperar los eventos personales.';
@@ -341,7 +344,7 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
     });
 
     // Ruta para obtener los datos del usuario
-    router.get('/:id/datos', requireAuth, (req, res, next) => {
+    router.get('/:id/datos', (req, res, next) => {
         const userId = req.params.id;
        pool.query('SELECT * FROM usuarios WHERE id = ?', [userId], (error, results) => {
             if (error) {

@@ -80,10 +80,30 @@ app.use('/node_modules', express.static(__dirname + '/node_modules'));
 app.use(middlewareSession);
 app.use(detectIPBloqueadas);
 
+//middleware para validar si el usuarios es participante
+function requireParticipante(req, res, next) {
+    if (req.session.user.rol === 'participante') {
+        return next(); 
+    } else {
+        const err = new Error('Debes iniciar sesión como participante para acceder a esta página.');
+        err.status = 401;
+        next(err); 
+    }
+}
+//middleware para validar si el usuarios es organizador
+function requireOrganizador(req, res, next) {
+    if (req.session.user.rol === 'organizador') {
+        return next(); 
+    } else {
+        const err = new Error('Debes iniciar sesión como organizador para acceder a esta página.');
+        err.status = 401;
+        next(err); 
+    }
+}
 // Rutas
 app.use('/auth', createAuthRouter(pool, middlewareSession));
-app.use('/eventos', createEventosRouter(pool, requireAuth, middlewareSession));
-app.use('/usuarios', createUsuariosRouter(pool, requireAuth, middlewareSession));
+app.use('/eventos', createEventosRouter(pool, requireAuth, middlewareSession,requireParticipante,requireOrganizador));
+app.use('/usuarios', createUsuariosRouter(pool, requireAuth, middlewareSession,requireParticipante,requireOrganizador));
 app.use('/notificaciones', createNotificationsRouter(pool, requireAuth, middlewareSession));
 
 // Configurar el motor de plantillas EJS
@@ -126,6 +146,7 @@ app.get('/dashboard', requireAuth, (req, res, next) => {
         }
         getEventosPersonales(req.session.user, pool, (err, eventosPersonales) => {
             if (err) {
+                console.log(err);
                 err.message = "Error al recuperar los eventos personales.";
                 err.status = 500;
                 return next(err);

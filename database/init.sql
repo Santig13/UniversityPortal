@@ -87,19 +87,24 @@ CREATE TABLE IF NOT EXISTS CALIFICACIONES (
     calificacion INT NOT NULL,
     comentario TEXT,
     fecha TIMESTAMP NOT NULL,
-    horaEntrada TIME NOT NULL,
-    horaSalida TIME,
     FOREIGN KEY (usuario_id) REFERENCES USUARIOS(id) ON DELETE CASCADE,
     FOREIGN KEY (evento_id) REFERENCES EVENTOS(id) ON DELETE CASCADE
 );
 /*
 INSERT INTO EVENTOS (titulo, descripcion, fecha, hora_ini, hora_fin, ubicacion, capacidad_maxima, organizador_id, activo) VALUES
-('Conferencia de Tecnología', 'Una conferencia sobre las últimas tendencias en tecnología.', '2024-12-03', '09:00:00', '12:00:00', 'Auditorio Principal', 100, 1, TRUE),
-('Taller de Programación', 'Un taller práctico sobre programación en Python.', '2024-12-03', '14:00:00', '17:00:00', 'Sala de Computadoras', 30, 1, TRUE),
-('Seminario de Inteligencia Artificial', 'Un seminario sobre aplicaciones de la inteligencia artificial.', '2024-12-03', '10:00:00', '13:00:00', 'Sala de Conferencias 1', 50, 1, TRUE),
-('Mesa Redonda de Ciberseguridad', 'Una mesa redonda con expertos en ciberseguridad.', '2024-12-03', '15:00:00', '18:00:00', 'Sala de Conferencias 2', 40, 1, TRUE),
-('Hackathon de Desarrollo Web', 'Un hackathon para desarrollar aplicaciones web en 24 horas.', '2024-12-03', '08:00:00', '2024-12-04 08:00:00', 'Laboratorio de Innovación', 60, 1, TRUE);
+('Conferencia de Tecnología', 'Una conferencia sobre las últimas tendencias en tecnología.', '2024-12-06', '09:00:00', '12:00:00', 'Informatica, Sala 5', 100, 2, TRUE),
+('Taller de Programación', 'Un taller práctico sobre programación en Python.', '2024-12-06', '14:00:00', '17:00:00', 'Informatica, Sala 5', 2, 2, TRUE),
+('Seminario de Inteligencia Artificial', 'Un seminario sobre aplicaciones de la inteligencia artificial.', '2024-12-06', '14:00:00', '17:00:00', 'Medicina, Sala de Conferencias', 50, 2, TRUE),
+('Mesa Redonda de Ciberseguridad', 'Una mesa redonda con expertos en ciberseguridad.', '2024-12-06', '15:00:00', '18:00:00', 'Informatica, Sala 5', 40, 2, TRUE),
+('Hackathon de Desarrollo Web', 'Un hackathon para desarrollar aplicaciones web en 24 horas.', '2024-12-03', '08:00:00', '2024-12-04 08:00:00', 'Medicina, Laboratorio de Innovación', 60, 2, TRUE);
 */
-    -- INSERT INTO FACULTADES (nombre) VALUES ('Informatica'), ('Derecho'), ('Economia'), ('Ingenieria'), ('Medicina'), ('Arquitectura'), ('Humanidades'), ('Artes'), ('ucm'), ('gmail');
+    -- INSERT INTO FACULTADES (nombre) VALUES ('Informatica'), ('Derecho'), ('Economia'), ('Ingenieria'), ('Medicina'), ('Arquitectura'), ('Humanidades'), ('Artes');
 
     -- INSERT INTO ACCESIBILIDADES (paleta, tamañoTexto, navegacion) VALUES ('oscura', 'Normal', 'ambos');
+
+    INSERT INTO EVENTOS (titulo, descripcion, fecha, hora_ini, hora_fin, ubicacion, capacidad_maxima, organizador_id, activo) VALUES
+('Conferencia de Tecnología', 'Una conferencia sobre las últimas tendencias en tecnología.', '2024-12-06', '09:00:00', '12:00:00', 'Informatica, Sala de Conferencias', 100, 2, TRUE),
+('Taller de Programación', 'Un taller práctico sobre programación en Python.', '2024-12-06', '14:00:00', '17:00:00', 'Informatica, Sala 5', 2, 2, TRUE),
+('Seminario de Salud y Tecnología', 'Un seminario sobre cómo la inteligencia artificial está revolucionando la medicina.', '2024-12-06', '14:00:00', '17:00:00', 'Medicina, Sala de Conferencias 1', 50, 2, TRUE),
+('Mesa Redonda de Ética Médica', 'Una discusión sobre los desafíos éticos en ciberseguridad en el ámbito de la salud.', '2024-12-06', '15:00:00', '18:00:00', 'Medicina, Sala 5', 40, 2, TRUE),
+('Hackathon de Innovación Médica', 'Un hackathon para desarrollar soluciones tecnológicas para la medicina en 24 horas.', '2024-12-03', '08:00:00', '10:00:00', 'Medicina, Laboratorio de Innovación', 60, 2, TRUE);

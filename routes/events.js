@@ -26,7 +26,7 @@ function getEventosParticipante(user, pool, callback) {
         JOIN 
             usuarios ON eventos.organizador_id = usuarios.id
         WHERE 
-            inscripciones.usuario_id = ?
+            inscripciones.usuario_id = ? AND inscripciones.activo = 1 AND eventos.activo = 1 
     `;
     sql += ' ORDER BY fecha DESC, hora_ini DESC';
     pool.getConnection((err, connection) => {
@@ -53,7 +53,7 @@ function getEventosParticipante(user, pool, callback) {
 }
 
 function getEventosOrganizador(user, pool, callback) {
-    let sql = 'SELECT eventos.*,   DATE_FORMAT(eventos.hora_ini, "%H:%i") as hora_ini, DATE_FORMAT(eventos.hora_fin, "%H:%i") as hora_fin  FROM eventos WHERE organizador_id=?';
+    let sql = 'SELECT eventos.*,   DATE_FORMAT(eventos.hora_ini, "%H:%i") as hora_ini, DATE_FORMAT(eventos.hora_fin, "%H:%i") as hora_fin  FROM eventos WHERE organizador_id=? AND activo = 1';
     sql += ' ORDER BY fecha DESC, hora_ini DESC';
     pool.getConnection((err, connection) => {
         if (err) {
@@ -93,7 +93,7 @@ function getEventos(query, pool, callback) {
         ON 
             eventos.organizador_id = usuarios.id 
         WHERE 
-            1=1
+            1=1 AND eventos.activo = 1
     `;
     const params = [];
 
@@ -139,18 +139,15 @@ function getEventos(query, pool, callback) {
 }
 
 //Funcion que comprueba si un evento se solapa con otro evento en la misma ubicacion y fecha
-function solapan(connection,ubicacion,fecha,hora_ini,hora_fin, callback) {
+function solapan(connection,ubicacion,fecha,hora_ini,hora_fin,id, callback) {
     const sql = `
         SELECT * FROM eventos
-        WHERE ubicacion = ? AND fecha = ? AND  hora_fin >= ?
+        WHERE ubicacion = ? AND fecha = ? AND  hora_fin >= ? AND hora_ini <= ? AND activo = 1 AND id != ?
     `;  
-    connection.query(sql, [ubicacion, fecha, hora_ini], (err, result) => {
+    connection.query(sql, [ubicacion, fecha, hora_ini,hora_fin,id], (err, result) => {
    
         if (err) {
             return callback(err);
-        }
-        if (result.length > 0) {
-            return callback(new Error('El evento se solapa con otro evento en la misma ubicación y fecha.'));
         }
         return callback(null, result);
     });
@@ -184,7 +181,7 @@ function comprobarCapacidad(connection, evento_id, callback) {
     });
 }
 
-function createEventosRouter(pool, requireAuth, middlewareSession) {
+function createEventosRouter(pool, requireAuth, middlewareSession,requireParticipante,requireOrganizador) {
     const router = Router();
     
     router.use(requireAuth);
@@ -223,6 +220,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
     router.get('/personales', (req, res, next) => {
         getEventosPersonales(req.session.user, pool, (err, eventos) => {
             if (err) {
+                console.log(err);
                 err.message = 'Error al obtener eventos personales para el usuario.';
                 err.status = 500;
                 return next(err);
@@ -231,7 +229,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
         });
     });
     // Ruta para crear un evento
-    router.post('/crear', validateEvent ,(req, res, next) => {
+    router.post('/crear', requireOrganizador,validateEvent ,(req, res, next) => {
         const { titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima} = req.body;
         const sql = 'INSERT INTO eventos(titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima, organizador_id) VALUES(?, ?, ?, ?,?, ?, ?, ?)';
         pool.getConnection((err, connection) => {
@@ -239,10 +237,18 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                 err.message = 'Error al obtener conexión de la base de datos para crear evento.';
                 return next(err);
             }
-            solapan(connection,ubicacion,fecha,hora_ini,hora_fin, (err, result) => {
+            solapan(connection,ubicacion,fecha,hora_ini,hora_fin,-1, (err, result) => {
                 if (err) {
-                  return res.status(400).json({ success: false, message: err.message });
+                    err.status = 500;
+                    err.message = 'Error al comprobar si se solapan los eventos.';
+                    return next(err);    
                 }
+
+                if (result.length > 0) {
+                    connection.release();
+                    return res.status(400).json({ success:false, message:'Ya hay un evento programado en esa ubicación y fecha.' });
+                }
+
 
                 connection.query(sql, [titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima, req.session.user.id], (err, result) => {
                     connection.release();
@@ -257,7 +263,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
     });
 
     function usuariosInscritos(connection, evento_id, callback) {
-        const sql = 'SELECT usuario_id FROM inscripciones WHERE evento_id=?';
+        const sql = 'SELECT usuario_id, estado FROM inscripciones WHERE evento_id=? AND activo = 1 ';
         connection.query(sql, [ evento_id], (err, result) => {
             if (err) {
                 return callback(err);
@@ -280,10 +286,20 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
         });
         return callback(null);
     }
-
+    function desinscribirUsuarios(connection, usuarios, callback) {
+        const sql = 'UPDATE inscripciones SET activo = 0 WHERE usuario_id=?';
+        usuarios.forEach(usuario_id => {
+            connection.query(sql, [usuario_id], (err, result) => {
+                if (err) {
+                    return callback(err);
+                }
+            });
+        });
+        return callback(null);
+    }
     // Ruta para borrar un evento
-    router.delete('/:id', (req, res, next) => {
-        const sql = 'DELETE FROM eventos WHERE id=?';
+    router.patch('/:id',requireOrganizador, (req, res, next) => {
+        const sql = 'UPDATE eventos SET activo = 0 WHERE id=?';
         pool.getConnection((err, connection) => {
             if (err) {
                 err.message = 'Error al obtener conexión de la base de datos para eliminar evento.';
@@ -298,7 +314,6 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                 }
                
                 usuarios = result;
-            
                 connection.query(sql, [req.params.id], (err, result) => {
                     if (err) {
                         connection.release();
@@ -309,13 +324,14 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                     const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
 
                     notificarTodosLosParticipantes(connection, usuarios, mensaje, req.params.id, fecha, (err) => {
-                        connection.release();
-                        if (err) {
-                            return next(err);
-                        }
-                        res.status(200).json({ success: true });
+                        desinscribirUsuarios(connection, usuarios, (err) => {
+                            connection.release();
+                            if (err) {
+                                return next(err);
+                            }
+                            res.status(200).json({ success: true });
+                        });
                     });
-                    
                 });
               
             });
@@ -323,7 +339,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
     });
 
     // Ruta para editar un evento
-    router.put('/:id', validateEvent, (req, res, next) => {
+    router.put('/:id', requireOrganizador,validateEvent, (req, res, next) => {
         const { titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima} = req.body;
         const id = req.params.id;
         
@@ -334,14 +350,26 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
                 return next(err);
             }
             let usuarios;
-            usuariosInscritos(connection, id, (err, result) => {
+            usuariosInscritos(connection, id, (err, result) => { // ESTO DEVUELVE SOLO LOS IDS
                 if (err) {
                     connection.release();
                     return next(err);
                 }
                 usuarios = result;
-                const sql2 = 'SELECT * FROM eventos WHERE ubicacion = ? AND fecha = ? AND hora_fin => ? AND id != ?';
-                connection.query(sql2, [ubicacion, fecha, hora_ini, id], (err, result) => {
+                const contadorInscritos = usuarios.length;
+                if(contadorInscritos >capacidad_maxima){
+                    connection.release();
+                    return res.status(400).json({ success:false, message:`No se puede reducir la capacidad del evento ya que hay ${usuarios.length} participantes.`});
+                }
+                solapan(connection,ubicacion,fecha,hora_ini,hora_fin,id, (err, result) => {
+                    if (err) {
+                        err.message = 'Error al comprobar si se solapan los eventos.';
+                        return next(err);
+                    }
+                    if (result.length > 0) {
+                        connection.release();
+                        return res.status(400).json({ success:false, message:'Ya hay un evento programado en esa ubicación y fecha.' });
+                    }
                     connection.query(sql, [titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima, id], (err, result) => {
                         
                         if (err) {
@@ -365,7 +393,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
         });
     });
     
-    router.get('/:id/participantes', (req, res, next) => {
+    router.get('/:id/participantes',requireOrganizador, (req, res, next) => {
         const { id } = req.params;
         const sql = `
             SELECT usuarios.nombre, usuarios.telefono, usuarios.email, facultades.nombre AS facultad,inscripciones.estado
@@ -417,7 +445,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession) {
         });
     });
     
-    router.post('/calificacion', validateCalification,(req, res, next) => {
+    router.post('/calificacion', requireParticipante, validateCalification,(req, res, next) => {
         const { eventId, calificacion, comentario } = req.body;
         const sql = 'INSERT INTO calificaciones(usuario_id, evento_id, calificacion, comentario) VALUES(?, ?, ?, ?)';
         pool.getConnection((err, connection) => {

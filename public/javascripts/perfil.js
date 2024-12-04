@@ -71,7 +71,6 @@ $(document).ready(function () {
             $(`.dropdown-menu a[data-prefix="${prefix}"]`).addClass('active');
         },
         error: function (jqXHR) {
-            console.log(jqXHR);
             console.error('Error al obtener datos:', jqXHR.responseText);
         }
     });

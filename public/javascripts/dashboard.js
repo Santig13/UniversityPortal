@@ -189,6 +189,12 @@ $('#createEventButton').on('click', async function(event) {
         organizador_id: parseInt(form.find('[name="organizador_id"]').val(), 10)
     };
 
+    //mostrar toast y cerrar modal si alguno de los campos no esta rellenado
+    if (!data.titulo || !data.descripcion || !data.fecha || !data.hora_ini || !data.hora_fin || !data.ubicacion || !data.capacidad_maxima) {
+        showToast('Por favor, rellene todos los campos');
+        return;
+    }
+
     $.ajax({
         url: '/eventos/crear',
         method: 'POST',
@@ -251,7 +257,7 @@ $('#confirmDeleteEventButton').on('click', async function(event) {
 function eliminarEvento(eventId) { 
     $.ajax({
         url: `/eventos/${eventId}`,
-        method: 'DELETE',
+        method: 'PATCH',
         success: function(data) {
             if (data.success) {
                 showToast('Evento eliminado exitosamente');
@@ -284,7 +290,6 @@ function fillModal(evento) {
     if (typeof evento === 'string') {
         evento = JSON.parse(evento);
     }
-    console.log(evento);
 
     const form = $('#editEventForm');
 
@@ -318,7 +323,6 @@ function fillModal(evento) {
                         .prop('selected', fac.nombre.trim() === facultad?.trim());
                     facultadSelect.append(option);
                 });
-                console.log('Facultades cargadas:', data);
             },
             error: function (jqXHR) {
                 console.error('Error al cargar las facultades:', jqXHR);
@@ -417,11 +421,23 @@ function inscribirUsuario(eventId, organizador_id) {
                 showToast(data.message);
                 filtrar(); // Refrescar la lista después de inscribirse
             } else {
-                showToast('Error al inscribirse en el evento');
+                showToast('Error al inscribirse en el evento: ' + data.message);
             }
         },
-        error: function() {
-            showToast('Error al inscribirse en el evento');
+        error: function(jqXHR) {
+            if(jqXHR.responseJSON){
+                showToast('Error al inscribirse en el evento: ' + jqXHR.responseJSON.message);
+            }
+            else{
+                $('body').html(jqXHR.responseText)
+                    .css({
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100vh'
+                    });
+            }
+           
         }
     });
 }
@@ -430,7 +446,7 @@ function inscribirUsuario(eventId, organizador_id) {
 function desinscribirUsuario(eventId, organizador_id) {
     $.ajax({
         url: '/usuarios/desinscribir',
-        method: 'DELETE',
+        method: 'PATCH',
         contentType: 'application/json',
         data: JSON.stringify({
             userId: userId,
@@ -458,7 +474,7 @@ function desinscribirUsuario(eventId, organizador_id) {
 function abandonarListaEspera(eventId, organizador_id) {
     $.ajax({
         url: '/usuarios/abandonar',
-        method: 'DELETE',
+        method: 'PATCH',
         contentType: 'application/json',
         data: JSON.stringify({
             userId: userId,
