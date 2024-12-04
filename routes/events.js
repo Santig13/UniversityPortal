@@ -455,7 +455,7 @@ function createEventosRouter(pool, requireAuth, middlewareSession,requirePartici
             FROM inscripciones
             JOIN usuarios ON inscripciones.usuario_id = usuarios.id
             JOIN facultades ON usuarios.facultad_id = facultades.id
-            WHERE inscripciones.evento_id = ?
+            WHERE inscripciones.evento_id = ? AND inscripciones.activo = 1
         `;
         pool.getConnection((err, connection) => {
             if (err) {

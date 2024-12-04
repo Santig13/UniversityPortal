@@ -545,10 +545,6 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     border-bottom: none; 
 }
 
-.toast-modal{
-    z-index: 1500; /* Mayor que el modal */
-  
-}
 
 .nav-tabs .nav-link {
     background-color: #1A2226; 

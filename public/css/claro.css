@@ -358,7 +358,7 @@ a:hover {
 
 .lista-estadisticas, .lista-eventos{
     overflow-y: auto;
-    max-height: 65vh;
+    max-height: 75vh;
 }
 
 
