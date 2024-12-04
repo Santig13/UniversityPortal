@@ -72,8 +72,8 @@
                                 <p class="card-text"><strong>Capacidad Máxima:</strong> <%= evento.capacidad_maxima %></p>
                                 <p class="card-text"><strong>Organizador:</strong> <%= evento.organizador_nombre %></p>
                             </div>
-                            <div class="card-footer m-1 d-flex flex-wrap align-items-center justify-content-lg-start">
-                                <small class="mx-2 mt-1">ID Evento: <%= evento.id %></small>
+                            <div class="card-footer m-1 d-flex flex-wrap align-items-center justify-content-md-start justify-content-evenly">
+                                <small class="mx-2 mt-1 d-none">ID Evento: <%= evento.id %></small>
                                 <% if (evento.terminado) { %>
                                     <div class="mx-2 mt-1 red-text"> <i class="bi bi-calendar-x red-text"></i> Evento finalizado</div>
                                     <% if (user.rol === 'participante' && evento.estadoInscripcion === 'inscrito') { %>
@@ -242,13 +242,13 @@
                      <div class="mb-3">
                         <label for="facultad" id="facultadLabel" class="form-label">Facultad</label>
                         <select id="facultad" name="facultad" class="form-select" aria-labelledby="facultadLabel" required aria-label="Selecciona tu facultad">
-                            <option value="" disabled selected>Seleccione una facultad</option>
+                            <option value="" disabled selected>Cargando facultades...</option>
                         </select>
                     </div>
                     <!-- Ubicación del Evento -->
                     <div class="mb-3">
                         <label for="editUbicacion" class="form-label">Ubicación</label>
-                        <input type="text" class="form-control" id="editUbicacion" name="ubicacion" required>
+                        <input type="text" class="form-control" id="editUbicacion" name="ubicacion" required placeholder="Sala o Lugar dentro de la Facultad">
                     </div>
                     <!-- Capacidad Máxima -->
                     <div class="mb-3">

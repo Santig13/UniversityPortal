@@ -29,8 +29,8 @@ $(document).ready(function () {
                                     </div>
                                 </div>
                                 <div class="card-footer m-1 d-flex align-items-center">
-                                    <small class="mx-2">ID Notificación: ${notificacion.id}</small>
-                                    ${!notificacion.leido ? `<button id="btn-${notificacion.id}" class="btn btn-outline-primary btn-event ms-auto" onclick="marcarComoLeido(${notificacion.id})">Marcar como leído</button>` : ''}
+                                    <small class="mx-2 d-none">ID Notificación: ${notificacion.id}</small>
+                                    ${!notificacion.leido ? `<button id="btn-${notificacion.id}" class="btn btn-outline-primary btn-event mx-auto" onclick="marcarComoLeido(${notificacion.id})">Marcar como leído</button>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -114,7 +114,6 @@ $(document).ready(function () {
 
     const savedNavigationMode = Cookies.get('navigationMode');
     if(savedNavigationMode){
-        console.log("Modo de navegación guardado: ", savedNavigationMode);
         setNavigationMode(savedNavigationMode);   
         $('#navigationModeSelector').val(savedNavigationMode);
     }
@@ -133,7 +132,6 @@ $(document).ready(function () {
 
     $('#navigationModeSelector').on('change', function () {
         const selectedMode = $(this).val().toLowerCase();
-        console.log("Modo de navegación seleccionado: ", selectedMode);
         setNavigationMode(selectedMode);
         // Almacenar el modo de navegación en una cookie por 1 dia
         Cookies.set('navigationMode', selectedMode, { expires: 1 });
@@ -262,7 +260,6 @@ $(document).ready(function () {
             disableHover();
             disableInputInteractions();
         } else if (mode === 'ratón') {
-            console.log("Modo ratón");
             // Habilitar navegación con ratón, deshabilitar teclado
             $(document).on('keydown', preventKeyboardNavigation);
             $(document).on('click', handleMouseNavigation);

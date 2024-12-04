@@ -34,9 +34,9 @@ function createNotificationsRouter(pool, requireAuth, middlewareSession) {
     // Marcar una notificación específica como leída
     router.post('/:notificacionId/leido', requireAuth, (req, res, next) => {
         const { notificacionId } = req.params;
-        const sql = 'UPDATE notificaciones SET leido = 1 WHERE id = ?';
-        
-        pool.query(sql, [notificacionId], (err, results) => {
+        // Comprobar que la notificación pertenece al usuario y que existe la notificación
+        const sql = 'UPDATE notificaciones SET leida = 1 WHERE id = ? AND usuario_id = ?';
+        pool.query(sql, [notificacionId, usuarioId], (err, results) => {
             if (err) {
                 err.message = 'Error al marcar la notificación como leída.';
                 err.status = 500;

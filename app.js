@@ -146,7 +146,7 @@ app.get('/dashboard', requireAuth, (req, res, next) => {
         }
         getEventosPersonales(req.session.user, pool, (err, eventosPersonales) => {
             if (err) {
-                console.log(err);
+              
                 err.message = "Error al recuperar los eventos personales.";
                 err.status = 500;
                 return next(err);
@@ -160,7 +160,6 @@ app.get('/dashboard', requireAuth, (req, res, next) => {
                 }
                 return evento;
             });
-           console.log(req.session.user);
             res.render('dashboard', { user: req.session.user, eventos });
         });
     });

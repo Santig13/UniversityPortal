@@ -41,7 +41,7 @@ function getEventosParticipante(user, pool, callback) {
                 return callback(err);
             }
             rows = rows.map(row => {
-                row.estadoInscripcion="inscrito";
+                row.estadoInscripcion = row.estado;
                 const fecha = moment(row.fecha).format('YYYY-MM-DD'); 
                 const fechaHoraFin = moment(`${fecha} ${row.hora_fin}`, 'YYYY-MM-DD HH:mm');
                 row.terminado = moment().isAfter(fechaHoraFin);
@@ -220,7 +220,6 @@ function createEventosRouter(pool, requireAuth, middlewareSession,requirePartici
     router.get('/personales', (req, res, next) => {
         getEventosPersonales(req.session.user, pool, (err, eventos) => {
             if (err) {
-                console.log(err);
                 err.message = 'Error al obtener eventos personales para el usuario.';
                 err.status = 500;
                 return next(err);
@@ -263,16 +262,15 @@ function createEventosRouter(pool, requireAuth, middlewareSession,requirePartici
     });
 
     function usuariosInscritos(connection, evento_id, callback) {
-        const sql = 'SELECT usuario_id, estado FROM inscripciones WHERE evento_id=? AND activo = 1 ';
+        const sql = 'SELECT usuario_id, estado,fecha_inscripcion FROM inscripciones WHERE evento_id=? AND activo = 1 ORDER BY fecha_inscripcion ASC';
         connection.query(sql, [ evento_id], (err, result) => {
             if (err) {
                 return callback(err);
             }
-            const usuarios = result.map(row => row.usuario_id);
-            return callback(null, usuarios);
+        
+            return callback(null, result);
         });
     }
-    
     
 
     function notificarTodosLosParticipantes(connection, usuarios,mensaje,id, fecha, callback) {
@@ -305,35 +303,53 @@ function createEventosRouter(pool, requireAuth, middlewareSession,requirePartici
                 err.message = 'Error al obtener conexión de la base de datos para eliminar evento.';
                 return next(err);
             }
-           
-            let usuarios;
-            usuariosInscritos(connection, req.params.id, (err, result) => {
+          
+            connection.query('SELECT * FROM eventos WHERE id = ?', [id], (err, result) => {
                 if (err) {
                     connection.release();
+                    err.message = 'Error al obtener el evento de la base de datos.';
                     return next(err);
                 }
-               
-                usuarios = result;
-                connection.query(sql, [req.params.id], (err, result) => {
+                if (result.length === 0) {
+                    connection.release();
+                    return res.status(404).json({ success:false, message:'Evento no encontrado.' });
+                }
+                const anterior = result[0];
+                let usuarios;
+                
+                usuariosInscritos(connection, req.params.id, (err, result) => {
                     if (err) {
                         connection.release();
-                        err.message = 'Error al eliminar evento en la base de datos.';
                         return next(err);
                     }
-                    const mensaje = `El organizador ha eliminado el evento con id ${req.params.id}`;
-                    const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
-
-                    notificarTodosLosParticipantes(connection, usuarios, mensaje, req.params.id, fecha, (err) => {
-                        desinscribirUsuarios(connection, usuarios, (err) => {
+                    usuarios = result.map(row => row.usuario_id);
+                    connection.query(sql, [req.params.id], (err, result) => {
+                        if (err) {
                             connection.release();
+                            err.message = 'Error al eliminar evento en la base de datos.';
+                            return next(err);
+                        }
+                        //consigo el nombre del evento
+                        connection.query('SELECT titulo FROM eventos WHERE id = ?', [req.params.id], (err, result) => {
                             if (err) {
+                                connection.release();
+                                err.message = 'Error al obtener el nombre del evento.';
                                 return next(err);
                             }
-                            res.status(200).json({ success: true });
+                            const mensaje = `El organizador ha eliminado el evento " ${result[0].titulo}" `;
+                            const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
+                            notificarTodosLosParticipantes(connection, usuarios, mensaje, req.params.id, fecha, (err) => {
+                                desinscribirUsuarios(connection, usuarios, (err) => {
+                                    connection.release();
+                                    if (err) {
+                                        return next(err);
+                                    }
+                                    res.status(200).json({ success: true });
+                                });
+                            });
                         });
                     });
                 });
-              
             });
         });
     });
@@ -350,45 +366,84 @@ function createEventosRouter(pool, requireAuth, middlewareSession,requirePartici
                 return next(err);
             }
             let usuarios;
-            usuariosInscritos(connection, id, (err, result) => { // ESTO DEVUELVE SOLO LOS IDS
+            //compruebo si el id existe
+            connection.query('SELECT * FROM eventos WHERE id = ?', [id], (err, result) => {
                 if (err) {
                     connection.release();
+                    err.message = 'Error al obtener el evento de la base de datos.';
                     return next(err);
                 }
-                usuarios = result;
-                const contadorInscritos = usuarios.length;
-                if(contadorInscritos >capacidad_maxima){
+                if (result.length === 0) {
                     connection.release();
-                    return res.status(400).json({ success:false, message:`No se puede reducir la capacidad del evento ya que hay ${usuarios.length} participantes.`});
+                    return res.status(404).json({ success:false, message:'Evento no encontrado.' });
                 }
-                solapan(connection,ubicacion,fecha,hora_ini,hora_fin,id, (err, result) => {
+                const anterior = result[0];
+                usuariosInscritos(connection, id, (err, result) => { 
                     if (err) {
-                        err.message = 'Error al comprobar si se solapan los eventos.';
+                        connection.release();
                         return next(err);
                     }
-                    if (result.length > 0) {
+                    usuarios = result;
+                    const contadorInscritos = usuarios.filter(user => user.estado === 'inscrito').length;
+                    if(contadorInscritos >capacidad_maxima){
                         connection.release();
-                        return res.status(400).json({ success:false, message:'Ya hay un evento programado en esa ubicación y fecha.' });
+                        return res.status(400).json({ success:false, message:`No se puede reducir la capacidad del evento ya que hay ${usuarios.length} participantes.`});
                     }
-                    connection.query(sql, [titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima, id], (err, result) => {
+                    else if(contadorInscritos < capacidad_maxima){
+                
+                        const enEspera = usuarios.filter(user => user.estado === 'lista de espera').sort((a, b) => new Date(a.fecha_inscripcion) - new Date(b.fecha_inscripcion));
+                        const porInscribir = capacidad_maxima - contadorInscritos;
                         
+                        for(let i = 0; i < porInscribir && i < enEspera.length; i++){
+                        
+                            const inscribir = 'UPDATE inscripciones SET estado = "inscrito" WHERE usuario_id=? AND evento_id=?';
+                        
+                            connection.query(inscribir, [enEspera[i].usuario_id, id], (err, result) => {
+                                if (err) {
+                                    connection.release();
+                                    err.message = 'Error al inscribir a los usuarios en la base de datos.';
+                                    return next(err);
+                                }
+                                añadirNotificacion(connection, enEspera[i].usuario_id, `Se te ha añadido automaticamente al evento "${anterior.titulo}", ya que se ha ampliado su capacidad`, moment().format('YYYY-MM-DD HH:mm:ss'), (err) => {
+                                    if (err) {
+                                        connection.release();
+                                        err.message = 'Error al añadir notificación en la base de datos.';
+                                        return next(err);
+                                    }
+                                });
+                            });
+                        }
+                    }
+                    solapan(connection,ubicacion,fecha,hora_ini,hora_fin,id, (err, result) => {
                         if (err) {
-                            err.message = 'Error al actualizar evento en la base de datos.';
+                            err.message = 'Error al comprobar si se solapan los eventos.';
                             return next(err);
                         }
-                        const mensaje = `El organizador ha modificado el evento con id ${id}`;
-                        const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
-                        
-                        notificarTodosLosParticipantes(connection, usuarios, mensaje, req.params.id, fecha, (err) => {
+                        if (result.length > 0) {
                             connection.release();
+                            return res.status(400).json({ success:false, message:'Ya hay un evento programado en esa ubicación y fecha.' });
+                        }
+                        connection.query(sql, [titulo, descripcion, fecha, hora_ini,hora_fin, ubicacion, capacidad_maxima, id], (err, result) => {
+                            
                             if (err) {
+                                err.message = 'Error al actualizar evento en la base de datos.';
                                 return next(err);
                             }
-                            res.status(200).json({ success: true });
+                            const mensaje = `El organizador ha modificado el evento "${anterior.titulo}"`;
+                            const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
+                            usuarios = usuarios.map(row => row.usuario_id);
+                            
+                            notificarTodosLosParticipantes(connection, usuarios, mensaje, req.params.id, fecha, (err) => {
+                                connection.release();
+                                if (err) {
+                                    return next(err);
+                                }
+                                res.status(200).json({ success: true });
+                            });
                         });
                     });
+                
                 });
-               
             });
         });
     });
@@ -407,14 +462,25 @@ function createEventosRouter(pool, requireAuth, middlewareSession,requirePartici
                 err.message = 'Error al obtener conexión de la base de datos para obtener participantes.';
                 return next(err);
             }
-            connection.query(sql, [id], (err, rows) => {
-                
-                connection.release();
+            //compruebo si el id existe
+            connection.query('SELECT * FROM eventos WHERE id = ?', [id], (err, result) => {
                 if (err) {
-                    err.message = 'Error al consultar participantes en la base de datos.';
+                    connection.release();
+                    err.message = 'Error al obtener el evento de la base de datos.';
                     return next(err);
                 }
-                res.status(200).json({ participantes: rows });
+                if (result.length === 0) {
+                    connection.release();
+                    return res.status(404).json({ success:false, message:'Evento no encontrado.' });
+                }
+                connection.query(sql, [id], (err, rows) => {
+                    connection.release();
+                    if (err) {
+                        err.message = 'Error al consultar participantes en la base de datos.';
+                        return next(err);
+                    }
+                    res.status(200).json({ participantes: rows });
+                });
             });
         });
     });
@@ -434,13 +500,25 @@ function createEventosRouter(pool, requireAuth, middlewareSession,requirePartici
                 err.message = 'Error al obtener conexión de la base de datos para obtener calificaciones.';
                 return next(err);
             }
-            connection.query(sql, [id], (err, rows) => {
-                connection.release();
+            //compruebo si el evento existe
+            connection.query('SELECT * FROM eventos WHERE id = ?', [id], (err, result) => {
                 if (err) {
-                    err.message = 'Error al consultar calificaciones en la base de datos.';
+                    connection.release();
+                    err.message = 'Error al obtener el evento de la base de datos.';
                     return next(err);
                 }
-                res.status(200).json({ calificaciones: rows });
+                if (result.length === 0) {
+                    connection.release();
+                    return res.status(404).json({ success:false, message:'Evento no encontrado.' });
+                }
+                connection.query(sql, [id], (err, rows) => {
+                    connection.release();
+                    if (err) {
+                        err.message = 'Error al consultar calificaciones en la base de datos.';
+                        return next(err);
+                    }
+                    res.status(200).json({ calificaciones: rows });
+                });
             });
         });
     });
@@ -453,14 +531,24 @@ function createEventosRouter(pool, requireAuth, middlewareSession,requirePartici
                 err.message = 'Error al obtener conexión de la base de datos para calificar evento.';
                 return next(err);
             }
-          
-            connection.query(sql, [req.session.user.id, eventId, calificacion, comentario], (err, result) => {
-                connection.release();
+            connection.query('SELECT * FROM eventos WHERE id = ?', [eventId], (err, result) => {
                 if (err) {
-                    err.message = 'Error al calificar evento en la base de datos.';
+                    connection.release();
+                    err.message = 'Error al obtener el evento de la base de datos.';
                     return next(err);
                 }
-                res.status(200).json({ success: true, message: 'Evento calificado exitosamente' });
+                if (result.length === 0) {
+                    connection.release();
+                    return res.status(404).json({ success:false, message:'Evento no encontrado.' });
+                }
+                connection.query(sql, [req.session.user.id, eventId, calificacion, comentario], (err, result) => {
+                    connection.release();
+                    if (err) {
+                        err.message = 'Error al calificar evento en la base de datos.';
+                        return next(err);
+                    }
+                    res.status(200).json({ success: true, message: 'Evento calificado exitosamente' });
+                });
             });
         });
     });

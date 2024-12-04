@@ -23,109 +23,122 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession,requirePartic
         const queryConflict = `
             SELECT * FROM inscripciones i
             JOIN eventos e ON i.evento_id = e.id
-            WHERE i.usuario_id = ? AND i.activo = TRUE 
+            WHERE i.usuario_id = ? AND i.activo = TRUE AND e.activo = 1 
+            AND e.fecha = (SELECT fecha FROM eventos WHERE id = ?)
             AND e.hora_fin >= (SELECT hora_ini FROM eventos WHERE id = ?) 
             AND e.hora_ini <= (SELECT hora_fin FROM eventos WHERE id = ?)
         `;
-        
-        let message = 'Te has inscrito en el evento';
-        let mensaje = `Te has inscrito en el evento con id ${eventId}`;
-        let estado = "inscrito";
-        let mensaje2 = `El usuario con id ${userId} se ha inscrito a su evento con id ${eventId}`;
         
         pool.getConnection((err, connection) => {
             if (err) {
                 err.message = 'Error al obtener conexión de la base de datos para inscribir usuario en evento';
                 return next(err);
             }
-        
-            // Verificar conflictos de horario
-            connection.query(queryConflict, [userId, eventId, eventId], (error, results) => {
-                if (error) {
+            //verifico que el evento exista
+            connection.query('SELECT * FROM eventos WHERE id = ?', [eventId], (error, results) => {
+                if (err) {
                     connection.release();
-                    error.message = 'Error verificando conflictos de horario';
-                    error.status = 500;
-                    return next(error);
+                    err.message = 'Error al obtener el evento de la base de datos.';
+                    return next(err);
                 }
-    
-                if (results.length > 0) {
+                if (results.length === 0) {
                     connection.release();
-                    return res.status(200).send({ success: false, message: 'Ya estás inscrito en otro evento que se solapa con este.' });
+                    return res.status(404).json({ success:false, message:'Evento no encontrado.' });
                 }
-    
-                comprobarCapacidad(connection, eventId, (err, resultado) => {
-                    if (err) {
+                const anterior=results[0];
+                let message = 'Te has inscrito en el evento';
+                let mensaje = `Te has inscrito en el evento "${anterior.titulo}"`;
+                let estado = "inscrito";
+                let mensaje2 = `El usuario ${req.session.user.email} se ha inscrito a su evento "${anterior.titulo}"`;
+               
+                // Verificar conflictos de horario
+                connection.query(queryConflict, [userId, eventId, eventId,eventId], (error, results) => {
+                    if (error) {
                         connection.release();
-                        return next(err);
+                        error.message = 'Error verificando conflictos de horario';
+                        error.status = 500;
+                        return next(error);
                     }
-    
-                    // Si no hay espacio, cambia el estado de la inscripción y los mensajes
-                    if (!resultado.hayEspacio) {
-                        message = 'Se te ha añadido a la lista de espera';
-                        mensaje = `Te has añadido a la lista de espera del evento con id ${eventId}`;
-                        estado = "lista de espera";
-                        mensaje2 = `El usuario con id ${userId} se ha añadido a la lista de espera de su evento con id ${eventId}`;
+        
+                    if (results.length > 0) {
+                        connection.release();
+                        return res.status(200).send({ success: false, message: 'Ya estás inscrito en otro evento que se solapa con este.' });
                     }
-    
-                    connection.query(queryCheck, [userId, eventId], (error, results) => {
-                        if (error) {
+                   
+                    comprobarCapacidad(connection, eventId, (err, resultado) => {
+                        if (err) {
                             connection.release();
-                            error.message = 'Error verificando la inscripción del usuario en el evento';
-                            error.status = 500;
-                            return next(error);
+                            return next(err);
                         }
-    
-                        if (results.length > 0) {
-                            // Si ya existe una inscripción, actualizarla
-                            connection.query(queryUpdate, [estado, fecha_inscripcion, true, userId, eventId], (error, results) => {
-                                if (error) {
-                                    connection.release();
-                                    error.message = 'Error actualizando la inscripción del usuario en el evento';
-                                    error.status = 500;
-                                    return next(error);
-                                }
-                                const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
-                                añadirNotificacion(connection, userId, mensaje, fecha, (err) => {
-                                    if (err) {
+        
+                        // Si no hay espacio, cambia el estado de la inscripción y los mensajes
+                        if (!resultado.hayEspacio) {
+                            message = 'Se te ha añadido a la lista de espera';
+                            mensaje = `Te has añadido a la lista de espera del evento "${anterior.titulo}"`;
+                            estado = "lista de espera";
+                            mensaje2 = `El usuario ${req.session.user.email} se ha añadido a la lista de espera de su evento "${anterior.titulo}"`;
+                        }
+        
+                        connection.query(queryCheck, [userId, eventId], (error, results) => {
+                            if (error) {
+                                connection.release();
+                                error.message = 'Error verificando la inscripción del usuario en el evento';
+                                error.status = 500;
+                                return next(error);
+                            }
+        
+                            if (results.length > 0) {
+                                // Si ya existe una inscripción, actualizarla
+                                connection.query(queryUpdate, [estado, fecha_inscripcion, true, userId, eventId], (error, results) => {
+                                    if (error) {
                                         connection.release();
-                                        return next(err);
+                                        error.message = 'Error actualizando la inscripción del usuario en el evento';
+                                        error.status = 500;
+                                        return next(error);
                                     }
-                                    añadirNotificacion(connection, organizador_id, mensaje2, fecha, (err) => {
-                                        connection.release();
+                                    const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
+                                    añadirNotificacion(connection, userId, mensaje, fecha, (err) => {
                                         if (err) {
+                                            connection.release();
                                             return next(err);
                                         }
-    
-                                        res.status(200).send({ success: true, message: message });
+                                        añadirNotificacion(connection, organizador_id, mensaje2, fecha, (err) => {
+                                            connection.release();
+                                            if (err) {
+                                                return next(err);
+                                            }
+        
+                                            res.status(200).send({ success: true, message: message });
+                                        });
                                     });
                                 });
-                            });
-                        } else {
-                            // Si no existe una inscripción, crear una nueva
-                            connection.query(queryInsert, [userId, eventId, estado, fecha_inscripcion, true], (error, results) => {
-                                if (error) {
-                                    connection.release();
-                                    error.message = 'Error inscribiendo al usuario en el evento';
-                                    error.status = 500;
-                                    return next(error);
-                                }
-                                const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
-                                añadirNotificacion(connection, userId, mensaje, fecha, (err) => {
-                                    if (err) {
+                            } else {
+                                // Si no existe una inscripción, crear una nueva
+                                connection.query(queryInsert, [userId, eventId, estado, fecha_inscripcion, true], (error, results) => {
+                                    if (error) {
                                         connection.release();
-                                        return next(err);
+                                        error.message = 'Error inscribiendo al usuario en el evento';
+                                        error.status = 500;
+                                        return next(error);
                                     }
-                                    añadirNotificacion(connection, organizador_id, mensaje2, fecha, (err) => {
-                                        connection.release();
+                                    const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
+                                    añadirNotificacion(connection, userId, mensaje, fecha, (err) => {
                                         if (err) {
+                                            connection.release();
                                             return next(err);
                                         }
-    
-                                        res.status(200).send({ success: true, message: message });
+                                        añadirNotificacion(connection, organizador_id, mensaje2, fecha, (err) => {
+                                            connection.release();
+                                            if (err) {
+                                                return next(err);
+                                            }
+        
+                                            res.status(200).send({ success: true, message: message });
+                                        });
                                     });
                                 });
-                            });
-                        }
+                            }
+                        });
                     });
                 });
             });
@@ -141,27 +154,40 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession,requirePartic
                 err.message = 'Error al obtener conexión de la base de datos para desinscribir usuario de evento';
                 return next(err);
             }
-            connection.query(queryUpdate, ['desinscrito', moment().format('YYYY-MM-DD'), false, userId, eventId], (error, results) => {
-                if (error) {
+            //verifico que el evento exista
+            connection.query('SELECT * FROM eventos WHERE id = ?', [eventId], (error, results) => {
+                if (err) {
                     connection.release();
-                    error.message = 'Error desinscribiendo al usuario del evento';
-                    error.status = 500;
-                    return next(error);
+                    err.message = 'Error al obtener el evento de la base de datos.';
+                    return next(err);
                 }
-                const mensaje = `Has abandonado la lista de espera del evento con id ${eventId}`;
-                const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
-                añadirNotificacion(connection, userId, mensaje, fecha, (err) => {
-                    if (err) {
+                if (results.length === 0) {
+                    connection.release();
+                    return res.status(404).json({ success:false, message:'Evento no encontrado.' });
+                }
+                const evento = results[0];
+                connection.query(queryUpdate, ['desinscrito', moment().format('YYYY-MM-DD'), false, userId, eventId], (error, results) => {
+                    if (error) {
                         connection.release();
-                        return next(err);
+                        error.message = 'Error desinscribiendo al usuario del evento';
+                        error.status = 500;
+                        return next(error);
                     }
-                    const mensaje2 = `El usuario con id ${userId} ha abandonado la lista de espera de su evento con id ${eventId}`;
-                    añadirNotificacion(connection, organizador_id, mensaje2, fecha, (err) => {
-                        connection.release();
+                    const mensaje = `Has abandonado la lista de espera del evento "${evento.titulo}"`;
+                    const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
+                    añadirNotificacion(connection, userId, mensaje, fecha, (err) => {
                         if (err) {
+                            connection.release();
                             return next(err);
                         }
-                        res.status(200).send({ success: true, message: 'Has abandonado la lista de espera del evento' });
+                        const mensaje2 = `El usuario con id ${req.session.user.email} ha abandonado la lista de espera de su evento "${evento.titulo}"`;
+                        añadirNotificacion(connection, organizador_id, mensaje2, fecha, (err) => {
+                            connection.release();
+                            if (err) {
+                                return next(err);
+                            }
+                            res.status(200).send({ success: true, message: 'Has abandonado la lista de espera del evento' });
+                        });
                     });
                 });
             });
@@ -240,59 +266,72 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession,requirePartic
                 err.message = 'Error al obtener conexión de la base de datos para desinscribir usuario de evento';
                 return next(err);
             }
-            connection.query(queryUpdate, ['desinscrito', moment().format('YYYY-MM-DD'), false, userId, eventId], (error, results) => {
-                if (error) {
+            //verifico que el evento exista
+            connection.query('SELECT * FROM eventos WHERE id = ?', [eventId], (error, results) => {
+                if (err) {
                     connection.release();
-                    error.message = 'Error desinscribiendo al usuario del evento';
-                    error.status = 500;
-                    return next(error);
+                    err.message = 'Error al obtener el evento de la base de datos.';
+                    return next(err);
                 }
-                const mensaje = `Te has desinscrito del evento con id ${eventId}`;
-                const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
-                añadirNotificacion(connection, userId, mensaje, fecha, (err) => {
-                    if (err) {
+                if (results.length === 0) {
+                    connection.release();
+                    return res.status(404).json({ success:false, message:'Evento no encontrado.' });
+                }
+                const evento = results[0];
+                connection.query(queryUpdate, ['desinscrito', moment().format('YYYY-MM-DD'), false, userId, eventId], (error, results) => {
+                    if (error) {
                         connection.release();
-                        return next(err);
+                        error.message = 'Error desinscribiendo al usuario del evento';
+                        error.status = 500;
+                        return next(error);
                     }
-                    const mensaje2 = `El usuario con id ${userId} se ha desinscrito de su evento con id ${eventId}`;
-                    añadirNotificacion(connection, organizador_id, mensaje2, fecha, (err) => {
+                    const mensaje = `Te has desinscrito del evento "${evento.titulo}"`;
+                    const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
+                    añadirNotificacion(connection, userId, mensaje, fecha, (err) => {
                         if (err) {
                             connection.release();
                             return next(err);
                         }
-    
-                        // Buscar el usuario en la lista de espera que lleva más tiempo
-                        connection.query(queryWaitlist, [eventId, 'lista de espera'], (error, results) => {
-                            if (error) {
+                        const mensaje2 = `El usuario ${req.session.user.email} se ha desinscrito de su evento "${evento.titulo}"`;
+                        añadirNotificacion(connection, organizador_id, mensaje2, fecha, (err) => {
+                            if (err) {
                                 connection.release();
-                                error.message = 'Error buscando en la lista de espera';
-                                error.status = 500;
-                                return next(error);
+                                return next(err);
                             }
-    
-                            if (results.length > 0) {
-                                const waitlistUser = results[0];
-                                // Actualizar el estado del usuario en la lista de espera a "inscrito"
-                                connection.query(queryUpdateWaitlist, ['inscrito', moment().format('YYYY-MM-DD'), true, waitlistUser.usuario_id, eventId], (error, results) => {
-                                    if (error) {
-                                        connection.release();
-                                        error.message = 'Error actualizando el estado del usuario en la lista de espera';
-                                        error.status = 500;
-                                        return next(error);
-                                    }
-                                    const mensaje3 = `Has sido inscrito en el evento con id ${eventId} desde la lista de espera`;
-                                    añadirNotificacion(connection, waitlistUser.usuario_id, mensaje3, fecha, (err) => {
-                                        connection.release();
-                                        if (err) {
-                                            return next(err);
+        
+                            // Buscar el usuario en la lista de espera que lleva más tiempo
+                            connection.query(queryWaitlist, [eventId, 'lista de espera'], (error, results) => {
+                                if (error) {
+                                    connection.release();
+                                    error.message = 'Error buscando en la lista de espera';
+                                    error.status = 500;
+                                    return next(error);
+                                }
+        
+                                if (results.length > 0) {
+                                    const waitlistUser = results[0];
+                                    // Actualizar el estado del usuario en la lista de espera a "inscrito"
+                                    connection.query(queryUpdateWaitlist, ['inscrito', moment().format('YYYY-MM-DD'), true, waitlistUser.usuario_id, eventId], (error, results) => {
+                                        if (error) {
+                                            connection.release();
+                                            error.message = 'Error actualizando el estado del usuario en la lista de espera';
+                                            error.status = 500;
+                                            return next(error);
                                         }
-                                        res.status(200).send({ success: true, message: 'Te has desinscrito del evento y el siguiente usuario en la lista de espera ha sido inscrito' });
+                                        const mensaje3 = `Has sido inscrito en el evento "${evento.titulo}" desde la lista de espera`;
+                                        añadirNotificacion(connection, waitlistUser.usuario_id, mensaje3, fecha, (err) => {
+                                            connection.release();
+                                            if (err) {
+                                                return next(err);
+                                            }
+                                            res.status(200).send({ success: true, message: 'Te has desinscrito del evento y el siguiente usuario en la lista de espera ha sido inscrito' });
+                                        });
                                     });
-                                });
-                            } else {
-                                connection.release();
-                                res.status(200).send({ success: true, message: 'Te has desinscrito del evento' });
-                            }
+                                } else {
+                                    connection.release();
+                                    res.status(200).send({ success: true, message: 'Te has desinscrito del evento' });
+                                }
+                            });
                         });
                     });
                 });

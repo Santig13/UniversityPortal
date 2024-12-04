@@ -43,7 +43,7 @@ $('#passwordConfirm').on('keyup', function() {
     if (passwordConfirm === '') {
         message.text('');
     } else if (password === passwordConfirm) {
-        message.text('Las contraseñas coinciden').css('color', 'green');
+        message.text('Las contraseñas coinciden').css('color', '#00C700');
     } else {
         message.text('Las contraseñas no coinciden').css('color', 'red');
     }

@@ -93,7 +93,7 @@ function renderEventos(eventos) {
                             <p class="card-text"><strong>Organizador:</strong> ${evento.organizador_nombre}</p>
                         </div>
                         <div class="card-footer m-1 d-flex flex-wrap align-items-center justify-content-lg-start">
-                            <small class="mx-2 mt-1">ID Evento: ${evento.id}</small>
+                            <small class="mx-2 mt-1 d-none">ID Evento: ${evento.id}</small>
                             ${evento.terminado ? `
                                 <div class="mx-2 mt-1 red-text"> <i class="bi bi-calendar-x red-text"></i> Este evento ha terminado </div>
                                 ${(userRole === 'participante' && evento.estadoInscripcion === 'inscrito') ? `
@@ -192,8 +192,15 @@ $('#createEventButton').on('click', async function(event) {
     //mostrar toast y cerrar modal si alguno de los campos no esta rellenado
     if (!data.titulo || !data.descripcion || !data.fecha || !data.hora_ini || !data.hora_fin || !data.ubicacion || !data.capacidad_maxima) {
         showToast('Por favor, rellene todos los campos');
+        const modal = $('#createEventModal');
+        const modalInstance = bootstrap.Modal.getInstance(modal[0]);
+        if (modalInstance) {
+            modalInstance.hide();
+        }
         return;
     }
+
+
 
     $.ajax({
         url: '/eventos/crear',
@@ -304,45 +311,56 @@ function fillModal(evento) {
     form.find('[name="ubicacion"]').val(lugar?.trim() || '');
     form.find('[name="capacidad_maxima"]').val(evento.capacidad_maxima || '');
 
-    const modal = $('#editEventModal');
-    const modalInstance = bootstrap.Modal.getInstance(modal[0]) || new bootstrap.Modal(modal[0]);
+    const facultadSelect = form.find('[name="facultad"]');
+    
+    // Limpia y deshabilita el select mientras se cargan las opciones
+    facultadSelect.empty();
+    facultadSelect.prop('disabled', true);
 
-    modal.on('shown.bs.modal', function () {
-        const facultadSelect = form.find('[name="facultad"]');
-        facultadSelect.empty(); // Limpia opciones previas
+    // Llamada AJAX para cargar facultades antes de abrir el modal
+    $.ajax({
+        url: '/facultades',
+        method: 'GET',
+        success: function (data) {
+            // Limpia y rellena las opciones con los datos obtenidos
+            facultadSelect.empty();
+            data.forEach(fac => {
+                const option = $('<option></option>')
+                    .val(fac.nombre)
+                    .text(fac.nombre)
+                    .prop('selected', fac.nombre.trim() === facultad?.trim());
+                facultadSelect.append(option);
+            });
 
-        // Realiza la llamada AJAX para obtener las facultades
-        $.ajax({
-            url: '/facultades',
-            method: 'GET',
-            success: function (data) {
-                data.forEach(fac => {
-                    const option = $('<option></option>')
-                        .val(fac.nombre)
-                        .text(fac.nombre)
-                        .prop('selected', fac.nombre.trim() === facultad?.trim());
-                    facultadSelect.append(option);
+            // Habilitar el select después de cargar los datos
+            facultadSelect.prop('disabled', false);
+
+            // Una vez cargadas las facultades, abre el modal
+            const modal = $('#editEventModal');
+            const modalInstance = bootstrap.Modal.getInstance(modal[0]) || new bootstrap.Modal(modal[0]);
+            modalInstance.show();
+            eventoId = evento.id;
+        },
+        error: function (jqXHR) {
+            console.error('Error al cargar las facultades:', jqXHR);
+
+            facultadSelect.empty();
+            facultadSelect.append('<option value="" disabled selected>Error al cargar facultades</option>');
+
+            if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                showToast('Error al cargar las facultades: ' + jqXHR.responseJSON.message);
+            } else {
+                $('body').html(jqXHR.responseText || 'Error inesperado').css({
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100vh'
                 });
-            },
-            error: function (jqXHR) {
-                console.error('Error al cargar las facultades:', jqXHR);
-                if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
-                    showToast('Error al cargar las facultades: ' + jqXHR.responseJSON.message);
-                } else {
-                    $('body').html(jqXHR.responseText || 'Error inesperado').css({
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: '100vh'
-                    });
-                }
             }
-        });
+        }
     });
-
-    modalInstance.show();
-    eventoId = evento.id;
 }
+
 
 
 // Funcion para editar eventos
@@ -357,6 +375,13 @@ function editarEvento() {
         ubicacion: form.find('[name="facultad"]').val() + ", " + form.find('[name="ubicacion"]').val(),
         capacidad_maxima: parseInt(form.find('[name="capacidad_maxima"]').val(), 10)
     };
+
+     //mostrar toast y cerrar modal si alguno de los campos no esta rellenado
+     if (!data.titulo || !data.descripcion || !data.fecha || !data.hora_ini || !data.hora_fin || !data.ubicacion || !data.capacidad_maxima ||!form.find('[name="ubicacion"]').val()) {
+        showToast('Por favor, rellene todos los campos');
+        return;
+    }
+
 
     $.ajax({
         url: `/eventos/${eventoId}`,
@@ -625,7 +650,7 @@ function showRatings(eventoId) {
             }
         },
         error: function() {
-            console.log('Error al obtener las calificaciones');
+            showToast('Error al obtener las calificaciones');
         }
     });
 }
