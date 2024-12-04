@@ -128,12 +128,10 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
             });
         });
     });
-    // Desinscribir usuario de la lista de espera de un evento
+       // Desinscribir usuario de la lista de espera de un evento
     router.delete('/abandonar', (req, res, next) => {
         const { userId, eventId, organizador_id } = req.body;
         const queryUpdate = 'UPDATE inscripciones SET estado = ?, fecha_inscripcion = ?, activo = ? WHERE usuario_id = ? AND evento_id = ?';
-        const queryWaitlist = 'SELECT * FROM inscripciones WHERE evento_id = ? AND estado = ? ORDER BY fecha_inscripcion ASC LIMIT 1';
-        const queryUpdateWaitlist = 'UPDATE inscripciones SET estado = ?, fecha_inscripcion = ?, activo = ? WHERE usuario_id = ? AND evento_id = ?';
         
         pool.getConnection((err, connection) => {
             if (err) {
@@ -156,50 +154,16 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
                     }
                     const mensaje2 = `El usuario con id ${userId} ha abandonado la lista de espera de su evento con id ${eventId}`;
                     añadirNotificacion(connection, organizador_id, mensaje2, fecha, (err) => {
+                        connection.release();
                         if (err) {
-                            connection.release();
                             return next(err);
                         }
-    
-                        // Buscar el usuario en la lista de espera que lleva más tiempo
-                        connection.query(queryWaitlist, [eventId, 'lista de espera'], (error, results) => {
-                            if (error) {
-                                connection.release();
-                                error.message = 'Error buscando en la lista de espera';
-                                error.status = 500;
-                                return next(error);
-                            }
-    
-                            if (results.length > 0) {
-                                const waitlistUser = results[0];
-                                // Actualizar el estado del usuario en la lista de espera a "inscrito"
-                                connection.query(queryUpdateWaitlist, ['inscrito', moment().format('YYYY-MM-DD'), true, waitlistUser.usuario_id, eventId], (error, results) => {
-                                    if (error) {
-                                        connection.release();
-                                        error.message = 'Error actualizando el estado del usuario en la lista de espera';
-                                        error.status = 500;
-                                        return next(error);
-                                    }
-                                    const mensaje3 = `Has sido inscrito en el evento con id ${eventId} desde la lista de espera`;
-                                    añadirNotificacion(connection, waitlistUser.usuario_id, mensaje3, fecha, (err) => {
-                                        connection.release();
-                                        if (err) {
-                                            return next(err);
-                                        }
-                                        res.status(200).send({ success: true, message: 'Has abandonado la lista de espera del evento y el siguiente usuario en la lista de espera ha sido inscrito' });
-                                    });
-                                });
-                            } else {
-                                connection.release();
-                                res.status(200).send({ success: true, message: 'Has abandonado la lista de espera del evento' });
-                            }
-                        });
+                        res.status(200).send({ success: true, message: 'Has abandonado la lista de espera del evento' });
                     });
                 });
             });
         });
     });
-
     //Ruta para obtener los ajustes de accesibilidad del usuario
     router.get('/:id/accesibilidad', (req, res, next) => {
         const userId = req.params.id;
@@ -262,16 +226,18 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
         }
     });
     // Desinscribir usuario de un evento
-    router.delete('/desinscribir', (req, res, next) => {
-        const { userId, eventId,organizador_id } = req.body;
-        const query = 'DELETE FROM inscripciones WHERE usuario_id = ? AND evento_id = ?';
-        
+       router.delete('/desinscribir', (req, res, next) => {
+        const { userId, eventId, organizador_id } = req.body;
+        const queryUpdate = 'UPDATE inscripciones SET estado = ?, fecha_inscripcion = ?, activo = ? WHERE usuario_id = ? AND evento_id = ?';
+        const queryWaitlist = 'SELECT * FROM inscripciones WHERE evento_id = ? AND estado = ? ORDER BY fecha_inscripcion ASC LIMIT 1';
+        const queryUpdateWaitlist = 'UPDATE inscripciones SET estado = ?, fecha_inscripcion = ?, activo = ? WHERE usuario_id = ? AND evento_id = ?';
+    
         pool.getConnection((err, connection) => {
-            if(err){
+            if (err) {
                 err.message = 'Error al obtener conexión de la base de datos para desinscribir usuario de evento';
                 return next(err);
             }
-            connection.query(query, [userId, eventId], (error, results) => {
+            connection.query(queryUpdate, ['desinscrito', moment().format('YYYY-MM-DD'), false, userId, eventId], (error, results) => {
                 if (error) {
                     connection.release();
                     error.message = 'Error desinscribiendo al usuario del evento';
@@ -279,7 +245,6 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
                     return next(error);
                 }
                 const mensaje = `Te has desinscrito del evento con id ${eventId}`;
-                
                 const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
                 añadirNotificacion(connection, userId, mensaje, fecha, (err) => {
                     if (err) {
@@ -288,18 +253,49 @@ function createUsuariosRouter(pool, requireAuth, middlewareSession){
                     }
                     const mensaje2 = `El usuario con id ${userId} se ha desinscrito de su evento con id ${eventId}`;
                     añadirNotificacion(connection, organizador_id, mensaje2, fecha, (err) => {
-                        connection.release();
                         if (err) {
+                            connection.release();
                             return next(err);
                         }
-                       
-                        res.status(200).send({ success: true, message: 'Te has desinscrito del evento' });
+    
+                        // Buscar el usuario en la lista de espera que lleva más tiempo
+                        connection.query(queryWaitlist, [eventId, 'lista de espera'], (error, results) => {
+                            if (error) {
+                                connection.release();
+                                error.message = 'Error buscando en la lista de espera';
+                                error.status = 500;
+                                return next(error);
+                            }
+    
+                            if (results.length > 0) {
+                                const waitlistUser = results[0];
+                                // Actualizar el estado del usuario en la lista de espera a "inscrito"
+                                connection.query(queryUpdateWaitlist, ['inscrito', moment().format('YYYY-MM-DD'), true, waitlistUser.usuario_id, eventId], (error, results) => {
+                                    if (error) {
+                                        connection.release();
+                                        error.message = 'Error actualizando el estado del usuario en la lista de espera';
+                                        error.status = 500;
+                                        return next(error);
+                                    }
+                                    const mensaje3 = `Has sido inscrito en el evento con id ${eventId} desde la lista de espera`;
+                                    añadirNotificacion(connection, waitlistUser.usuario_id, mensaje3, fecha, (err) => {
+                                        connection.release();
+                                        if (err) {
+                                            return next(err);
+                                        }
+                                        res.status(200).send({ success: true, message: 'Te has desinscrito del evento y el siguiente usuario en la lista de espera ha sido inscrito' });
+                                    });
+                                });
+                            } else {
+                                connection.release();
+                                res.status(200).send({ success: true, message: 'Te has desinscrito del evento' });
+                            }
+                        });
                     });
                 });
             });
         });
     });
-    
 
     // Listar eventos en los que el usuario está inscrito
     router.get('/:userId/eventos', requireAuth, (req, res, next) => {
