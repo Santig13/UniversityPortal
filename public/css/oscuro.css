@@ -28,6 +28,7 @@
     --fc-today-bg-color: rgba(255, 220, 40, 0.15);
     --fc-now-indicator-color: red;
     --fc-border-color: black;
+    --fc-timegrid-slot: background-color: white;
     --fc-daygrid-event-dot-width: 5px;
     --fc-daygrid-event-dot-height: 5px;
     --primary-color: rgba(9, 85, 208, 1);
@@ -56,8 +57,20 @@ header, .footer-nuestro, .navbar {
     text-align: center;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
-
-
+.fc-timegrid-axis{
+    background-color: #1A2226;
+}
+.fc-timegrid-slot-label,.fc-timegrid-axis-frame,.fc-timegrid-slot{
+    background-color: white;
+}  
+.fc-timegrid-slot-label-cushion{
+    color:black;
+}   
+.fc-timegrid-slot.today-highlight,
+.fc-timegrid-slot-lane.today-highlight,
+.fc-timegrid-slot-minor.today-highlight {
+    background-color: #ffeb3b !important;  /* Color de fondo amarillo */
+}
 ::-webkit-scrollbar {
     width: 13px;
     height: 13px; 

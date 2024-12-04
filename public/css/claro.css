@@ -58,7 +58,13 @@ header, .navbar {
 .fc-daygrid-day-frame {
     background-color: white !important;
 }
+.fc-timegrid-axis{
+    background-color: var(--light-color);
+}
 
+.fc-timegrid-slot ,.fc-timegrid-slot-lane,.fc-timegrid-axis-frame,.fc-timegrid-slot-minor{
+    background-color: white;
+} 
 
 .fc-event,
 .fc-event-start,

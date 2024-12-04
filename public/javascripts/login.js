@@ -30,6 +30,7 @@ $('#recoverButton').click(function(event) {
         data: JSON.stringify({ email }),
         success: function(data, statusText, jqXHR) {
             $('#recoverPasswordModal').modal('hide');
+            $('#recoverEmail').val('');
             showToast(data.message);
         },
         error: function(jqXHR, statusText, errorThrown) {

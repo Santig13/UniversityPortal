@@ -78,6 +78,11 @@
                     },
                     events: eventos,
                     eventBackgroundColor: '#378006', // Color de los evento
+                    dayCellClassNames: function(arg) {
+                        if (arg.date.getTime() === new Date().setHours(0, 0, 0, 0)) {
+                            return ['today-highlight'];
+                        }
+                    },
                     eventClick: function(info) {
                         document.getElementById('modalTitle').textContent = info.event.title;
                         document.getElementById('modalDescription').textContent = info.event.extendedProps.description;
